@@ -109,17 +109,17 @@ export default {
         draw(e){
             if(!this.painting) return;
 
-            this.positionX = (this.canvasContainer[0].offsetWidth - this.canvas.getBoundingClientRect().width)/2;
-            this.positionY = (this.canvasContainer[0].offsetHeight - this.canvas.getBoundingClientRect().height)/2;
+             this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;
+             this.positionY = (document.body.scrollHeight - this.canvas.getBoundingClientRect().height)/2;
              this.ctx.strokeStyle = this.color;
              this.ctx.lineWidth = 10;
              this.ctx.lineCap = "round";
-            var scaledX = (e.clientX-this.positionX) * this.canvas.width /this.canvas.getBoundingClientRect().width;
+             var scaledX = (e.clientX-this.positionX) * this.canvas.width /this.canvas.getBoundingClientRect().width;
              var scaledY =(e.clientY-this.positionY) * this.canvas.height / this.canvas.getBoundingClientRect().height;
-             this.ctx.lineTo(scaledX, scaledY);
+             this.ctx.lineTo(scaledX+(window.scrollX/this.canvasScale), scaledY+(window.scrollY/this.canvasScale));
              this.ctx.stroke();
              this.ctx.beginPath();
-             this.ctx.moveTo(scaledX, scaledY);
+             this.ctx.moveTo(scaledX+(window.scrollX/this.canvasScale), scaledY+(window.scrollY/this.canvasScale));
         },
         zoomIn(){
             if(parseFloat(this.canvasScale.toFixed(2)) <= 2.9){
@@ -175,7 +175,7 @@ $default-icon-color: #2c3e50;
     box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
     .color-picker--container{
         position: absolute;
-        left: 50px;
+        left: 55px;
         top: 19px;
     }
     .color-picker{
@@ -213,13 +213,13 @@ $default-icon-color: #2c3e50;
          visibility: hidden;
          right: -74px;
          padding: 0px 25px;
-         margin-top: -7px;
+         margin-top: -9px;
 
          div{
              background: white;
              box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
              border-radius: 50%;
-             padding: 7px;
+             padding: 9px;
              display: flex;
              flex-direction: column;
              justify-content: center;
