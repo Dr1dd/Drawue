@@ -1,6 +1,13 @@
 <template>
   <div id ="DrawingBoard">
       <div class ="tool-bar">
+          <div class="pencil-container" @click ="toolType = 'pencil'" :class ="{'selected': toolType == 'pencil'}">
+              <svg width="24" height="24" viewBox="0 0 268 367" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="152.123" y="13.9879" width="52.1453" height="250.218" transform="rotate(25.8416 152.123 13.9879)" stroke="black" stroke-width="20"/>
+                <path d="M70.3613 277.384L44.1092 296.597L42.8219 264.091L70.3613 277.384Z" stroke="black" stroke-width="25"/>
+                <path d="M30.1847 327.878C30.1847 327.878 21.1367 358.188 82.5684 349.594C144 341 139 337 182 327.878C225 318.756 260 349.594 260 349.594" stroke="black" stroke-width="20"/>
+              </svg>
+          </div>
           <div class ="color-picker">
               <div class="color-icon" :style="{'background': color}" @click = 'showColorPicker = !showColorPicker'>
                   
@@ -15,7 +22,29 @@
                 />
               </div>
           </div>
-          <div></div>
+          <div class ="shapes-container">
+              <div class="shapes-selector" :class ="{'selected': toolType == 'shapes'}">
+                <svg width="24" height="24" viewBox="0 0 195 202" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g id="Shapes">
+                    <rect id="box" x="10" y="62" width="130" height="130" stroke-width="20"/>
+                    <circle id="circle" cx="120" cy="75" r="65" stroke-width="20"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="shape-type--container">
+                <div class="shape-rectangle" @click= "selectedShape = 'rectangle'; toolType= 'shapes'" :class="{'selected-child': (selectedShape == 'rectangle' && toolType== 'shapes')}">
+                    <svg width="18" height="18" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="10" width="130" height="130" stroke-width="20"/>
+                    </svg>
+                </div>
+                <div class="shape-circle" @click= "selectedShape = 'circle'; toolType= 'shapes'" :class="{'selected-child': (selectedShape == 'circle' && toolType== 'shapes')}">
+                    <svg width="18" height="18" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="75" cy="75" r="65" stroke-width="20"/>
+                    </svg>
+                </div>
+              </div>
+              
+          </div>
           <div class="zoom">
               <div class="zoom-in" @click ="zoomIn()">
                 <svg width="24" height="24" viewBox="0 0 371 320" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,7 +58,7 @@
               </div>
               <div class="zoom-out">
                   <div @click ="zoomOut()">
-                    <svg width="24" height="24" viewBox="0 0 371 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="20" height="20" viewBox="0 0 371 320" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="zoom">
                         <circle id="Ellipse 1" cx="125" cy="125" r="109.5" stroke-width="31"/>
                         <line id="Line 2" x1="74" y1="125.5" x2="177" y2="125.5" stroke-width="31"/>
@@ -43,6 +72,7 @@
       <div class="canvas-container">
          <canvas id="canvas"></canvas> 
       </div>
+
   </div>
 </template>
 
@@ -62,12 +92,16 @@ export default {
             suckerArea: [],
             isSucking: false,
             showColorPicker: false,
+            toolType: 'pencil',
+            selectedShape: this.toolType == 'shapes' ? 'rectangle' : 'none',
 
             ctx: '',
             canvas: '',
             canvasContainer: '',
             positionX: 0,
             positionY: 0,
+            scaledXTransformed: 0,
+            scaledYTransformed: 0,
             canvasScale: 1,
             marginVertical: 0,
         }
@@ -89,9 +123,10 @@ export default {
             this.positionY = canvasHeight-3;
             toolBar[0].setAttribute("style", "left:"+(canvasWidth-15)+"px")
             //EventListeners
+            
             this.canvas.addEventListener('mousedown', this.startDrawing);
             this.canvas.addEventListener('mouseup', this.finishDrawing);
-            this.canvas.addEventListener('mousemove', this.draw);
+            this.canvas.addEventListener('mousemove',this.draw);
     },
     methods: {
         changeColor(color) {
@@ -100,26 +135,69 @@ export default {
         },
         startDrawing(e) {
             this.painting = true;
-            this.draw(e)
+            switch(this.toolType){
+                case 'shapes':
+                    var mousePos = this.getMousePosition(e);
+                    this.scaledXTransformed = mousePos[0];
+                    this.scaledYTransformed = mousePos[1]; 
+                    break;
+                case 'pencil':
+                    this.draw(e);
+                    break;
+            }
         },
-        finishDrawing(){
+        finishDrawing(e){
             this.painting = false;
+            switch(this.toolType){
+                case 'shapes':
+                    var mousePos = this.getMousePosition(e);
+                    var width =  mousePos[0]- this.scaledXTransformed;
+                    var height = mousePos[1]- this.scaledYTransformed;
+                    var rectXCoord = this.scaledXTransformed;
+                    var rectYCoord =  this.scaledYTransformed;
+                    this.ctx.beginPath();
+                    if(this.selectedShape == 'rectangle')
+                        this.ctx.rect(rectXCoord, rectYCoord, width, height);
+                    if(this.selectedShape == 'circle'){
+                        var hypotenuseLength = Math.sqrt(Math.pow(width, 2) +Math.pow(height, 2));
+                        this.ctx.arc(rectXCoord, rectYCoord, hypotenuseLength, 0, 2 * Math.PI);
+                    }
+                    this.ctx.stroke();
+                    break;
+                case 'pencil':
+                    break;
+            }
             this.ctx.beginPath();
         },
         draw(e){
             if(!this.painting) return;
-
-             this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;
-             this.positionY = (document.body.scrollHeight - this.canvas.getBoundingClientRect().height)/2;
-             this.ctx.strokeStyle = this.color;
-             this.ctx.lineWidth = 10;
-             this.ctx.lineCap = "round";
-             var scaledX = (e.clientX-this.positionX) * this.canvas.width /this.canvas.getBoundingClientRect().width;
-             var scaledY =(e.clientY-this.positionY) * this.canvas.height / this.canvas.getBoundingClientRect().height;
-             this.ctx.lineTo(scaledX+(window.scrollX/this.canvasScale), scaledY+(window.scrollY/this.canvasScale));
-             this.ctx.stroke();
-             this.ctx.beginPath();
-             this.ctx.moveTo(scaledX+(window.scrollX/this.canvasScale), scaledY+(window.scrollY/this.canvasScale));
+            this.ctx.strokeStyle = this.color;
+            this.ctx.lineWidth = 10;
+            this.ctx.lineCap = "round";
+            var mousePos = this.getMousePosition(e);
+            switch(this.toolType){
+                case 'shapes':
+                    console.log('');
+                    break;
+                case 'pencil':
+                    this.ctx.lineTo(mousePos[0], mousePos[1]);
+                    this.ctx.stroke();
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(mousePos[0], mousePos[1]);
+                    break;
+            }
+        },
+        getMousePosition(e){
+            this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;
+            this.positionY = (document.body.scrollHeight - this.canvas.getBoundingClientRect().height)/2;
+            var scaledX = (e.clientX-this.positionX) * this.canvas.width /this.canvas.getBoundingClientRect().width;
+            var scaledY =(e.clientY-this.positionY) * this.canvas.height / this.canvas.getBoundingClientRect().height;
+            var scaledXTransformed = scaledX+(window.scrollX/this.canvasScale);
+            var scaledYTransformed = scaledY+(window.scrollY/this.canvasScale);
+            return [scaledXTransformed, scaledYTransformed];
+        },
+        drawShape(){
+            if(!this.painting) return;
         },
         zoomIn(){
             if(parseFloat(this.canvasScale.toFixed(2)) <= 2.9){
@@ -156,7 +234,7 @@ export default {
 <style lang="scss">
 $default-icon-color: #2c3e50;
 #DrawingBoard{
-    width: 100vw;
+    width: 99vw;
     margin: 0 auto;
 
 }
@@ -165,29 +243,37 @@ $default-icon-color: #2c3e50;
     flex-direction: column;
     position: fixed;
     justify-content: space-around;
+    align-items: center;
     min-height: 100px;
     top: 28%;
     transform: translate(-50%, -50%);
     border-radius: 24px;
     background: white;
     z-index: 100;
-    padding: 10px;
+    padding: 6px;
     box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
-    .color-picker--container{
-        position: absolute;
-        left: 55px;
-        top: 19px;
-    }
-    .color-picker{
-        cursor: pointer;
-        .color-icon{
-            border-radius: 50%;
-            height: 24px;
-            width: 24px;
-            border: 2px solid $default-icon-color;
-        }
-    }
 
+}
+.pencil-container{
+    display: flex;
+    border-radius: 50%;
+    margin: 15px 0;
+    padding: 9px
+}
+ .color-picker--container{
+        position: absolute;
+        left: 58px;
+        margin-top: -27px;
+}
+.color-picker{
+    cursor: pointer;
+    margin: 15px 0;
+    .color-icon{
+        border-radius: 50%;
+        height: 24px;
+        width: 24px;
+        border: 2px solid $default-icon-color;
+    }
 }
  .canvas-container{
      padding: 67px 0;
@@ -198,9 +284,47 @@ $default-icon-color: #2c3e50;
      transform-origin: center center;
      
  }
+ .shapes-container{
+     display: flex;
+     align-self: center;
+     cursor: pointer;
+     margin: 15px 0;
+     .shapes-selector{
+        display: flex;
+        padding: 9px;
+        border-radius: 50%;
+     }
+     svg{
+         stroke: $default-icon-color;
+     }
+     .shape-type--container{
+        display: flex;
+        position: absolute;
+        visibility: hidden;
+        left: 37px;
+        margin: -2.5px 7px;
+        padding: 5px 15px;
+        width: 100px;
+        justify-content: space-around;
+        z-index: 101;
+         div{
+            display: flex;
+            padding: 10px 10px;
+            border-radius: 50%;
+            box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
+            background: white;
+         }
+     }
+     &:hover{
+         .shape-type--container{
+             visibility: visible;
+         }
+     }
+ }
  .zoom{
      display: flex;
      cursor:pointer;
+     margin: 15px 0;
      transition: all 0.25s;
      svg{
          stroke: $default-icon-color;
@@ -213,8 +337,9 @@ $default-icon-color: #2c3e50;
          visibility: hidden;
          right: -74px;
          padding: 0px 25px;
-         margin-top: -9px;
-
+         margin-top: -5px;
+         z-index: 101;
+         
          div{
              background: white;
              box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
@@ -234,4 +359,12 @@ $default-icon-color: #2c3e50;
         }
      }
  }
+ .selected{
+     background: #8fcde17d;
+ }
+ .selected-child{
+     background: #effbff !important;
+ }
+
+
 </style>
