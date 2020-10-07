@@ -3,9 +3,9 @@
       <div class ="tool-bar">
           <div class="pencil-container" @click ="toolType = 'pencil'" :class ="{'selected': toolType == 'pencil'}">
               <svg width="24" height="24" viewBox="0 0 268 367" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="152.123" y="13.9879" width="52.1453" height="250.218" transform="rotate(25.8416 152.123 13.9879)" stroke="black" stroke-width="20"/>
-                <path d="M70.3613 277.384L44.1092 296.597L42.8219 264.091L70.3613 277.384Z" stroke="black" stroke-width="25"/>
-                <path d="M30.1847 327.878C30.1847 327.878 21.1367 358.188 82.5684 349.594C144 341 139 337 182 327.878C225 318.756 260 349.594 260 349.594" stroke="black" stroke-width="20"/>
+                <rect x="152.123" y="13.9879" width="52.1453" height="250.218" transform="rotate(25.8416 152.123 13.9879)" stroke-width="20"/>
+                <path d="M70.3613 277.384L44.1092 296.597L42.8219 264.091L70.3613 277.384Z" stroke-width="25"/>
+                <path d="M30.1847 327.878C30.1847 327.878 21.1367 358.188 82.5684 349.594C144 341 139 337 182 327.878C225 318.756 260 349.594 260 349.594" stroke-width="20"/>
               </svg>
           </div>
           <div class ="color-picker">
@@ -21,6 +21,20 @@
                     @changeColor="changeColor"
                 />
               </div>
+          </div>
+          <div class="pencil-size--container">
+              <svg width="24" height="24" viewBox="0 0 123 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="25" r="10"/>
+                <circle cx="46.5" cy="25.5" r="17.5"/>
+                <circle cx="98" cy="25" r="25"/>
+              </svg>
+               <div class="pencil-stroke--list">
+                   <div class="pencil-strokeSize" @click="strokeSize =5" :class="{'selected-child': strokeSize==5}"><span></span></div>
+                   <div class="pencil-strokeSize" @click="strokeSize =10" :class="{'selected-child': strokeSize==10}"><span></span></div>
+                   <div class="pencil-strokeSize" @click="strokeSize =15" :class="{'selected-child': strokeSize==15}"><span></span></div>
+                   <div class="pencil-strokeSize" @click="strokeSize =25" :class="{'selected-child': strokeSize==25}"><span></span></div>
+                   <div class="pencil-strokeSize" @click="strokeSize =30" :class="{'selected-child': strokeSize==30}"><span></span></div>
+               </div>
           </div>
           <div class ="shapes-container">
               <div class="shapes-selector" :class ="{'selected': toolType == 'shapes'}">
@@ -104,7 +118,12 @@ export default {
             scaledYTransformed: 0,
             canvasScale: 1,
             marginVertical: 0,
+            
+            strokeSize: 5,
         }
+    },
+    created(){
+        window.addEventListener('beforeunload', this.saveCanvas);
     },
     mounted(){
             this.canvasContainer = document.getElementsByClassName('canvas-container');
@@ -115,13 +134,22 @@ export default {
             // window resize
             this.canvas.height = 720;
             this.canvas.width = 1080;
-            
+            var ctx = document.querySelector("#canvas").getContext('2d');
+            if(localStorage.getItem('imgCanvas') !== null){
+                var img=new Image();
+                img.onload=function(){
+                    ctx.drawImage(img,0,0);
+                }
+                img.src=localStorage.getItem("imgCanvas");
+            }
+
             const canvasWidth = (this.canvasContainer[0].offsetWidth - this.canvas.getBoundingClientRect().width)/2;
             const canvasHeight = (this.canvasContainer[0].offsetHeight - this.canvas.getBoundingClientRect().height)/2;
             
             this.positionX = canvasWidth;
             this.positionY = canvasHeight-3;
-            toolBar[0].setAttribute("style", "left:"+(canvasWidth-15)+"px")
+            var toolBarPos = (window.innerWidth - this.canvas.getBoundingClientRect().width) <=0 ? 53 : ((window.innerWidth - this.canvas.getBoundingClientRect().width)/2);
+            toolBar[0].setAttribute("style", "left:"+(toolBarPos-15)+"px")
             //EventListeners
             
             this.canvas.addEventListener('mousedown', this.startDrawing);
@@ -155,6 +183,7 @@ export default {
                     var height = mousePos[1]- this.scaledYTransformed;
                     var rectXCoord = this.scaledXTransformed;
                     var rectYCoord =  this.scaledYTransformed;
+                    this.ctx.lineWidth = this.strokeSize;
                     this.ctx.beginPath();
                     if(this.selectedShape == 'rectangle')
                         this.ctx.rect(rectXCoord, rectYCoord, width, height);
@@ -172,7 +201,7 @@ export default {
         draw(e){
             if(!this.painting) return;
             this.ctx.strokeStyle = this.color;
-            this.ctx.lineWidth = 10;
+            this.ctx.lineWidth = this.strokeSize;
             this.ctx.lineCap = "round";
             var mousePos = this.getMousePosition(e);
             switch(this.toolType){
@@ -226,6 +255,9 @@ export default {
                     this.canvas.style.margin = this.marginVertical +'px 0';
                 }
             }
+        },
+        saveCanvas(){
+            localStorage.setItem("imgCanvas",this.canvas.toDataURL());
         }
     },
 }
@@ -258,7 +290,10 @@ $default-icon-color: #2c3e50;
     display: flex;
     border-radius: 50%;
     margin: 15px 0;
-    padding: 9px
+    padding: 9px;
+    svg{
+        stroke: $default-icon-color;
+    }
 }
  .color-picker--container{
         position: absolute;
@@ -283,6 +318,82 @@ $default-icon-color: #2c3e50;
      background: white;
      transform-origin: center center;
      
+ }
+ .pencil-size--container{
+     margin: 15px 0;
+     cursor: pointer;
+     svg{
+         fill: $default-icon-color;
+     }
+     .pencil-stroke--list{
+        display: flex;
+        position: absolute;
+        visibility: hidden;
+        left: 37px;
+        margin: -39px 2px;
+        padding: 5px 20px;
+        justify-content: space-around;
+        z-index: 101;
+         div{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 38px;
+            height: 38px;
+            margin: 0 6px;
+            border-radius: 50%;
+            box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.8);
+            background: white;
+            transition: background 0.25s;
+             z-index: 101;
+            &:hover{
+               background: #effbff; 
+            }
+            span{
+                display: flex;
+                height: 5px;
+                width: 5px;
+                background: $default-icon-color;
+                border-radius: 50%;
+            }
+         }
+         div:nth-of-type(1){
+             span{
+                height: 10px;
+                width: 10px;
+             }
+         }
+         div:nth-of-type(2){
+             span{
+                height: 15px;
+                width: 15px;
+             }
+         }
+         div:nth-of-type(3){
+             span{
+                height: 20px;
+                width: 20px;
+             }
+         }
+         div:nth-of-type(4){
+             span{
+                height: 25px;
+                width: 25px;
+             }
+         }
+          div:nth-of-type(5){
+             span{
+                height: 30px;
+                width: 30px;
+             }
+         }
+     }
+     &:hover{
+          .pencil-stroke--list{
+             visibility: visible; 
+          }
+     }
  }
  .shapes-container{
      display: flex;
@@ -313,6 +424,10 @@ $default-icon-color: #2c3e50;
             border-radius: 50%;
             box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
             background: white;
+            transition: background 0.25s;
+            &:hover{
+                background: #effbff; 
+            }
          }
      }
      &:hover{
@@ -360,10 +475,10 @@ $default-icon-color: #2c3e50;
      }
  }
  .selected{
-     background: #8fcde17d;
+     background: #bdcddd;
  }
  .selected-child{
-     background: #effbff !important;
+     background: #e3eaf1 !important;
  }
 
 
