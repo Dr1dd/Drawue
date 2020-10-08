@@ -29,11 +29,14 @@
                 <circle cx="98" cy="25" r="25"/>
               </svg>
                <div class="pencil-stroke--list">
-                   <div class="pencil-strokeSize" @click="strokeSize =5" :class="{'selected-child': strokeSize==5}"><span></span></div>
-                   <div class="pencil-strokeSize" @click="strokeSize =10" :class="{'selected-child': strokeSize==10}"><span></span></div>
-                   <div class="pencil-strokeSize" @click="strokeSize =15" :class="{'selected-child': strokeSize==15}"><span></span></div>
-                   <div class="pencil-strokeSize" @click="strokeSize =25" :class="{'selected-child': strokeSize==25}"><span></span></div>
-                   <div class="pencil-strokeSize" @click="strokeSize =30" :class="{'selected-child': strokeSize==30}"><span></span></div>
+                   <div class="pencil-strokeSize"
+                    v-for="strokeWidth in strokeArray" 
+                    :key="strokeWidth" 
+                    @click="selectedStrokeSize = strokeWidth" 
+                    :class="{'selected-child': selectedStrokeSize==strokeWidth}"
+                    >
+                       <span :style="{height: strokeWidth+'px', width: strokeWidth+'px'}"></span>
+                   </div>
                </div>
           </div>
           <div class ="shapes-container">
@@ -102,15 +105,14 @@ export default {
             painting: false,
 
             color: '#59c7f9',
-            suckerCanvas: null,
-            suckerArea: [],
-            isSucking: false,
             showColorPicker: false,
             toolType: 'pencil',
             selectedShape: this.toolType == 'shapes' ? 'rectangle' : 'none',
+            strokeArray: [5, 10, 15, 25, 30],
 
             ctx: '',
             canvas: '',
+            savedCanvasData: '',
             canvasContainer: '',
             positionX: 0,
             positionY: 0,
@@ -119,7 +121,7 @@ export default {
             canvasScale: 1,
             marginVertical: 0,
             
-            strokeSize: 5,
+            selectedStrokeSize: 5,
         }
     },
     created(){
@@ -131,7 +133,7 @@ export default {
             this.canvas = document.querySelector("#canvas");
             this.ctx = this.canvas.getContext('2d');
             
-            // window resize
+            // Canvas size and localstorage loading
             this.canvas.height = 720;
             this.canvas.width = 1080;
             var ctx = document.querySelector("#canvas").getContext('2d');
@@ -143,18 +145,13 @@ export default {
                 img.src=localStorage.getItem("imgCanvas");
             }
 
-            const canvasWidth = (this.canvasContainer[0].offsetWidth - this.canvas.getBoundingClientRect().width)/2;
-            const canvasHeight = (this.canvasContainer[0].offsetHeight - this.canvas.getBoundingClientRect().height)/2;
-            
-            this.positionX = canvasWidth;
-            this.positionY = canvasHeight-3;
+            // ToolBar position (left)
             var toolBarPos = (window.innerWidth - this.canvas.getBoundingClientRect().width) <=0 ? 53 : ((window.innerWidth - this.canvas.getBoundingClientRect().width)/2);
             toolBar[0].setAttribute("style", "left:"+(toolBarPos-15)+"px")
+            
             //EventListeners
             
             this.canvas.addEventListener('mousedown', this.startDrawing);
-            this.canvas.addEventListener('mouseup', this.finishDrawing);
-            this.canvas.addEventListener('mousemove',this.draw);
     },
     methods: {
         changeColor(color) {
@@ -163,50 +160,23 @@ export default {
         },
         startDrawing(e) {
             this.painting = true;
-            switch(this.toolType){
-                case 'shapes':
-                    var mousePos = this.getMousePosition(e);
-                    this.scaledXTransformed = mousePos[0];
-                    this.scaledYTransformed = mousePos[1]; 
-                    break;
-                case 'pencil':
-                    this.draw(e);
-                    break;
-            }
-        },
-        finishDrawing(e){
-            this.painting = false;
-            switch(this.toolType){
-                case 'shapes':
-                    var mousePos = this.getMousePosition(e);
-                    var width =  mousePos[0]- this.scaledXTransformed;
-                    var height = mousePos[1]- this.scaledYTransformed;
-                    var rectXCoord = this.scaledXTransformed;
-                    var rectYCoord =  this.scaledYTransformed;
-                    this.ctx.lineWidth = this.strokeSize;
-                    this.ctx.beginPath();
-                    if(this.selectedShape == 'rectangle')
-                        this.ctx.rect(rectXCoord, rectYCoord, width, height);
-                    if(this.selectedShape == 'circle'){
-                        var hypotenuseLength = Math.sqrt(Math.pow(width, 2) +Math.pow(height, 2));
-                        this.ctx.arc(rectXCoord, rectYCoord, hypotenuseLength, 0, 2 * Math.PI);
-                    }
-                    this.ctx.stroke();
-                    break;
-                case 'pencil':
-                    break;
-            }
-            this.ctx.beginPath();
+            this.savedCanvasData = this.ctx.getImageData(0,0, this.canvas.clientWidth, this.canvas.clientHeight);
+            var mousePos = this.getMousePosition(e);
+            this.scaledXTransformed = mousePos[0];
+            this.scaledYTransformed = mousePos[1];
+            this.draw(e);
+            this.canvas.addEventListener('mouseup', this.finishDrawing);
+            this.canvas.addEventListener('mousemove',this.draw);
         },
         draw(e){
             if(!this.painting) return;
             this.ctx.strokeStyle = this.color;
-            this.ctx.lineWidth = this.strokeSize;
+            this.ctx.lineWidth = this.selectedStrokeSize;
             this.ctx.lineCap = "round";
             var mousePos = this.getMousePosition(e);
             switch(this.toolType){
                 case 'shapes':
-                    console.log('');
+                    this.drawShape(e);
                     break;
                 case 'pencil':
                     this.ctx.lineTo(mousePos[0], mousePos[1]);
@@ -215,6 +185,33 @@ export default {
                     this.ctx.moveTo(mousePos[0], mousePos[1]);
                     break;
             }
+        },
+        drawShape(e){
+            if(!this.painting) return;
+            if(this.toolType == 'shapes'){
+                this.ctx.putImageData(this.savedCanvasData, 0, 0);
+                var mousePos = this.getMousePosition(e);
+                var width =  mousePos[0]- this.scaledXTransformed;
+                var height = mousePos[1]- this.scaledYTransformed;
+                var rectXCoord = this.scaledXTransformed;
+                var rectYCoord =  this.scaledYTransformed;
+                this.ctx.lineWidth = this.selectedStrokeSize;
+                this.ctx.beginPath();
+                 switch(this.selectedShape){
+                    case 'rectangle':
+                        this.ctx.rect(rectXCoord, rectYCoord, width, height);
+                        break;
+                    case 'circle':
+                        var hypotenuseLength = Math.sqrt(Math.pow(width, 2) +Math.pow(height, 2));
+                        this.ctx.arc(rectXCoord, rectYCoord, hypotenuseLength, 0, 2 * Math.PI);
+                        break;
+                 }
+                 this.ctx.stroke();
+            }
+        },
+        finishDrawing(){
+            this.painting = false;
+            this.ctx.beginPath();
         },
         getMousePosition(e){
             this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;
@@ -225,10 +222,8 @@ export default {
             var scaledYTransformed = scaledY+(window.scrollY/this.canvasScale);
             return [scaledXTransformed, scaledYTransformed];
         },
-        drawShape(){
-            if(!this.painting) return;
-        },
         zoomIn(){
+            // max 300% zoom
             if(parseFloat(this.canvasScale.toFixed(2)) <= 2.9){
                 var Page = document.getElementById('canvas');
                 this.canvasScale = parseFloat(this.canvasScale.toFixed(2)) + 0.1;
@@ -243,6 +238,7 @@ export default {
             }
         },
         zoomOut(){
+            // min zoom-out: 100% -> 10%
             if(parseFloat(this.canvasScale.toFixed(2)) > 0.1){
                 var Page = document.getElementById('canvas');
                 this.canvasScale = parseFloat(this.canvasScale.toFixed(2)) - 0.1;
@@ -291,6 +287,7 @@ $default-icon-color: #2c3e50;
     border-radius: 50%;
     margin: 15px 0;
     padding: 9px;
+    cursor: pointer;
     svg{
         stroke: $default-icon-color;
     }
@@ -357,36 +354,6 @@ $default-icon-color: #2c3e50;
                 background: $default-icon-color;
                 border-radius: 50%;
             }
-         }
-         div:nth-of-type(1){
-             span{
-                height: 10px;
-                width: 10px;
-             }
-         }
-         div:nth-of-type(2){
-             span{
-                height: 15px;
-                width: 15px;
-             }
-         }
-         div:nth-of-type(3){
-             span{
-                height: 20px;
-                width: 20px;
-             }
-         }
-         div:nth-of-type(4){
-             span{
-                height: 25px;
-                width: 25px;
-             }
-         }
-          div:nth-of-type(5){
-             span{
-                height: 30px;
-                width: 30px;
-             }
          }
      }
      &:hover{
