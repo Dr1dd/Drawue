@@ -59,6 +59,11 @@
                         <circle cx="75" cy="75" r="65" stroke-width="20"/>
                     </svg>
                 </div>
+                <div class="shape-triangle" @click= "selectedShape = 'triangle'; toolType= 'shapes'" :class="{'selected-child': (selectedShape == 'triangle' && toolType== 'shapes')}">
+                    <svg width="18" height="18" viewBox="0 0 130 113" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.3686 102.5L65 20L112.631 102.5H17.3686Z"  stroke-width="15"/>
+                    </svg>
+                </div>
               </div>
               
           </div>
@@ -69,7 +74,7 @@
                     <circle id="Ellipse 1" cx="125" cy="125" r="109.5"  stroke-width="31"/>
                     <line id="Line 1" x1="125.5" y1="74" x2="125.5" y2="177" stroke-width="31"/>
                     <line id="Line 2" x1="74" y1="125.5" x2="177" y2="125.5" stroke-width="31"/>
-                    <path class="Rectangle_1" d="M225.443 184L353.97 273.592C363.031 279.908 365.257 292.375 358.94 301.436L357.437 303.593C351.12 312.654 338.654 314.88 329.593 308.563L201.066 218.971L225.443 184Z" fill="black"/>
+                    <path class="Rectangle_1" d="M225.443 184L353.97 273.592C363.031 279.908 365.257 292.375 358.94 301.436L357.437 303.593C351.12 312.654 338.654 314.88 329.593 308.563L201.066 218.971L225.443 184Z"/>
                     </g>
                 </svg>
               </div>
@@ -204,6 +209,14 @@ export default {
                     case 'circle':
                         var hypotenuseLength = Math.sqrt(Math.pow(width, 2) +Math.pow(height, 2));
                         this.ctx.arc(rectXCoord, rectYCoord, hypotenuseLength, 0, 2 * Math.PI);
+                        break;
+                    case 'triangle':
+                        this.ctx.moveTo(rectXCoord, rectYCoord+height);
+                        this.ctx.lineTo(rectXCoord+(width/2), rectYCoord);
+                        this.ctx.moveTo(rectXCoord+(width/2), rectYCoord);
+                        this.ctx.lineTo(rectXCoord+width, rectYCoord+height);
+                        this.ctx.moveTo(rectXCoord+width, rectYCoord+height);
+                        this.ctx.lineTo(rectXCoord, rectYCoord+height);
                         break;
                  }
                  this.ctx.stroke();
@@ -382,13 +395,13 @@ $default-icon-color: #2c3e50;
         left: 37px;
         margin: -2.5px 7px;
         padding: 5px 15px;
-        width: 100px;
         justify-content: space-around;
         z-index: 101;
          div{
             display: flex;
             padding: 10px 10px;
             border-radius: 50%;
+            margin: 0 6px;
             box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
             background: white;
             transition: background 0.25s;
@@ -410,9 +423,10 @@ $default-icon-color: #2c3e50;
      transition: all 0.25s;
      svg{
          stroke: $default-icon-color;
-         .Rectangle_1{
+         path{
              fill: $default-icon-color;
          }
+
      }
      .zoom-out{
          position: absolute;
