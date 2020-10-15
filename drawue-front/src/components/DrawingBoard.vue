@@ -90,9 +90,22 @@
                   </div>
               </div>
           </div>
+          <div class="clear-container" @click = "clearCanvas">
+              <div class="clear-canvas">
+                <svg width="24" height="24" viewBox="0 0 364 454" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M80.6599 116.5H283.488C306.591 116.5 324.763 136.242 322.852 159.267L302.978 398.767C301.279 419.245 284.162 435 263.614 435H99.1867C78.553 435 61.3957 419.119 59.8043 398.546L41.2776 159.046C39.5025 136.099 57.644 116.5 80.6599 116.5Z" stroke-width="37"/>
+                    <path d="M333 66H33C23.0589 66 15 74.0589 15 84V110C15 111.105 15.8954 112 17 112H347C348.105 112 349 111.105 349 110V82C349 73.1634 341.837 66 333 66Z" stroke-width="29"/>
+                    <path d="M134 24V64H231V24C231 19.0294 226.971 15 222 15H143C138.029 15 134 19.0294 134 24Z" stroke-width="29"/>
+                    <rect x="108.5" y="166.5" width="17" height="207" rx="8.5" stroke-width="17"/>
+                    <rect x="173.5" y="166.5" width="17" height="207" rx="8.5" stroke-width="17"/>
+                    <rect x="238.5" y="166.5" width="17" height="207" rx="8.5" stroke-width="17"/>
+                </svg>
+
+              </div>
+          </div>
       </div>
       <div class="canvas-container">
-         <canvas id="canvas"></canvas> 
+         <canvas id="canvas" @mouseout="finishDrawing"></canvas> 
       </div>
 
   </div>
@@ -151,8 +164,8 @@ export default {
             }
 
             // ToolBar position (left)
-            var toolBarPos = (window.innerWidth - this.canvas.getBoundingClientRect().width) <=0 ? 53 : ((window.innerWidth - this.canvas.getBoundingClientRect().width)/2);
-            toolBar[0].setAttribute("style", "left:"+(toolBarPos-15)+"px")
+            var toolBarPosLeft = (window.innerWidth - this.canvas.getBoundingClientRect().width) <=30 ? 53 : ((window.innerWidth - this.canvas.getBoundingClientRect().width)/2);
+            toolBar[0].setAttribute("style", "left:"+(toolBarPosLeft-15)+"px");
             
             //EventListeners
             
@@ -200,6 +213,7 @@ export default {
                 var height = mousePos[1]- this.scaledYTransformed;
                 var rectXCoord = this.scaledXTransformed;
                 var rectYCoord =  this.scaledYTransformed;
+               
                 this.ctx.lineWidth = this.selectedStrokeSize;
                 this.ctx.beginPath();
                  switch(this.selectedShape){
@@ -225,6 +239,7 @@ export default {
         finishDrawing(){
             this.painting = false;
             this.ctx.beginPath();
+            console.log("hello");
         },
         getMousePosition(e){
             this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;
@@ -267,6 +282,10 @@ export default {
         },
         saveCanvas(){
             localStorage.setItem("imgCanvas",this.canvas.toDataURL());
+        },
+        clearCanvas(){
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            localStorage.setItem("imgCanvas",this.canvas.toDataURL());
         }
     },
 }
@@ -286,7 +305,7 @@ $default-icon-color: #2c3e50;
     justify-content: space-around;
     align-items: center;
     min-height: 100px;
-    top: 28%;
+    top: 37%;
     transform: translate(-50%, -50%);
     border-radius: 24px;
     background: white;
@@ -453,6 +472,15 @@ $default-icon-color: #2c3e50;
         .zoom-out{
             visibility: visible;
         }
+     }
+ }
+ .clear-container{
+     display: flex;
+     cursor:pointer;
+     margin: 15px 0;
+     transition: all 0.25s;
+     svg{
+         stroke: $default-icon-color;
      }
  }
  .selected{
