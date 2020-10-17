@@ -6,8 +6,8 @@
           </div>
           <div class="register-form--wrapper">
             <div class="register-form">
-                <input type="text" placeholder="Username" v-model="user.username">
-                <input type="email" placeholder="Email" v-model="user.email">
+                <input type="text" placeholder="Username" v-model="user['username']">
+                <input type="email" placeholder="Email" v-model="user['email']">
                 <input type="password" placeholder="Password" v-model="user.password">
                 <input type="password" placeholder="Confirm Password" v-model="user.passwordConfirm">
                 <div class="btn" @click ="register">
@@ -38,6 +38,7 @@ export default {
             var username = this.user.username;
             var email = this.user.email;
             var password = this.user.password;
+            console.log(this.user);
             axios.post('api/auth/register', {username, email, password }, {})
                 .then((res) => {
                     if (res.data) {

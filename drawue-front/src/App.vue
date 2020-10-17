@@ -29,4 +29,7 @@ body{
   color: #2c3e50;
   background: #2c3e50;
 }
+.btn{
+  cursor: pointer;
+}
 </style>
