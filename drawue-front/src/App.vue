@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <DrawingBoard />
+    <Header />
+    <router-view />
   </div>
 </template>
 
 <script>
-import DrawingBoard from './components/DrawingBoard.vue'
 
+import Header from './components/Header'
 export default {
   name: 'App',
   components: {
-    DrawingBoard
+    Header
   }
 }
 </script>

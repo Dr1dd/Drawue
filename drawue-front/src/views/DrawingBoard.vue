@@ -239,7 +239,6 @@ export default {
         finishDrawing(){
             this.painting = false;
             this.ctx.beginPath();
-            console.log("hello");
         },
         getMousePosition(e){
             this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;
