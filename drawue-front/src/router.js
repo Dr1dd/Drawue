@@ -23,11 +23,16 @@ export default new VueRouter({
             name: "Register",
             component: () => import("./views/Register"),
         },
-        // {
-        //     path: '/404',
-        //     alias: '*',
-        //     name: "NotFound",
-        //     component: () => import("./views/NotFound"),
-        // }
+        {
+            path: '/verification/:email_token',
+            name: "Verification",
+            component: () => import("./views/Verification"),
+        },
+        {
+            path: '/404',
+            alias: '*',
+            name: "Error",
+            component: () => import("./views/Error"),
+        }
     ]
 });

@@ -38,7 +38,6 @@ export default {
             var username = this.user.username;
             var email = this.user.email;
             var password = this.user.password;
-            console.log(this.user);
             axios.post('api/auth/register', {username, email, password }, {})
                 .then((res) => {
                     if (res.data) {

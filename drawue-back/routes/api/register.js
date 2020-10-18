@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
             //       pass: "secret.1"
             //     }
             //   });
-               console.log("https://localhost.com/api/confirmation/"+emailToken);
+               console.log("http://localhost:8080/verification/"+emailToken);
             //   const email = new Email({
             //     transport: transporter,
             //     send: true,
@@ -58,9 +58,8 @@ router.post('/', async (req, res) => {
             //   })
             //   .then(() => res.status(200).send({"successSend": "Confirmation email has been sent to:  "+req.body.email}))
             //   .catch((err) => console.log(err)); 
+            res.status(200).send({"successSend": "Confirmation email has been sent to:  "+req.body.email});
         });
     }
-    
-    //res.status(200).send(req.body.username);
 });
 module.exports = router;

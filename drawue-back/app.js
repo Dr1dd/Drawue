@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 var cors = require('cors');
 
 var register = require('./routes/api/register');
+var verification = require('./routes/api/verification');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //working routes
 app.use('/api/auth/register', register);
+app.use('/api/auth/verification', verification);
 
 
 if(process.env.NODE_ENV == 'production'){
