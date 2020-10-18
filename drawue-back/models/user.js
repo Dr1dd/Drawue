@@ -99,6 +99,54 @@ function validateUser(user) {
     });
     return schema.validate(user);
 }
+function validateLogin(user){
+  const schema = Joi.object({
+    username_email: Joi.string().min(8).max(254).required().error(errors => {
+        errors.forEach(err => {
+          switch (err.type) {
+            case "any.empty":
+                err.message = "Username field should not be empty!";
+                break;
+            case "any.required":
+              err.message = "Username field is required!";
+              break;
+            case "string.min":
+              err.message = `Username should have at least ${err.context.limit} characters!`;
+              break;
+            case "string.max":
+              err.message = `Username field should not exceed ${err.context.limit} characters!`;
+              break;
+            default:
+              break;
+          }
+        });
+        return errors;
+      }),
+    password: Joi.string().min(6).max(256).required().error(errors => {
+        errors.forEach(err => {
+          switch (err.type) {
+            case "any.empty":
+                err.message = "Password field should not be empty!";
+                break;
+            case "any.required":
+              err.message = "Password field is required!";
+              break;
+            case "string.min":
+              err.message = `Password should have at least ${err.context.limit} characters!`;
+              break;
+            case "string.max":
+              err.message = `Password field should not exceed ${err.context.limit} characters!`;
+              break;
+            default:
+              break;
+          }
+        });
+        return errors;
+      }),
+});
+return schema.validate(user);
+
+}
 function validatePassword(password){
   const schema = {
     password: Joi.string().min(6).max(255).required().error(errors => {
@@ -157,5 +205,6 @@ function validateEmail(email){
  
 exports.User = User;
 exports.validate = validateUser;
+exports.validateLogin = validateLogin;
 exports.validatePassword = validatePassword;
 exports.validateEmail = validateEmail;

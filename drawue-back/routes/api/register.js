@@ -5,10 +5,6 @@ const express = require('express');
 const router = express.Router();
 const { User, validate } = require('../../models/user');
 
-const mailgun = require("mailgun-js"); 
-
-const DOMAIN = "sandbox8b099beb9c7046cb8bbf1b0e64b2f452.mailgun.org";
-const mg = mailgun({apiKey: "3cc2bcf53e6b13ac8b03ceb5616b5173-2fbe671d-b1ae1cd6", domain: DOMAIN});
 
 router.post('/', async (req, res) => {
     const { error } = validate(req.body);
@@ -31,8 +27,6 @@ router.post('/', async (req, res) => {
         });
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
-        const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'), {expiresIn: '1m' });
-        const refreshToken = jwt.sign({ _id: user._id }, config.get('PrivateKey2'), {expiresIn: '1d'});
         await user.save();
         jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{
             // var transport = nodemailer.createTransport({

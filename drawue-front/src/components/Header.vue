@@ -3,13 +3,18 @@
       <div class="auth-section">
            <router-link to="/login"><div class="sign-in"> Sign In</div></router-link>
            <router-link to="/register"><div class="sign-up"> Sign Up</div></router-link>
+           <router-link to="/profile"><div class="sign-up"> Profile</div></router-link>
       </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
     name: 'Header',
+    computed: {
+      ...mapGetters(['getToken'])
+    }
 }
 </script>
 

@@ -29,6 +29,11 @@ export default new VueRouter({
             component: () => import("./views/Verification"),
         },
         {
+            path: '/profile',
+            name: "Profile",
+            component: () => import("./views/Profile"),
+        },
+        {
             path: '/404',
             alias: '*',
             name: "Error",

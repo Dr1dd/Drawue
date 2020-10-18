@@ -5,9 +5,12 @@ var helmet = require('helmet');
 var cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 var cors = require('cors');
+var cookieParser = require('cookie-parser')
 
 var register = require('./routes/api/register');
+var login = require('./routes/api/login');
 var verification = require('./routes/api/verification');
+var profile = require('./routes/api/profile/userProfile');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -28,6 +31,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // app.use(logger('dev'));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -35,7 +39,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //working routes
 app.use('/api/auth/register', register);
+app.use('/api/auth/login', login);
 app.use('/api/auth/verification', verification);
+app.use('/api/profile/', profile);
 
 
 if(process.env.NODE_ENV == 'production'){

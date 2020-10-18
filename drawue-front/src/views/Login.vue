@@ -9,9 +9,9 @@
 
             </div>
             <div class="login-form">
-                <input type="text" placeholder="Username/Email">
-                <input type="password" placeholder="Password">
-                <div class="btn">
+                <input type="text" placeholder="Username/Email" v-model="user['email_username']">
+                <input type="password" placeholder="Password" v-model="user['password']">
+                <div class="btn" @click="login">
                     Login
                 </div>
             </div>
@@ -21,8 +21,32 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     name: 'Login',
+    data(){
+        return{
+            user:{
+                email_username: '',
+                password: '',
+            }
+        }
+    },
+    methods:{
+        login(){
+            var username_email = this.user.email_username;
+            var password = this.user.password;
+            axios.post('api/auth/login', {username_email, password }, {})
+                .then((res) => {
+                    if (res.data) {
+                        console.log(res.data);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err.response);
+                });
+        }
+    }
 
 }
 </script>
