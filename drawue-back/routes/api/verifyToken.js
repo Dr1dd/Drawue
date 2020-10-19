@@ -20,6 +20,7 @@ const verifyToken = (req, res, next) =>{
         req.user = verified;
         
     } catch(err){
+        
          try{
             const verifiedRefresh = jwt.verify(refreshToken, config.get('PrivateKey2'));
             var userInfo = verifiedRefresh;
@@ -28,12 +29,11 @@ const verifyToken = (req, res, next) =>{
                 maxAge: 1000*60*2,
                 httpOnly: true,
             });
-            console.log(signToken, req.cookie['access-token']);
             const verified = jwt.verify(signToken, config.get('PrivateKey'));
             req.user = verified;
          }
          catch(e){
-            return res.status(401).send('Access denied. You must be logged-in to view the content of this page.');
+            return res.status(401).send('Access denied. You must be logged-in to view the content of this page.2');
         }
     }
     next();
