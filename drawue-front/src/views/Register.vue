@@ -2,16 +2,18 @@
   <div class ="register-container">
       <div class="register-module">
           <div class="register-header">
-              Sign In
+              Sign Up
           </div>
           <div class="register-form--wrapper">
             <div class="register-form">
-                <input type="text" placeholder="Username" v-model="user['username']">
-                <input type="email" placeholder="Email" v-model="user['email']">
-                <input type="password" placeholder="Password" v-model="user.password">
-                <input type="password" placeholder="Confirm Password" v-model="user.passwordConfirm">
+                <div class="input-container">
+                    <input type="text" placeholder="Username" v-model="user['username']">
+                    <input type="email" placeholder="Email" v-model="user['email']">
+                    <input type="password" placeholder="Password" v-model="user.password">
+                    <input type="password" placeholder="Confirm Password" v-model="user.passwordConfirm">
+                </div>
                 <div class="btn" @click ="register">
-                    Sign In
+                    Sign Up
                 </div>
             </div>
           </div>
@@ -83,7 +85,11 @@ export default {
             display: flex;
             flex-direction: column;
             padding: 20px;
-            
+            .input-container{
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+            }
         }
      }
  }

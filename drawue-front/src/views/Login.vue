@@ -5,14 +5,19 @@
               Login
           </div>
           <div class="login-form--wrapper">
-            <div class="social-form">
-
-            </div>
             <div class="login-form">
-                <input type="text" placeholder="Username/Email" v-model="user['email_username']">
-                <input type="password" placeholder="Password" v-model="user['password']">
+                <div class="input-container">
+                    <input type="text" placeholder="Username/Email" v-model="user['email_username']">
+                    <input type="password" placeholder="Password" v-model="user['password']">
+                </div>
                 <div class="btn" @click="login">
                     Login
+                </div>
+            </div>
+            <div class="social-form">
+                <div class="social-buttons">
+                    <div class="btn">Facebook</div>
+                    <div class="btn">Google</div>
                 </div>
             </div>
           </div>
@@ -78,14 +83,31 @@ export default {
      .login-form--wrapper{
         display: flex;
         flex-direction: row;
-        .social-form{
-
-        }
+        padding: 20px;
         .login-form{
             display: flex;
             flex-direction: column;
+            padding-right: 20px;
+            padding-right: 15px;
+            border-right: 3px solid #9c9b9b;
+            .input-container{
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+            }
+            &::after{
+                content: '';
+                height: 100%;
+                width: 2px;
+                background: black;
+            }   
+        }
+        .social-form{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             padding: 20px;
-            
+
         }
      }
  }
