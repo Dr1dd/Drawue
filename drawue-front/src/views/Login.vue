@@ -17,7 +17,7 @@
             <div class="social-form">
                 <div class="social-buttons">
                     <div class="btn">Facebook</div>
-                    <div class="btn">Google</div>
+                    <div class="btn"><a href="api/auth/google/authentication">Google </a></div>
                 </div>
             </div>
           </div>
@@ -34,6 +34,15 @@ export default {
             user:{
                 email_username: '',
                 password: '',
+            },
+            params: {
+                    client_id: "824438532723-18sdtimloab6culfrb2cl2n225svuqk8.apps.googleusercontent.com"
+            },
+                // only needed if you want to render the button with the google ui
+            renderParams: {
+                width: 250,
+                height: 50,
+                longtitle: true
             }
         }
     },
@@ -42,15 +51,16 @@ export default {
             var username_email = this.user.email_username;
             var password = this.user.password;
             axios.post('api/auth/login', {username_email, password }, {})
-                .then((res) => {
-                    if (res.data) {
-                        console.log(res.data);
-                    }
-                })
-                .catch((err) => {
-                    console.log(err.response);
-                });
-        }
+            .then((res) => {
+                if (res.data) {
+                    console.log(res.data);
+                }
+            })
+            .catch((err) => {
+                console.log(err.response);
+            });
+        },
+
     }
 
 }

@@ -13,7 +13,7 @@ const verifyToken = (req, res, next) =>{
             maxAge: 0,
             httpOnly: true,
         });
-        return res.status(401).send('Access denied. You must be logged-in to view the content of this page.');
+        return res.status(200).send(false);
     }
     try{
         const verified = jwt.verify(token, config.get('PrivateKey'));
@@ -33,7 +33,7 @@ const verifyToken = (req, res, next) =>{
             req.user = verified;
          }
          catch(e){
-            return res.status(401).send('Access denied. You must be logged-in to view the content of this page.2');
+            return res.status(200).send(false);
         }
     }
     next();

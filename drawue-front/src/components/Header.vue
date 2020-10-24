@@ -1,9 +1,14 @@
 <template>
   <div class="header">
-      <div class="auth-section">
-           <router-link to="/login"><div class="sign-in"> Sign In</div></router-link>
-           <router-link to="/register"><div class="sign-up"> Sign Up</div></router-link>
-           <router-link to="/profile"><div class="sign-up"> Profile</div></router-link>
+      <div class="auth-section" v-if="getLoginState !=true">
+        <router-link to="/login"><div class="sign-in"> Sign In</div></router-link>
+        <router-link to="/register"><div class="sign-up"> Sign Up</div></router-link>
+      </div>
+      <div v-else>
+        <div class="logout" @click="logOut">
+          Logout
+        </div>
+        <router-link to="/profile"><div> Profile</div></router-link>
       </div>
   </div>
 </template>
@@ -13,7 +18,12 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'Header',
     computed: {
-      ...mapGetters(['getToken'])
+      ...mapGetters(['getLoginState'])
+    },
+    methods:{
+      logOut(){
+        this.$store.dispatch('Logout');
+      }
     }
 }
 </script>

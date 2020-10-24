@@ -12,7 +12,11 @@ export default {
   name: 'App',
   components: {
     Header
-  }
+  },
+  beforeCreate(){
+    this.$store.dispatch('UpdateLoginState');
+  },
+
 }
 </script>
 

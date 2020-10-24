@@ -6,11 +6,16 @@ var cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 var cors = require('cors');
 var cookieParser = require('cookie-parser')
+var passport = require('passport');
 
 var register = require('./routes/api/register');
 var login = require('./routes/api/login');
 var verification = require('./routes/api/verification');
+var state = require('./routes/api/state');
+var logout = require('./routes/api/logout');
 var profile = require('./routes/api/profile/userProfile');
+//var passportGoogle = require('./routes/api/google/authentication');
+var callback = require('./routes/api/google/callback');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -41,7 +46,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth/register', register);
 app.use('/api/auth/login', login);
 app.use('/api/auth/verification', verification);
+app.use('/api/auth/state', state);
+app.use('/api/auth/logout', logout);
 app.use('/api/profile/', profile);
+//API authentication
+require('./routes/api/google/authentication');
+app.use(passport.initialize());
+app.get('/api/auth/google/authentication', passport.authenticate('google', {scope: ['profile', 'email']}));
+app.use('/api/auth/google/callback', passport.authenticate('google'), callback);
 
 
 if(process.env.NODE_ENV == 'production'){
@@ -60,6 +72,7 @@ if(process.env.NODE_ENV == 'production'){
     res.locals.error = req.app.get('env') === 'development' ? err : {};
   
     // render the error page
+    console.log(err.message);
     res.status(err.status || 500);
     res.render('error');
   });

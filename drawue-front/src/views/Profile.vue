@@ -28,15 +28,20 @@ export default {
         }
     },
     created(){
-        axios.get('api/profile/user',)
+        axios.get('api/profile/user')
         .then((res)=>{
             console.log(res.data);
             this.user.username = res.data.username;
             this.user.email = res.data.email;
+            //this.$store.commit("UPDATE_LOGIN", true);
+            //console.log(this.$store.getters.getLoginState);
         })
         .catch((err)=>{
             console.log(err.response);
+            //this.$store.commit("UPDATE_LOGIN", false);
+            //console.log(this.$store.getters.getLoginState);
         });
+
     }
 }
 </script>
