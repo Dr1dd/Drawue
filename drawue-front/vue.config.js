@@ -7,6 +7,9 @@ module.exports ={
                     target: 'http://localhost:5000'
                 },
             },
+            allowedHosts: [
+                'drawue.com'
+            ]
     }
 
 }

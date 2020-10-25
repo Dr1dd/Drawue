@@ -16,6 +16,7 @@ var logout = require('./routes/api/logout');
 var profile = require('./routes/api/profile/userProfile');
 //var passportGoogle = require('./routes/api/google/authentication');
 var callback = require('./routes/api/google/callback');
+var fbCallback = require('./routes/api/facebook/callback');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -51,9 +52,13 @@ app.use('/api/auth/logout', logout);
 app.use('/api/profile/', profile);
 //API authentication
 require('./routes/api/google/authentication');
+require('./routes/api/facebook/fbAuth');
 app.use(passport.initialize());
 app.get('/api/auth/google/authentication', passport.authenticate('google', {scope: ['profile', 'email']}));
 app.use('/api/auth/google/callback', passport.authenticate('google'), callback);
+
+app.get('/api/auth/facebook', passport.authenticate('facebook', { scope : ['email']}));
+app.use('/api/auth/facebook/callback', passport.authenticate('facebook'), fbCallback);
 
 
 if(process.env.NODE_ENV == 'production'){
