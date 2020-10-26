@@ -7,8 +7,17 @@
           <div class="login-form--wrapper">
             <div class="login-form">
                 <div class="input-container">
-                    <input type="text" placeholder="Username/Email" v-model="user['email_username']">
-                    <input type="password" placeholder="Password" v-model="user['password']">
+                    <input type="text" placeholder="Username/Email" maxlength="128" v-model="$v.email_username.$model"  @blur="$v.email_username.$touch()">
+                    <transition name="fade">
+                        <div class="error" v-if="$v.email_username.$dirty && !$v.email_username.required">Field is required</div>
+                        <div class="error" v-else-if="$v.email_username.$dirty && !$v.email_username.minLength">Username/Email must have at least {{$v.email_username.$params.minLength.min}} characters.</div>
+                        <div class="error" v-else-if="backendError"> {{backendError}} </div>
+                    </transition>
+                    <input type="password" placeholder="Password" v-model="$v.password.$model" @blur="$v.password.$touch()">
+                    <transition name="fade">
+                        <div class="error" v-if="$v.password.$dirty && !$v.password.required">Field is required</div>
+                        <div class="error" v-else-if="$v.password.$dirty && !$v.password.minLength">Password must have at least {{$v.password.$params.minLength.min}} characters.</div>
+                    </transition>
                 </div>
                 <div class="btn" @click="login">
                     Login
@@ -16,7 +25,7 @@
             </div>
             <div class="social-form">
                 <div class="social-buttons">
-                    <div class="btn">Facebook</div>
+                    <div class="btn"><a href="api/auth/facebook">Facebook </a></div>
                     <div class="btn"><a href="api/auth/google/authentication">Google </a></div>
                 </div>
             </div>
@@ -27,37 +36,43 @@
 
 <script>
 import axios from 'axios';
+import { required, minLength, maxLength } from 'vuelidate/lib/validators'
 export default {
     name: 'Login',
     data(){
         return{
-            user:{
-                email_username: '',
-                password: '',
-            },
-            params: {
-                    client_id: "824438532723-18sdtimloab6culfrb2cl2n225svuqk8.apps.googleusercontent.com"
-            },
-                // only needed if you want to render the button with the google ui
-            renderParams: {
-                width: 250,
-                height: 50,
-                longtitle: true
-            }
+            email_username: '',
+            password: '',
+            backendError: '',
         }
+    },
+    validations: {
+        email_username: {
+            required,
+            minLength: minLength(8),  
+        },
+        password: {              
+            required,
+            minLength: minLength(8),   
+            maxLength: maxLength(100),    
+        }
+
     },
     methods:{
         login(){
-            var username_email = this.user.email_username;
-            var password = this.user.password;
+
+            this.$v.$touch();
+            if (this.$v.$invalid) {
+                return;
+            }
+            var username_email = this.email_username;
+            var password = this.password;
             axios.post('api/auth/login', {username_email, password }, {})
-            .then((res) => {
-                if (res.data) {
-                    console.log(res.data);
-                }
+            .then(() => {
+                this.$router.push('/profile');
             })
             .catch((err) => {
-                console.log(err.response);
+                this.backendError = err.response.data;
             });
         },
 
@@ -93,12 +108,11 @@ export default {
      .login-form--wrapper{
         display: flex;
         flex-direction: row;
-        padding: 20px;
+        padding: 10px 32px 32px;
         .login-form{
             display: flex;
             flex-direction: column;
-            padding-right: 20px;
-            padding-right: 15px;
+            padding-right: 32px;
             border-right: 3px solid #9c9b9b;
             .input-container{
                 display: flex;

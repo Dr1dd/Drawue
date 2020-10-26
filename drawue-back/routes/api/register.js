@@ -7,16 +7,18 @@ const { User, validate } = require('../../models/user');
 
 
 router.post('/', async (req, res) => {
-    const { error } = validate(req.body);
+    var {confirmPassword, ...validationBody} = req.body;
+    const { error } = validate(validationBody);
     if (error) {
         return res.status(400).send(error.details[0].message);
     }
+    if(req.body.password != req.body.confirmPassword) return res.status(400).send({'passwordConfirm': 'Passwords do not match!'});
     let user = await User.findOne({$or: [{ username: req.body.username}, {email: req.body.email}]});
     if(user){
         if(user.username == req.body.username)
-            return res.status(400).send('This username is already taken!');
+            return res.status(400).send({'username':'This username is already taken!'});
         if(user.email == req.body.email)
-            return res.status(400).send('The email address you have entered is already registered!');
+            return res.status(400).send({'email': 'The email address you have entered is already registered!'});
     }
     else{
         user = new User({

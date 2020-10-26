@@ -5,15 +5,15 @@ const User = mongoose.model('User', new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        minlength: 4,
-        maxlength: 20,
+        minlength: 6,
+        maxlength: 22,
         unique: true
     },
     email: {
         type: String,
         required: true,
         minlength: 8,
-        maxlength: 40,
+        maxlength: 64,
         unique: true
     },
     password: {
@@ -29,7 +29,7 @@ const User = mongoose.model('User', new mongoose.Schema({
  
 function validateUser(user) {
     const schema = Joi.object({
-        username: Joi.string().min(8).max(254).required().error(errors => {
+        username: Joi.string().min(6).max(254).required().error(errors => {
             errors.forEach(err => {
               switch (err.type) {
                 case "any.empty":
@@ -149,7 +149,7 @@ return schema.validate(user);
 }
 function validatePassword(password){
   const schema = {
-    password: Joi.string().min(6).max(255).required().error(errors => {
+    password: Joi.string().min(8).max(255).required().error(errors => {
       errors.forEach(err => {
         switch (err.type) {
           case "any.empty":

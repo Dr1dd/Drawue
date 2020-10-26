@@ -16,17 +16,15 @@ router.post('/', async (req, res) => {
     //  Now find the user by their email address
     let user = await User.findOne({$or: [{ username: req.body.username_email}, {email: req.body.username_email}]});
     if (!user) {
-        return res.status(400).send('Incorrect email/username or password.');
+        return res.status(400).send('Incorrect username or password.');
     }
     if(user.emailConfirmed==false) return res.status(400).send('Please confirm your email address before logging in.');
     // Then validate the Credentials in MongoDB match
     // those provided in the request
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
-        return res.status(400).send('Incorrect email or password.');
+        return res.status(400).send('Incorrect username or password.');
     }
-    // expiredate = '1d';
-    // if(req.body.rememberUser == true) expiredate = '30d';
     const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'), {expiresIn: '1m'});
     const refreshToken = jwt.sign({ _id: user._id }, config.get('PrivateKey2'), {expiresIn: '7d'});
     res.cookie('access-token', token,{
@@ -38,7 +36,6 @@ router.post('/', async (req, res) => {
         httpOnly: true,
     })
     res.status(200).send("Authorized");
-    //res.send({'token': token, 'refreshToken': refreshToken});
 
 });
 
