@@ -345,6 +345,7 @@ $default-icon-color: #2c3e50;
      cursor:crosshair;
      background: white;
      transform-origin: center center;
+     box-shadow: 0px 0px 4px -2px #000000;
      
  }
  .pencil-size--container{
@@ -424,7 +425,7 @@ $default-icon-color: #2c3e50;
             background: white;
             transition: background 0.25s;
             &:hover{
-                background: #effbff; 
+                background: #f0f8ff; 
             }
          }
      }
@@ -483,10 +484,11 @@ $default-icon-color: #2c3e50;
      }
  }
  .selected{
-     background: #bdcddd;
+    background: #f0f8ff;
+    box-shadow: inset 0px 0px 2px 0px #b4b4b4;
  }
  .selected-child{
-     background: #e3eaf1 !important;
+     background: #ddeaee !important;
  }
 
 

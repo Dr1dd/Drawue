@@ -151,6 +151,7 @@ export default {
 </script>
 
 <style lang="scss">
+$module-theme: #86a1b8;
  .register-container{
      display: flex;
      flex-direction: column;
@@ -168,7 +169,7 @@ export default {
         display: flex;
         justify-content: center;
         padding: 10px;
-        background: #717171;
+        background: $module-theme;
         color: white;
         font-size: 25px;
         font-weight: 700;

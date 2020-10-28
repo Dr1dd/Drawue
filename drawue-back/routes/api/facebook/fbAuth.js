@@ -31,6 +31,7 @@ passport.use(new FacebookStrategy({
                 username: String(new_username),
                 email: profile.emails[0].value,
                 password: new_password,
+                profilePic: 'default-user.png',
                 emailConfirmed: true,
             });
             bcrypt.genSalt(10, function(err, salt) {

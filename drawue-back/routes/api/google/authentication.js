@@ -35,6 +35,7 @@ passport.use(new GoogleStrategy({
                 username: new_username,
                 email: profile.emails[0].value,
                 password: password,
+                profilePic: 'default-user.png',
                 emailConfirmed: true,
             });
             bcrypt.genSalt(10, function(err, salt) {
@@ -43,7 +44,7 @@ passport.use(new GoogleStrategy({
                     if (err) return err;
                     userNew.password = hash;
                     userNew.save().then(()=>{
-                        done(null, userNew);
+                        cb(null, userNew);
                     });
                 });
             });

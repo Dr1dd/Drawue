@@ -13,17 +13,14 @@ export default {
   components: {
     Header
   },
-  beforeCreate(){
-    this.$store.dispatch('UpdateLoginState');
-  },
-
 }
 </script>
 
 <style lang="scss">
+$module-theme: #86a1b8;
 body{
   margin: 0;
-  background: #2c3e50;
+  background: #f0f8ff;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -31,17 +28,16 @@ body{
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background: #2c3e50;
+  background: #f0f8ff;
 }
 .btn{
   cursor: pointer;
   padding: 8px;
   border-radius: 23px;
-  background: #717171;
+  background: #86a1b8;
   color: white;
   font-size: 16px;
   font-weight: 700;
-  border: 1px solid #9c9b9b;
   a{
     text-decoration: none;
     color: white;
@@ -52,13 +48,16 @@ input{
   padding: 8px;
   font-size: 20px;
   border: none;
-  border-bottom: 3px solid #9c9b9b;
+  border-bottom: 3px solid $module-theme;
   transition: 0.25s all;
   &:focus{
     outline: none;
     border: none;
-    border-bottom: 3px solid #4d4d4d;
-    box-shadow: 0px 9px 12px -13px rgba(0,0,0,0.75)
+    border-bottom: 3px solid #5f7282;
+    box-shadow: 0px 9px 12px -13px rgb(65 74 83);
+  }
+  &::placeholder{
+    color: #a7a5a5;
   }
 }
 .error{

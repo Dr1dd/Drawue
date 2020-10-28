@@ -69,6 +69,7 @@ export default {
             var password = this.password;
             axios.post('api/auth/login', {username_email, password }, {})
             .then(() => {
+                this.$store.dispatch('UpdateLoginState');
                 this.$router.push('/profile');
             })
             .catch((err) => {
@@ -82,6 +83,7 @@ export default {
 </script>
 
 <style lang="scss">
+$module-theme: #86a1b8;
  .login-container{
      display: flex;
      flex-direction: column;
@@ -94,12 +96,13 @@ export default {
      display: flex;
      flex-direction: column;
      background: white;
+     box-shadow: 0px 0px 4px -2px #000000;
      border-radius: 15px;
      .login-header{
         display: flex;
         justify-content: center;
         padding: 10px;
-        background: #717171;
+        background: $module-theme;
         color: white;
         font-size: 25px;
         font-weight: 700;
@@ -113,7 +116,7 @@ export default {
             display: flex;
             flex-direction: column;
             padding-right: 32px;
-            border-right: 3px solid #9c9b9b;
+            border-right: 3px solid $module-theme;
             .input-container{
                 display: flex;
                 flex-direction: column;

@@ -79,7 +79,7 @@ if(process.env.NODE_ENV == 'production'){
     // render the error page
     console.log(err.message);
     res.status(err.status || 500);
-    res.render('error');
+    //res.render('error');
   });
 
 app.listen(PORT, ()=>{

@@ -25,6 +25,9 @@ const User = mongoose.model('User', new mongoose.Schema({
     emailConfirmed: {
         type: Boolean
     },
+    profilePic: {
+        type: String,
+    },
 },{ timestamps: true }));
  
 function validateUser(user) {
