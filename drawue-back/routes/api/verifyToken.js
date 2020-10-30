@@ -2,9 +2,10 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 const verifyToken = (req, res, next) =>{
+    //console.log("refreshToken");
     let token = req.cookies['access-token'];
     let refreshToken = req.cookies['refresh-token'];
-    if(refreshToken == undefined) {
+    if(refreshToken === undefined) {
         res.cookie('access-token', token,{
             maxAge: 0,
             httpOnly: true,
@@ -13,7 +14,7 @@ const verifyToken = (req, res, next) =>{
             maxAge: 0,
             httpOnly: true,
         });
-        return res.status(200).send(false);
+        req.error = true;
     }
     try{
         const verified = jwt.verify(token, config.get('PrivateKey'));
@@ -33,7 +34,7 @@ const verifyToken = (req, res, next) =>{
             req.user = verified;
          }
          catch(e){
-            return res.status(200).send(false);
+            req.error = true;
         }
     }
     next();

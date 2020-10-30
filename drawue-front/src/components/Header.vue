@@ -43,9 +43,6 @@ export default {
         dropDown: false,
       }
     },
-    beforeCreate(){
-
-    },
     computed: {
       ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername'])
     },

@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 var cors = require('cors');
 var cookieParser = require('cookie-parser')
 var passport = require('passport');
+var bodyParser = require('body-parser');
 
 var register = require('./routes/api/register');
 var login = require('./routes/api/login');
@@ -17,6 +18,8 @@ var profile = require('./routes/api/profile/userProfile');
 //var passportGoogle = require('./routes/api/google/authentication');
 var callback = require('./routes/api/google/callback');
 var fbCallback = require('./routes/api/facebook/callback');
+
+var uploadProfilePic = require('./routes/api/upload/profileImage');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -38,6 +41,10 @@ app.set('view engine', 'jade');
 
 // app.use(logger('dev'));
 app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -59,7 +66,8 @@ app.use('/api/auth/google/callback', passport.authenticate('google'), callback);
 
 app.get('/api/auth/facebook', passport.authenticate('facebook', { scope : ['email']}));
 app.use('/api/auth/facebook/callback', passport.authenticate('facebook'), fbCallback);
-
+// Uploads
+app.use('/api/upload/profile-pic', uploadProfilePic);
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));

@@ -27,6 +27,7 @@ router.post('/', async (req, res) => {
             password: req.body.password,
             profilePic: 'default-user.png',
             emailConfirmed: false,
+            registrationComplete: true,
         });
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
@@ -59,4 +60,13 @@ router.post('/', async (req, res) => {
         });
     }
 });
+router.post('/resend', async (req, res) => {
+    let user = await User.findOne({ email: req.body.email });
+    if(!user) res.send({"successSend": "User was not found"});
+    jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{     
+        console.log("http://localhost:8080/verification/"+emailToken);
+        res.send({"successSend": "Email has been resent!"});
+    });
+});
+ 
 module.exports = router;

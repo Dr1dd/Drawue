@@ -27,6 +27,10 @@
           <div class="register-form--wrapper">
             <div v-if="successMessage" class ="confirm-email">
                 {{successMessage}}
+                <div class="resend-email"> 
+                  <div @click="resendEmail">Resend verification email</div>
+                  <pulse-loader :loading="loading" :color="color" :size="size"></pulse-loader>
+                </div>
             </div>
             <div v-else class="register-form">
                 <div class="input-container">
@@ -35,6 +39,7 @@
                         <div class="error" v-if="$v.user.username.$dirty && !$v.user.username.required">Field is required</div>
                         <div class="error" v-else-if="$v.user.username.$dirty && !$v.user.username.minLength">Username must have at least {{$v.user.username.$params.minLength.min}} characters.</div>
                         <div class="error" v-else-if="$v.user.username.$dirty && !$v.user.username.maxLength"> Your username should not exceed {{$v.user.username.$params.maxLength.max}} characters </div>
+                        <div class="error" v-else-if="$v.user.username.$dirty && !$v.user.username.validUsername"> Only alphanumeric letters and numbers are allowed! </div>
                         <div class="error" v-else-if="backendError['username']"> {{backendError['username']}} </div>
                     </transition>
                     <input type="email" maxlength="64" placeholder="Email" v-model.lazy="$v.user.email.$model" @blur="$v.user.email.$touch()">
@@ -60,8 +65,8 @@
                         <div class="error" v-else-if="backendError['passwordConfirm']"> {{backendError['passwordConfirm']}} </div>
                     </transition>
                 </div>
-                <div class="btn" @click ="register">
-                    Sign Up
+                <div class="btn loader" @click ="register">
+                     Sign Up  <pulse-loader :loading="loading" :color="color" :size="size"></pulse-loader>
                 </div>
             </div>
           </div>
@@ -72,8 +77,12 @@
 <script>
 import axios from "axios";
 import { required, minLength, maxLength, email, sameAs } from 'vuelidate/lib/validators'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 export default {
     name: 'Register',
+    components: {
+        PulseLoader
+    },
     data(){
         return{
             user:{
@@ -85,6 +94,9 @@ export default {
             isSubmitted: false,
             backendError: '',
             successMessage: '',
+            loading: false,
+            color: '#fff',
+            size: '5px'
         }
     },
     calculated:{
@@ -97,7 +109,12 @@ export default {
             username: {
                 required,
                 minLength: minLength(6),
-                maxLength: maxLength(22),  
+                maxLength: maxLength(22),
+                validUsername(username){
+                    return (
+                        /^[a-z0-9]+$/.test(username)
+                    );
+                }  
             },
             email: {
                 required,
@@ -132,11 +149,12 @@ export default {
             if (this.$v.$invalid) {
                 return;
             }
+            this.loading = true;
             var username = this.user.username;
             var email = this.user.email;
             var password = this.user.password;
             var confirmPassword = this.user.passwordConfirm;
-            axios.post('api/auth/register', {username, email, password, confirmPassword }, {})
+            axios.post('/api/auth/register', {username, email, password, confirmPassword }, {})
                 .then((res) => {
                     if (res.data) {
                         this.successMessage = res.data.successSend;
@@ -145,6 +163,21 @@ export default {
                 .catch((err) => {
                     this.backendError = err.response.data
                 });
+            this.loading = false;
+        },
+        resendEmail(){
+            var email = 'perter@gmail.com';
+            this.loading = true;
+            axios.post('/api/auth/register/resend', { email }, {})
+            .then((res) => {
+                if (res.data) {
+                    this.successMessage = res.data.successSend;
+                }
+            })
+            .catch((err) => {
+                this.successMessage = err.response.data
+            });
+            this.loading = false;
         }
     }
 }
@@ -163,8 +196,10 @@ $module-theme: #86a1b8;
  .register-module{
      display: flex;
      flex-direction: column;
+     min-width: 275px;
      background: white;
      border-radius: 15px;
+     box-shadow: 0px 0px 4px -2px #000000;
      .register-header{
         display: flex;
         justify-content: center;
@@ -222,6 +257,27 @@ $module-theme: #86a1b8;
     .confirm-email{
         padding: 20px;
         font-size: 20px;
-        max-width: 400px;
+        width: 100%;
+    }
+    .resend-email{
+        margin-top: 15px;
+        font-size: 14px;
+        color: $module-theme;
+        transition: all 0.2s;
+        cursor: pointer;
+        &:hover{
+            text-decoration: underline;
+            color: #0f3b5f;
+        }
+    }
+    .loader{
+        display: flex;
+        justify-content: center;
+        position: relative;
+        .v-spinner{
+            position: absolute;
+            left: 0;
+            right: -26%;
+        }
     }
 </style>

@@ -5,9 +5,12 @@ const { verifyToken } = require("./verifyToken");
 const router = express.Router();
  
 router.get('/', verifyToken, async (req, res) => {
-    let user = await User.findOne({_id: req.user._id});
-    if(user) return res.send({'login': true, 'path': user.profilePic, 'username': user.username});
-    else return res.status(200).send({'login': false});
+    if(req.user){
+        let user = await User.findOne({_id: req.user._id});
+        if(user) return res.send({'login': true, 'path': user.profilePic, 'username': user.username, 'emaii': user.email});
+        else return res.send({'login': false});
+    }
+    else return res.send(false);
 
 });
 module.exports = router;

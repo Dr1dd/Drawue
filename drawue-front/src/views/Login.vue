@@ -19,14 +19,26 @@
                         <div class="error" v-else-if="$v.password.$dirty && !$v.password.minLength">Password must have at least {{$v.password.$params.minLength.min}} characters.</div>
                     </transition>
                 </div>
-                <div class="btn" @click="login">
-                    Login
+                <div class="btn loader" @click="login">
+                    <div class="login-loader">
+                        <Loader v-if="loading" color="white" loaderType="bubble" />
+                    </div>
+                    Login 
+                    <div class="login-loader">
+                        <Loader v-if="loading" color="white" loaderType="bubble" />
+                    </div>
                 </div>
             </div>
             <div class="social-form">
                 <div class="social-buttons">
-                    <div class="btn"><a href="api/auth/facebook">Facebook </a></div>
-                    <div class="btn"><a href="api/auth/google/authentication">Google </a></div>
+                    <div>
+                        <img src="../assets/facebook.jpg" alt="">
+                        <a href="api/auth/facebook">Sign in with Facebook </a>
+                    </div>
+                    <div>
+                        <img src="../assets/google.jpg" alt="">
+                        <a href="api/auth/google/authentication">Sign in with Google </a>
+                    </div>
                 </div>
             </div>
           </div>
@@ -37,13 +49,20 @@
 <script>
 import axios from 'axios';
 import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+import Loader from 'vueloaderspinners'
 export default {
     name: 'Login',
+    components:{
+        Loader
+    },
     data(){
         return{
             email_username: '',
             password: '',
             backendError: '',
+            loading: false,
+            color: '#fff',
+            size: '5px'
         }
     },
     validations: {
@@ -67,7 +86,8 @@ export default {
             }
             var username_email = this.email_username;
             var password = this.password;
-            axios.post('api/auth/login', {username_email, password }, {})
+            this.loading=true;
+            axios.post('/api/auth/login', {username_email, password }, {})
             .then(() => {
                 this.$store.dispatch('UpdateLoginState');
                 this.$router.push('/profile');
@@ -75,6 +95,7 @@ export default {
             .catch((err) => {
                 this.backendError = err.response.data;
             });
+             this.loading=false;
         },
 
     }
@@ -84,6 +105,8 @@ export default {
 
 <style lang="scss">
 $module-theme: #86a1b8;
+
+
  .login-container{
      display: flex;
      flex-direction: column;
@@ -121,21 +144,64 @@ $module-theme: #86a1b8;
                 display: flex;
                 flex-direction: column;
                 margin-bottom: 20px;
-            }
-            &::after{
-                content: '';
-                height: 100%;
-                width: 2px;
-                background: black;
-            }   
+            } 
         }
         .social-form{
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 20px;
-
+            padding: 20px 0 20px 20px;
+            .social-buttons{
+                display: grid;
+                grid-row-gap: 12px;
+            }
         }
      }
  }
+.social-buttons{
+    display: grid;
+    grid-row-gap: 12px;
+    div{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        height: 42px;
+        width: 100%;
+        font-size: 14px;
+        font-weight: 700;
+        background: $module-theme;
+        border-radius: 2px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.25);
+        img{
+            height: 100%;
+        }
+        a{
+            color: #fff;
+            text-decoration: none;
+            line-height: 1;
+            font-size: 14px;
+            margin: 0px 10px;
+            letter-spacing: 0.2px;
+        } 
+    }
+}
+.loader{
+    display: flex;
+    justify-content: center;
+    .login-loader{
+        margin: 0 12px;
+        align-self: center;
+        height: 20px;
+        width: 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .bubbles-loader{
+             align-items: center;
+        }
+    }
+}
+
+
 </style>

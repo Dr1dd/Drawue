@@ -9,9 +9,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state:{
-        isLoggedIn: 'falsetto',
+        isLoggedIn: '',
         userProfilePic: '',
-        username: ''
+        username: '',
+        email: '',
     },
     mutations:{
         SET_STATE(state, bool){
@@ -22,26 +23,31 @@ export default new Vuex.Store({
         },
         SET_USERNAME(state, username){
             state.username = username;
-        }
+        },
+        SET_EMAIL(state, email){
+            state.email = email;
+        },
     },
     actions:{
         UpdateLoginState({ commit }){
             return new Promise(( resp, rej ) => {
-                axios.get('api/auth/state', {})
+                axios.get('/api/auth/state')
                 .then((res) => {
                     if(res.data.login) commit('SET_STATE', res.data.login);
                     else commit('SET_STATE', res.data);
                     if(res.data.path) commit('SET_PROFILE_PIC', res.data.path);
                     if(res.data.username) commit('SET_USERNAME', res.data.username);
+                    if(res.data.email) commit('SET_EMAIL', res.data.email);
                     resp();
                 })
                 .catch((err) =>{
+                    console.log("dsf");
                     rej(err);
                 });
             });
         },
         Logout({ commit }){
-            axios.get('api/auth/logout')
+            axios.get('/api/auth/logout')
             .then(() => {
                 commit('SET_STATE', false);
                 router.push({path:'/'});
@@ -50,6 +56,9 @@ export default new Vuex.Store({
                 
             })
         },
+        UpdateProfilePic( {commit, path} ){
+            commit('SET_PROFILE_PIC', path);
+        }
     },
     getters:{
         getLoginState: state => {

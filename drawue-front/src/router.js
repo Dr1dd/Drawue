@@ -29,6 +29,13 @@ const routes = [
     },
     {
         path: '/verification/:email_token',
+        beforeEnter:(to, from, next) => {
+            let email=to.params.email_token;
+            next({ path: '/verification', query: { email: email}})
+        }
+    },
+    {
+        path: '/verification',
         name: "Verification",
         component: () => import("./views/Verification"),
     },
@@ -55,7 +62,6 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     var isLoggedIn;
     if (to.matched.some(record => record.meta.requiresAuth)) {
-       // const store = import("./store/index.js");
         if(store){
             isLoggedIn = store.getters.getLoginState;
             if (isLoggedIn) next()
