@@ -1,5 +1,6 @@
 const path = require('path');
 module.exports ={
+    publicPath: '/',
     outputDir: path.resolve(__dirname, '../drawue-back/public'),
     devServer:{
             proxy: {
@@ -10,6 +11,7 @@ module.exports ={
             allowedHosts: [
                 'drawue.com'
             ]
-    }
+    },
+
 
 }

@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 const verifyToken = (req, res, next) =>{
-    //console.log("refreshToken");
     let token = req.cookies['access-token'];
     let refreshToken = req.cookies['refresh-token'];
     if(refreshToken === undefined) {

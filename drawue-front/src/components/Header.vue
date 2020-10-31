@@ -7,7 +7,7 @@
       <div v-else-if="getLoginState == true" class="profile-section">
         <div class="user">
           <div class="profile-pic" @click="$router.push('profile')">
-            <img :src="require('@/images/profile-pics/' + getProfilePic)" alt="pic">
+            <img :src="'/api/uploads/getImage/' + getProfilePic" alt="pic">
           </div>
           <div class="username" @click="dropDown = !dropDown">
             {{ getUsername }}
@@ -117,7 +117,9 @@ export default {
    }
    img{
      height: 100%;
+     width: 100%;
      border-radius: 50%;
+     border: 1px solid #eeeeee;
    }
    .drop-down{
      position: absolute;

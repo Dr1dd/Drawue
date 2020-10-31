@@ -5,7 +5,7 @@
             <div class="picture-container">
                 <div class="profile-picture">
                     <!-- <div class="overlay"></div> -->
-                    <img :src="require('@/images/profile-pics/' + getProfilePic)" alt="">
+                    <img :src="'/api/uploads/getImage/' + getProfilePic" alt="">
                     <div class="change-pic" @click="$refs.file.click()"> 
                         <svg height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m182.461 155.48 49.539-49.539v262.059a24 24 0 0 0 48 0v-262.059l49.539 49.539a24 24 0 1 0 33.941-33.941l-90.509-90.51a24 24 0 0 0 -33.942 0l-90.509 90.51a24 24 0 1 0 33.941 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
                         Change photo
@@ -58,6 +58,7 @@ export default {
             )
             .then((res) =>{
                this.$store.commit('SET_PROFILE_PIC', res.data);
+               console.log("hji");
             })
             .catch((err) =>{
                 console.log(err.response);
@@ -96,6 +97,9 @@ export default {
         display: flex;
         justify-content: center;
         max-height: 125px;
+        border-radius: 50%;
+        border: 1px solid #ededed;
+         box-shadow: 0px 0px 8px -4px #bdbdbd;
         .profile-picture{
            position: relative;
            height: 125px;
@@ -104,6 +108,19 @@ export default {
            clip-path: circle(60px at center);
             img{
                 height: 100%;
+                width: inherit;
+            }
+            &::before{
+                content:'\A';
+                position:absolute;
+                width:99%; height:99%;
+                top:0; left:0;
+                background: rgb(252 252 152 / 85%);
+                opacity:0;
+                transition: all 0.5s;
+                clip-path: circle(63.0% at 50% 105%);
+                -webkit-transition: all 0.5s;
+                transition: all 0.5s;
             }
             &::after{
                 content:'\A';

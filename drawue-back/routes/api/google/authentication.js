@@ -27,7 +27,6 @@ passport.use(new GoogleStrategy({
         }
         else{
             var password = generatePassword(12);
-            rug.setName(['Gonzales', 'Gytis', 'John', 'America']);
             rug.setAdjectives(['Fast', 'Dangerous', 'Bland', 'Slow', 'Speedy', 'Gamer', 'Drawer', 'Painter', 'Artistic']);
             rug.setSeperator('');
             var new_username = rug.generate();
@@ -38,7 +37,6 @@ passport.use(new GoogleStrategy({
                 password: password,
                 profilePic: 'default-user.png',
                 emailConfirmed: true,
-                registrationComplete: false,
             });
             bcrypt.genSalt(10, function(err, salt) {
                 if (err) return next(err);            

@@ -14,7 +14,6 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.config.productionTip = false
 
 Vue.use(Vuelidate)
-
  store.dispatch('UpdateLoginState')
   .then(()=>{
     new Vue({

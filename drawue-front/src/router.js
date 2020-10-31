@@ -64,14 +64,14 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if(store){
             isLoggedIn = store.getters.getLoginState;
-            if (isLoggedIn) next()
-            else if(isLoggedIn===false) next({path: '/login'})
+            if (isLoggedIn) next();
+            else next('login');
         }
     } 
     if (to.matched.some(record => record.meta.requiresNonAuth)) {
             isLoggedIn = store.getters.getLoginState;
-            if (isLoggedIn) next({path: '/profile'})
-            else if(isLoggedIn===false) next()
+            if (isLoggedIn) next('profile');
+            else next();
     }
     else next()
   })

@@ -2,9 +2,11 @@ const multer = require('multer');
 const express = require('express');
 const { User } = require('../../../models/user');
 const { verifyToken } = require("../verifyToken");
+const sharp = require('sharp');
+var fs = require('fs');
 const router = express();
 
-const DIR = './public/uploads/profile-pics';
+const DIR = './uploads/profile-pics';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -36,22 +38,49 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res, next) =>
         }
         else{
             const file = req.file
-            console.log(file);
             if (!file) {
                 res.status(400).send({'error': 'Failed to upload the file.'});
             }
-            user.profilePic = file.filename;
+            var oldFileName = user.profilePic;
+            user.profilePic = 're'+file.filename;
+
+            if (fs.existsSync('./uploads/profile-pics/'+file.filename)) {
+                await sharp('./uploads/profile-pics/'+file.filename).resize(
+                    {
+                        fit: sharp.fit.contain,
+                        background: { r: 255, g: 255, b: 255 },
+                        width: 125,
+                        height: 125
+                    }
+                    ) 
+                    .png({quality : 90}).toFile('./uploads/profile-pics/re'+file.filename)
+                
+                    fs.unlink('./uploads/profile-pics/'+file.filename, (err) => {
+                        if (err) {
+                            console.error(err)
+                            return
+                        }
+                    });
+                        console.log(oldFileName);
+                    if (fs.existsSync('./uploads/profile-pics/'+oldFileName)){
+                        fs.unlink('./uploads/profile-pics/'+oldFileName, (err) => {
+                            if (err) {
+                                console.error(err)
+                                return
+                            }
+                            });
+                    }
+              }
+            
             user.save().then(()=>{
-                res.send(file.filename); 
+                res.send('re'+file.filename); 
             }).catch(()=>{
                 res.status(400).status({"error": 'Failed to set profile picture path'});
             });
-                 
         }
     }
     else{
         return res.status(400).send('Session not found. Please try to re-login.');
     }
-
 });
 module.exports = router;

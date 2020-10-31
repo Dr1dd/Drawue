@@ -19,6 +19,7 @@ var profile = require('./routes/api/profile/userProfile');
 var callback = require('./routes/api/google/callback');
 var fbCallback = require('./routes/api/facebook/callback');
 
+var getProfilePic = require('./routes/api/upload/getImage');
 var uploadProfilePic = require('./routes/api/upload/profileImage');
 
 if (!config.get('PrivateKey')) {
@@ -48,7 +49,7 @@ app.use(bodyParser.urlencoded({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(__dirname+'/public/'));
 
 //working routes
 app.use('/api/auth/register', register);
@@ -67,6 +68,7 @@ app.use('/api/auth/google/callback', passport.authenticate('google'), callback);
 app.get('/api/auth/facebook', passport.authenticate('facebook', { scope : ['email']}));
 app.use('/api/auth/facebook/callback', passport.authenticate('facebook'), fbCallback);
 // Uploads
+app.use('/api/uploads/getImage', getProfilePic);
 app.use('/api/upload/profile-pic', uploadProfilePic);
 
 if(process.env.NODE_ENV == 'production'){
@@ -74,10 +76,12 @@ if(process.env.NODE_ENV == 'production'){
     app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
     console.log("production");
   }
+
+  // app.use(express.static(__dirname+'/public/'));
+  // app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
   app.use(function(req, res, next) {
     next(createError(404));
   });
-  
   // error handler
   app.use(function(err, req, res, next) {
     // set locals, only providing error in development

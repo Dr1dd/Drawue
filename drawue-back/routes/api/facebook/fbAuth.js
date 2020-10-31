@@ -22,7 +22,6 @@ passport.use(new FacebookStrategy({
         }
         else{
             var new_password = generatePassword(12);
-            rug.setName(['Gonzales', 'Gytis', 'John', 'America']);
             rug.setAdjectives(['Fast', 'Dangerous', 'Bland', 'Slow', 'Speedy', 'Gamer', 'Drawer', 'Painter', 'Artistic']);
             rug.setSeperator('');
             var new_username = rug.generate();
@@ -34,7 +33,6 @@ passport.use(new FacebookStrategy({
                 password: new_password,
                 profilePic: 'default-user.png',
                 emailConfirmed: true,
-                registrationComplete: false
             });
             bcrypt.genSalt(10, function(err, salt) {
                 if (err) return next(err);            
