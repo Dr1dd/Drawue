@@ -46,7 +46,7 @@
                     <transition name="fade">
                         <div class="error" v-if="$v.user.email.$dirty && !$v.user.email.required">Field is required</div>
                         <div class="error" v-else-if="$v.user.email.$dirty && !$v.user.email.minLength">Email must have at least {{$v.user.email.$params.minLength.min}} characters.</div>
-                        <div class="error" v-else-if="$v.user.email.$dirty && !$v.user.email.maxLength"> Your username should not exceed {{$v.user.email.$params.maxLength.max}} characters </div>
+                        <div class="error" v-else-if="$v.user.email.$dirty && !$v.user.email.maxLength"> Your email should not exceed {{$v.user.email.$params.maxLength.max}} characters </div>
                         <div class="error" v-else-if="$v.user.email.$dirty && !$v.user.email.email">Email must be formatted correctly.</div>
                         <div class="error" v-else-if="backendError['email']"> {{backendError['email']}} </div>
                     </transition>
@@ -156,14 +156,15 @@ export default {
             var confirmPassword = this.user.passwordConfirm;
             axios.post('/api/auth/register', {username, email, password, confirmPassword }, {})
                 .then((res) => {
-                    if (res.data) {
+                   this.loading = false;
+                   if (res.data) {
                         this.successMessage = res.data.successSend;
                     }
                 })
                 .catch((err) => {
-                    this.backendError = err.response.data
+                   this.loading = false;
+                   this.backendError = err.response.data
                 });
-            this.loading = false;
         },
         resendEmail(){
             var email = 'perter@gmail.com';

@@ -20,8 +20,10 @@ const storage = multer.diskStorage({
 const imageFilterHelper = function(req, file, cb) {
     // Accept images only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
-        req.fileValidationError = 'Only image files are allowed!';
         return cb(new Error('Only image files are allowed!'), false);
+    }
+    if(file.size >5000000){
+        return cb(new Error('File size should not exceed 5MB'), false);
     }
     if(file)
     cb(null, true);
@@ -30,11 +32,12 @@ var upload = multer({
     storage: storage,
     fileFilter: imageFilterHelper,
   });
-router.post('/', [verifyToken, upload.single('file')], async (req, res, next) => {
+router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
+    if(req.fileValidationError) return res.status(400).send({'error': req.fileValidationError});
     if(req.user){
         let user = await User.findOne({_id: req.user._id});
         if (!user) {
-            return res.status(400).send('Please try to login again.');
+            return res.status(400).send({'error':'Please try to login again.'});
         }
         else{
             const file = req.file
@@ -61,7 +64,6 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res, next) =>
                             return
                         }
                     });
-                        console.log(oldFileName);
                     if (fs.existsSync('./uploads/profile-pics/'+oldFileName)){
                         fs.unlink('./uploads/profile-pics/'+oldFileName, (err) => {
                             if (err) {
@@ -82,5 +84,10 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res, next) =>
     else{
         return res.status(400).send('Session not found. Please try to re-login.');
     }
+
+    }, (error, req, res, next) =>{
+        res.status(400).send({error: error.message});
+    
+    
 });
 module.exports = router;

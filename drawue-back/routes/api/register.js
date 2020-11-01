@@ -63,7 +63,7 @@ router.post('/resend', async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
     if(!user) res.send({"successSend": "User was not found"});
     jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{     
-        console.log("http://localhost:8080/verification/"+emailToken);
+        console.log("http://localhost:5000/verification/"+emailToken);
         res.send({"successSend": "Email has been resent!"});
     });
 });

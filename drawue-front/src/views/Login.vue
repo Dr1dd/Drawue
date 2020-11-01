@@ -1,10 +1,31 @@
 <template>
   <div class ="login-container">
-      <div class="login-module">
-          <div class="login-header">
+      <div v-if="forgotPassword" class="forgot-module">
+          <div class="module-header">
+              Account Recovery
+          </div>
+          <div class="module-form--wrapper">
+                <div v-if="!emailSent" class="input-container">
+                    <input type="text" placeholder="Email Address" maxlength="128" v-model="$v.email.$model"  @blur="$v.email.$touch()">
+                      <transition name="fade">
+                        <div class="error" v-if="$v.email.$dirty && !$v.email.required">Field is required</div>
+                        <div class="error" v-else-if="$v.email.$dirty && !$v.email.minLength">Email must have at least {{$v.email.$params.minLength.min}} characters.</div>
+                                 <div class="error" v-else-if="$v.email.$dirty && !$v.email.email">Email must be formatted correctly.</div>
+                        <div class="error" v-else-if="backendError"> {{backendError}} </div>
+                     </transition>
+                    <div class="btn" @click="resetPassword">Reset Password</div>
+                </div>
+                <div v-else>
+                    A password recovery link has been sent to you by email. When you receive it, click the link to open window where you can enter a new password.
+                    <div class="btn">Go to Login</div>
+                </div>
+          </div>
+      </div>
+      <div v-else class="login-module">
+          <div class="module-header">
               Login
           </div>
-          <div class="login-form--wrapper">
+          <div class="module-form--wrapper">
             <div class="login-form">
                 <div class="input-container">
                     <input type="text" placeholder="Username/Email" maxlength="128" v-model="$v.email_username.$model"  @blur="$v.email_username.$touch()">
@@ -39,6 +60,9 @@
                         <img src="../assets/google.jpg" alt="">
                         <a href="api/auth/google/authentication">Sign in with Google </a>
                     </div>
+                    <a class="forgot-password" @click ="forgotPassword = true">
+                            Forgot password? 
+                    </a>
                 </div>
             </div>
           </div>
@@ -48,7 +72,7 @@
 
 <script>
 import axios from 'axios';
-import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
 import Loader from 'vueloaderspinners'
 export default {
     name: 'Login',
@@ -58,14 +82,22 @@ export default {
     data(){
         return{
             email_username: '',
+            email: '',
             password: '',
             backendError: '',
             loading: false,
             color: '#fff',
-            size: '5px'
+            size: '5px',
+            forgotPassword: false,
+            emailSent: false,
         }
     },
     validations: {
+        email: {
+            required,
+            email,
+            minLength: minLength(8),  
+        },
         email_username: {
             required,
             minLength: minLength(8),  
@@ -89,15 +121,29 @@ export default {
             this.loading=true;
             axios.post('/api/auth/login', {username_email, password }, {})
             .then(() => {
+                this.loading=false;
                 this.$store.dispatch('UpdateLoginState');
                 this.$router.push('/profile');
             })
             .catch((err) => {
+                this.loading=false;
                 this.backendError = err.response.data;
             });
-             this.loading=false;
         },
-
+        resetPassword(){
+            this.$v.email.$touch();
+            if (this.$v.email.$invalid) {
+                return;
+            }
+            var restoreEmail = this.email
+             axios.post('/api/auth/account-recovery', {restoreEmail }, {})
+            .then(() => {
+                this.emailSent = true;
+            })
+            .catch((err) => {
+                this.backendError = err.response.data.sendError;
+            });
+        }
     }
 
 }
@@ -105,7 +151,7 @@ export default {
 
 <style lang="scss">
 $module-theme: #86a1b8;
-
+@use '../sass/abstracts/mixins';
 
  .login-container{
      display: flex;
@@ -115,48 +161,44 @@ $module-theme: #86a1b8;
      height: 100vh;
      width: 100%;
  }
+ .forgot-module{
+    @include mixins.form-module;
+    .input-container{
+        margin-bottom: 0px;
+        .btn{
+            margin-top: 10px;
+        }
+    } 
+    .module-form--wrapper{
+        max-width: 300px;
+        .btn{
+            margin-top: 10px;
+        }
+    }
+}
+.input-container{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+} 
  .login-module{
-     display: flex;
-     flex-direction: column;
-     background: white;
-     box-shadow: 0px 0px 4px -2px #000000;
-     border-radius: 15px;
-     .login-header{
+     @include mixins.form-module;
+    .login-form{
         display: flex;
+        flex-direction: column;
+        padding-right: 32px;
+        border-right: 3px solid $module-theme;
+    }
+    .social-form{
+        display: flex;
+        flex-direction: column;
         justify-content: center;
-        padding: 10px;
-        background: $module-theme;
-        color: white;
-        font-size: 25px;
-        font-weight: 700;
-        border-radius: 13px 13px 0 0;
-     }
-     .login-form--wrapper{
-        display: flex;
-        flex-direction: row;
-        padding: 10px 32px 32px;
-        .login-form{
-            display: flex;
-            flex-direction: column;
-            padding-right: 32px;
-            border-right: 3px solid $module-theme;
-            .input-container{
-                display: flex;
-                flex-direction: column;
-                margin-bottom: 20px;
-            } 
+        padding: 20px 0 20px 20px;
+        .social-buttons{
+            display: grid;
+            grid-row-gap: 12px;
         }
-        .social-form{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 20px 0 20px 20px;
-            .social-buttons{
-                display: grid;
-                grid-row-gap: 12px;
-            }
-        }
-     }
+    }
  }
 .social-buttons{
     display: grid;
@@ -201,6 +243,10 @@ $module-theme: #86a1b8;
              align-items: center;
         }
     }
+}
+.forgot-password{
+    color: #86a1b8;
+    cursor: pointer;
 }
 
 

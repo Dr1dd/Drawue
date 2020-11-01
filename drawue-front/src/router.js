@@ -20,6 +20,21 @@ const routes = [
         component: () => import("./views/Login"),
     },
     {
+        path: '/reset/:token',
+        beforeEnter:(to, from, next) => {
+            let token=to.params.token;
+            next({ path: '/reset', query: { tkn: token}})
+        },    
+    },
+    {
+        path: '/reset',
+        name: "Reset",
+        meta:{
+            requiresNonAuth: true,
+        },
+        component: () => import("./views/PasswordReset"),
+    },
+    {
         path: '/register',
         name: "Register",
         meta:{

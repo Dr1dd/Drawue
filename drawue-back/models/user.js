@@ -28,6 +28,12 @@ const User = mongoose.model('User', new mongoose.Schema({
     profilePic: {
         type: String,
     },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+        type: Date,
+    }
 },{ timestamps: true }));
  
 function validateUser(user) {
@@ -151,7 +157,7 @@ return schema.validate(user);
 
 }
 function validatePassword(password){
-  const schema = {
+  const schema = Joi.object({
     password: Joi.string().min(8).max(255).required().error(errors => {
       errors.forEach(err => {
         switch (err.type) {
@@ -173,11 +179,11 @@ function validatePassword(password){
       });
       return errors;
     }),
-  };
-  return Joi.validate(password, schema);
+  });
+  return schema.validate(password);
 }
 function validateEmail(email){
-  const schema = {
+  const schema = Joi.object({
     email: Joi.string().min(8).max(254).required().email().error(errors => {
       errors.forEach(err => {
         switch (err.type) {
@@ -202,8 +208,8 @@ function validateEmail(email){
       });
       return errors;
     }),
-  };
-  return Joi.validate(email, schema);
+  });
+  return schema.validate(email);
 }
  
 exports.User = User;

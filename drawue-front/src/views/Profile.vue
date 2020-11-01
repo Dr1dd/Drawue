@@ -1,6 +1,16 @@
 <template>
   <div class="profile-container">
       <div class="profile-module">
+         <transition name="appear">
+             <div v-if="uploadErrorMessage != ''" class="error-flash">
+                 <div class="close" @click ="uploadErrorMessage=''">
+                     <div></div>
+                     <div></div>
+                 </div>
+                 {{ uploadErrorMessage }}
+                 
+            </div>
+        </transition>
           <div class="user-details">
             <div class="picture-container">
                 <div class="profile-picture">
@@ -13,7 +23,7 @@
                     </div>
                 </div>
             </div>
-            <div class="profile-username" @click="submitFile"> @{{ getUsername }}</div>
+            <div class="profile-username"> @{{ getUsername }}</div>
 
           </div>
           <div class="password-change">
@@ -35,6 +45,7 @@ export default {
                 email: '',
             },
             picFile: null,
+            uploadErrorMessage: '',
         }
     },
 
@@ -43,7 +54,6 @@ export default {
     },
     methods: {
         handlePicUpload(event){
-            console.log(event);
             this.picFile = event.target.files[0];
         },
         submitFile(){
@@ -58,17 +68,27 @@ export default {
             )
             .then((res) =>{
                this.$store.commit('SET_PROFILE_PIC', res.data);
-               console.log("hji");
             })
             .catch((err) =>{
-                console.log(err.response);
+                //console.log(err.response);
+                this.uploadErrorMessage = err.response.data.error;
+
             });
         }
     },
     watch: {
         picFile: function(){
             this.submitFile();
+        },
+        uploadErrorMessage: function(){
+            if(this.uploadErrorMessage!=''){
+                setTimeout(()=> {
+                    return this.uploadErrorMessage = '';
+                }, 3000);
+            }
+     
         }
+
     }
 }
 </script>
@@ -83,6 +103,7 @@ export default {
         width: 100%;
         .profile-module{
             display: flex;
+            position: relative;
             flex-direction: column;
             padding: 20px;
             background: white;
@@ -169,4 +190,46 @@ export default {
     input[type=file]{
         display: none;
     }
+    .error-flash{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: initial;
+        height: 60px;
+        background: #f2a1a1;
+        border-radius: 11px;
+        color: #ffffff;
+        padding: 13px 5px 5px 5px;
+        top: -87px;
+        left: 0;
+        .close{
+            position: absolute;
+            cursor: pointer;
+            right: 10px;
+            top: 6px;
+            div{
+                height: 14px;
+                width: 2px; 
+                background: white;
+            }
+            div:nth-child(1){
+                position: absolute;
+                transform: rotate(-45deg);
+            }
+            div:nth-child(2){
+                transform: rotate(45deg);
+            }
+        }
+    }
+    .appear-enter-active, .appear-leave-active {
+     transition: all .5s;
+     transform: scale(1);
+    }
+    .appear-enter, .appear-leave-to /* .fade-leave-active below version 2.1.8 */ {
+     opacity: 0;
+     transform: translateY(20px) scale(0.8);
+    }
+
+
 </style>

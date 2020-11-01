@@ -15,7 +15,8 @@ var verification = require('./routes/api/verification');
 var state = require('./routes/api/state');
 var logout = require('./routes/api/logout');
 var profile = require('./routes/api/profile/userProfile');
-//var passportGoogle = require('./routes/api/google/authentication');
+var passwordReset = require('./routes/api/password-reset');
+
 var callback = require('./routes/api/google/callback');
 var fbCallback = require('./routes/api/facebook/callback');
 
@@ -54,6 +55,7 @@ app.use(cookieParser());
 //working routes
 app.use('/api/auth/register', register);
 app.use('/api/auth/login', login);
+app.use('/api/auth/account-recovery', passwordReset);
 app.use('/api/auth/verification', verification);
 app.use('/api/auth/state', state);
 app.use('/api/auth/logout', logout);
