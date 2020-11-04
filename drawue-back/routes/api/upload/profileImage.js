@@ -65,18 +65,22 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
                         }
                     });
                     if (fs.existsSync('./uploads/profile-pics/'+oldFileName)){
-                        fs.unlink('./uploads/profile-pics/'+oldFileName, (err) => {
-                            if (err) {
-                                console.error(err)
-                                return
-                            }
+                        if(oldFileName!="default-user.png"){
+                            fs.unlink('./uploads/profile-pics/'+oldFileName, (err) => {
+                                if (err) {
+                                    console.error(err)
+                                    return
+                                }
                             });
+                        }
                     }
               }
             
             user.save().then(()=>{
                 res.send('re'+file.filename); 
             }).catch(()=>{
+                user.profilePic = 'default-user.png';
+                user.save();
                 res.status(400).status({"error": 'Failed to set profile picture path'});
             });
         }

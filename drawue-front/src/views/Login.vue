@@ -28,25 +28,25 @@
           <div class="module-form--wrapper">
             <div class="login-form">
                 <div class="input-container">
-                    <input type="text" placeholder="Username/Email" maxlength="128" v-model="$v.email_username.$model"  @blur="$v.email_username.$touch()">
+                    <input type="text" placeholder="Username/Email" maxlength="128" v-model.lazy="$v.login.email_username.$model"  @blur="$v.login.email_username.$touch()">
                     <transition name="fade">
-                        <div class="error" v-if="$v.email_username.$dirty && !$v.email_username.required">Field is required</div>
-                        <div class="error" v-else-if="$v.email_username.$dirty && !$v.email_username.minLength">Username/Email must have at least {{$v.email_username.$params.minLength.min}} characters.</div>
+                        <div class="error" v-if="$v.login.email_username.$dirty && !$v.login.email_username.required">Field is required</div>
+                        <div class="error" v-else-if="$v.login.email_username.$dirty && !$v.login.email_username.minLength">Username/Email must have at least {{$v.login.email_username.$params.minLength.min}} characters.</div>
                         <div class="error" v-else-if="backendError"> {{backendError}} </div>
                     </transition>
-                    <input type="password" placeholder="Password" v-model="$v.password.$model" @blur="$v.password.$touch()">
+                    <input type="password" placeholder="Password" v-model.lazy="$v.login.password.$model" @blur="$v.login.password.$touch()">
                     <transition name="fade">
-                        <div class="error" v-if="$v.password.$dirty && !$v.password.required">Field is required</div>
-                        <div class="error" v-else-if="$v.password.$dirty && !$v.password.minLength">Password must have at least {{$v.password.$params.minLength.min}} characters.</div>
+                        <div class="error" v-if="$v.login.password.$dirty && !$v.login.password.required">Field is required</div>
+                        <div class="error" v-else-if="$v.login.password.$dirty && !$v.login.password.minLength">Password must have at least {{$v.login.password.$params.minLength.min}} characters.</div>
                     </transition>
                 </div>
-                <div class="btn loader" @click="login">
-                    <div class="login-loader">
-                        <Loader v-if="loading" color="white" loaderType="bubble" />
+                <div class="btn loader" @click="userLogin">
+                    <div class="login-loader" v-if="loading">
+                        <Loader color="white" loaderType="bubble" />
                     </div>
                     Login 
-                    <div class="login-loader">
-                        <Loader v-if="loading" color="white" loaderType="bubble" />
+                    <div class="login-loader" v-if="loading">
+                        <Loader color="white" loaderType="bubble" />
                     </div>
                 </div>
             </div>
@@ -81,7 +81,10 @@ export default {
     },
     data(){
         return{
-            email_username: '',
+            login:{
+                email_username: '',
+                password: '',
+            },
             email: '',
             password: '',
             backendError: '',
@@ -98,32 +101,33 @@ export default {
             email,
             minLength: minLength(8),  
         },
-        email_username: {
-            required,
-            minLength: minLength(8),  
-        },
-        password: {              
-            required,
-            minLength: minLength(8),   
-            maxLength: maxLength(100),    
+        login:{
+            email_username: {
+                required,
+                minLength: minLength(8),  
+            },
+            password: {              
+                required,
+                minLength: minLength(8),   
+                maxLength: maxLength(100),    
+            }
         }
 
     },
     methods:{
-        login(){
-
-            this.$v.$touch();
-            if (this.$v.$invalid) {
+        userLogin(){
+            this.$v.login.$touch();
+            if (this.$v.login.$invalid) {
                 return;
             }
-            var username_email = this.email_username;
-            var password = this.password;
+            var username_email = this.login.email_username;
+            var password = this.login.password;
             this.loading=true;
             axios.post('/api/auth/login', {username_email, password }, {})
             .then(() => {
                 this.loading=false;
                 this.$store.dispatch('UpdateLoginState');
-                this.$router.push('/profile');
+                this.$router.push('/');
             })
             .catch((err) => {
                 this.loading=false;

@@ -16,6 +16,7 @@ var state = require('./routes/api/state');
 var logout = require('./routes/api/logout');
 var profile = require('./routes/api/profile/userProfile');
 var passwordReset = require('./routes/api/password-reset');
+var passwordChange = require('./routes/api/change-password');
 
 var callback = require('./routes/api/google/callback');
 var fbCallback = require('./routes/api/facebook/callback');
@@ -56,6 +57,7 @@ app.use(cookieParser());
 app.use('/api/auth/register', register);
 app.use('/api/auth/login', login);
 app.use('/api/auth/account-recovery', passwordReset);
+app.use('/api/auth/change-password', passwordChange)
 app.use('/api/auth/verification', verification);
 app.use('/api/auth/state', state);
 app.use('/api/auth/logout', logout);

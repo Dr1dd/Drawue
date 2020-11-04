@@ -99,11 +99,7 @@ export default {
             size: '5px'
         }
     },
-    calculated:{
-        getErrorMessage(){
 
-        }
-    },
     validations: {
         user:{
             username: {
@@ -243,18 +239,6 @@ $module-theme: #86a1b8;
         }
      }
   }
-    .fade-enter-active, .fade-leave-active {
-        transition: all .4s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-    .fade-enter{
-        transform: translateX(-5px);
-    }
-    .fade-leave-to{
-        transform: translateX(5px);
-    }
     .confirm-email{
         padding: 20px;
         font-size: 20px;

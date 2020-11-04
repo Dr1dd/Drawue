@@ -126,18 +126,6 @@ export default {
             margin-top: 10px;
         }
     } 
-     .fade-enter-active, .fade-leave-active {
-        transition: all .4s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-    .fade-enter{
-        transform: translateX(-5px);
-    }
-    .fade-leave-to{
-        transform: translateX(5px);
-    }
     .response-message{
         margin-top: 15px;
         div{

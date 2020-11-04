@@ -1,13 +1,16 @@
 <template>
   <div class="header">
+      <div class="site-logo">
+        <router-link to="/"><img src="@/assets/Drawue-logo.png"> </router-link>
+      </div>
       <div class="auth-section" v-if="getLoginState === false">
         <router-link to="/login"><div class="sign-in"> Sign In</div></router-link>
         <router-link to="/register"><div class="sign-up"> Sign Up</div></router-link>
       </div>
       <div v-else-if="getLoginState == true" class="profile-section">
         <div class="user">
-          <div class="profile-pic" @click="$router.push('profile')">
-            <img :src="'/api/uploads/getImage/' + getProfilePic" alt="pic">
+          <div class="profile-pic">
+            <router-link to="/profile"><img :src="'/api/uploads/getImage/' + getProfilePic" alt="pic"> </router-link>
           </div>
           <div class="username" @click="dropDown = !dropDown">
             {{ getUsername }}
@@ -60,10 +63,24 @@ export default {
     height: 48px;
     width: 100%;
     background: white;
-    justify-content: flex-end;
+    justify-content: space-between;
     position: fixed;
     z-index: 999;
     box-shadow: 0px 0px 4px -2px #000000;
+    .site-logo{
+      height: 100%;
+      margin-left: 90px;
+      cursor: pointer;
+      a{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+      }
+      img{
+          height: 85%;
+      }
+    }
  }
  .auth-section{
     display: flex;
