@@ -90,7 +90,7 @@ export default {
         var token = this.$route.query.tkn;
         if(token.length!=64) this.message = 'Password reset token is invalid or has expired.';
         else{
-            axios.get('/api/auth/account-recovery/valid', { token }, {})
+            axios.post('/api/auth/account-recovery/valid', { token }, {})
             .then(()=>{
             })
             .catch((err)=>{
@@ -122,6 +122,8 @@ export default {
     .input-container{
         display: flex;
         flex-direction: column;
+        max-width: 300px;
+        min-width: 300px;
         .btn{
             margin-top: 10px;
         }

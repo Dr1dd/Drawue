@@ -108,7 +108,7 @@ export default {
                 maxLength: maxLength(22),
                 validUsername(username){
                     return (
-                        /^[a-z0-9]+$/.test(username)
+                        /^[a-zA-Z0-9]+$/.test(username)
                     );
                 }  
             },

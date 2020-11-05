@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
             //       pass: "secret.1"
             //     }
             //   });
-               console.log("http://localhost:8080/verification/"+emailToken);
+               console.log("http://localhost:5000/verification/"+emailToken);
             //   const email = new Email({
             //     transport: transporter,
             //     send: true,

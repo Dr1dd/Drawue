@@ -110,7 +110,7 @@ function validateUser(user) {
 }
 function validateLogin(user){
   const schema = Joi.object({
-    username_email: Joi.string().min(8).max(254).required().error(errors => {
+    username_email: Joi.string().min(6).max(254).required().error(errors => {
         errors.forEach(err => {
           switch (err.type) {
             case "any.empty":
@@ -131,7 +131,7 @@ function validateLogin(user){
         });
         return errors;
       }),
-    password: Joi.string().min(6).max(256).required().error(errors => {
+    password: Joi.string().min(8).max(256).required().error(errors => {
         errors.forEach(err => {
           switch (err.type) {
             case "any.empty":

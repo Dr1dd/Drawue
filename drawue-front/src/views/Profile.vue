@@ -185,10 +185,11 @@ export default {
             var currentPassword = this.password.currentPassword;
             var newPassword = this.password.newPassword;
             var confirmNewPassword = this.password.newPasswordConfirm;
+
             axios.post('/api/auth/change-password', {currentPassword, newPassword, confirmNewPassword }, {})
                 .then((res) => {
                    if (res.data) {
-                        this.loading = true;
+                        this.loading = false;
                         this.btnText = "Change Password";
                         this.successMessage = res.data.successPassword;
                     }

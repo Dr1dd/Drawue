@@ -7,7 +7,7 @@
             </div>
             <div class="text-container">
                 {{message}}
-                <div >Go <a href="/">Home</a></div>
+                <div >Go <router-link to="/">Home</router-link></div>
             </div>
         </div>
       </div>
@@ -25,7 +25,6 @@ export default {
     },
     mounted(){
         var token = this.$route.query.email;
-        console.log(token);
         axios.post('/api/auth/verification', { token }, {})
         .then((res)=>{
             if(res.data){

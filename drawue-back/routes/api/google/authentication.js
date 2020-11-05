@@ -1,5 +1,6 @@
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
+const {generatePassword, generateUsername } = require('../../../helpers/generators');
 const { User } = require('../../../models/user');
 const config = require('config');
 const bcrypt = require('bcrypt');
@@ -26,39 +27,39 @@ passport.use(new GoogleStrategy({
             cb(null,user);
         }
         else{
-            var password = generatePassword(12);
+            var new_password = generatePassword(12);
             rug.setAdjectives(['Fast', 'Dangerous', 'Bland', 'Slow', 'Speedy', 'Gamer', 'Drawer', 'Painter', 'Artistic']);
             rug.setSeperator('');
             var new_username = rug.generate();
             new_username = new_username.slice(0, 12);
-            userNew = new User({
-                username: new_username,
-                email: profile.emails[0].value,
-                password: password,
-                profilePic: 'default-user.png',
-                emailConfirmed: true,
-            });
-            bcrypt.genSalt(10, function(err, salt) {
-                if (err) return next(err);            
-                bcrypt.hash(userNew.password, salt, function(err, hash) {
-                    if (err) return err;
-                    userNew.password = hash;
-                    userNew.save().then(()=>{
-                        cb(null, userNew);
+            generateUsername(new_username)
+                .then((newUsername)=>{
+
+                    userNew = new User({
+                        username: String(newUsername),
+                        email: profile.emails[0].value,
+                        password: new_password,
+                        profilePic: 'default-user.png',
+                        emailConfirmed: true,
                     });
+                    bcrypt.genSalt(10, function(err, salt) {
+                        if (err) return next(err);            
+                        bcrypt.hash(userNew.password, salt, function(err, hash) {
+                            if (err) return err;
+                            userNew.password = hash;
+                            userNew.save().then(()=>{
+                                cb(null, userNew);
+                            });
+                        });
+                    });
+                })
+                .catch((err)=>{
+                    if (err) return err;
                 });
-            });
         }
     });
 
   }
 ));
-function generatePassword(length) {
-        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-        retVal = "";
-    for (var i = 0, n = charset.length; i < length; ++i) {
-        retVal += charset.charAt(Math.floor(Math.random() * n));
-    }
-    return retVal;
-}
+
 module.exports = passport;

@@ -17,7 +17,7 @@
                 </div>
                 <div v-else>
                     A password recovery link has been sent to you by email. When you receive it, click the link to open window where you can enter a new password.
-                    <div class="btn">Go to Login</div>
+                    <div class="btn" @click="forgotPassword = false; emailSent = false">Go to Login</div>
                 </div>
           </div>
       </div>
@@ -104,7 +104,7 @@ export default {
         login:{
             email_username: {
                 required,
-                minLength: minLength(8),  
+                minLength: minLength(6),  
             },
             password: {              
                 required,

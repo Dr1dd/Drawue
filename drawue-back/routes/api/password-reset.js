@@ -58,7 +58,7 @@ router.post('/reset', async (req, res) =>{
         }
   });
 });
-router.get('/valid', async (req, res)=>{
+router.post('/valid', async (req, res)=>{
     User.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
         if (!user) {
             res.status(400).send({ errorMessage: "Password reset token is invalid or has expired."});
