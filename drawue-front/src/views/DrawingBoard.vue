@@ -90,6 +90,11 @@
                   </div>
               </div>
           </div>
+          <div class="download-btn--container" @click ="saveCanvas">
+              <div class="download-btn">
+                  <svg  viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m239.029 384.97a24 24 0 0 0 33.942 0l90.509-90.509a24 24 0 0 0 0-33.941 24 24 0 0 0 -33.941 0l-49.539 49.539v-262.059a24 24 0 0 0 -48 0v262.059l-49.539-49.539a24 24 0 0 0 -33.941 0 24 24 0 0 0 0 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
+              </div>
+          </div>
           <div class="clear-container" @click = "clearCanvas">
               <div class="clear-canvas">
                 <svg width="24" height="24" viewBox="0 0 364 454" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -107,16 +112,18 @@
       <div class="canvas-container">
          <canvas id="canvas" @mouseout="finishDrawing"></canvas> 
       </div>
-
+        <SaveModule :drawingImage="imageDataURL" :isOpen="saveModule" @closingSaveModule="saveModule=false"/>
   </div>
 </template>
 
 <script>
 import colorPicker from '@caohenghu/vue-colorpicker'
+import SaveModule from '../components/SaveModule'
 export default {
     name: 'DrawingBoard',
     components:{
-        colorPicker
+        colorPicker,
+        SaveModule
     },
     data() {
         return {
@@ -138,12 +145,14 @@ export default {
             scaledYTransformed: 0,
             canvasScale: 1,
             marginVertical: 0,
-            
+            saveModule: false,
             selectedStrokeSize: 5,
+
+            imageDataURL: '',
         }
     },
     created(){
-        window.addEventListener('beforeunload', this.saveCanvas);
+        window.addEventListener('beforeunload', this.localStorageCanvas);
     },
     mounted(){
             this.canvasContainer = document.getElementsByClassName('canvas-container');
@@ -279,13 +288,18 @@ export default {
                 }
             }
         },
-        saveCanvas(){
+        localStorageCanvas(){
             localStorage.setItem("imgCanvas",this.canvas.toDataURL());
         },
         clearCanvas(){
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             localStorage.setItem("imgCanvas",this.canvas.toDataURL());
-        }
+        },
+        saveCanvas(){
+            this.saveModule = true;
+            var img = this.canvas.toDataURL("image/png");
+            this.imageDataURL = img;
+        },
     },
 }
 </script>
@@ -304,7 +318,7 @@ $default-icon-color: #2c3e50;
     justify-content: space-around;
     align-items: center;
     min-height: 100px;
-    top: 37%;
+    top: 40%;
     transform: translate(-50%, -50%);
     border-radius: 24px;
     background: white;
@@ -481,6 +495,17 @@ $default-icon-color: #2c3e50;
      transition: all 0.25s;
      svg{
          stroke: $default-icon-color;
+     }
+ }
+.download-btn--container{
+     display: flex;
+     cursor:pointer;
+     margin: 15px 0;
+     transition: all 0.25s;
+     svg{
+         width: 24px;
+         height: 24px;
+         fill: $default-icon-color;
      }
  }
  .selected{

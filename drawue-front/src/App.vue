@@ -18,6 +18,7 @@ export default {
 
 <style lang="scss">
 $module-theme: #86a1b8;
+@use './sass/transitions/transitions';
 body{
   margin: 0;
   background: #f0f8ff;
