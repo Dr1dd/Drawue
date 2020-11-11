@@ -61,6 +61,24 @@ input{
     color: #a7a5a5;
   }
 }
+textarea{
+    margin: 10px 0;
+  padding: 8px;
+  font-size: 20px;
+  border: none;
+  resize: none;
+  border: 3px solid $module-theme;
+  transition: 0.25s all;
+  &:focus{
+    outline: none;
+    border: none;
+    border: 3px solid #5f7282;
+    box-shadow: 0px 9px 12px -13px rgb(65 74 83);
+  }
+  &::placeholder{
+    color: #a7a5a5;
+  }
+}
 .error{
   font-size: 13px;
   text-align: left;

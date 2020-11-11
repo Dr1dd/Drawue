@@ -179,6 +179,7 @@ export default {
             //EventListeners
             
             this.canvas.addEventListener('mousedown', this.startDrawing);
+
     },
     methods: {
         changeColor(color) {
