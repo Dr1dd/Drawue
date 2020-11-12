@@ -163,6 +163,7 @@ export default {
             // Canvas size and localstorage loading
             this.canvas.height = 720;
             this.canvas.width = 1080;
+            localStorage.setItem('resolution', [this.canvas.width, this.canvas.height])
             var ctx = document.querySelector("#canvas").getContext('2d');
             if(localStorage.getItem('imgCanvas') !== null){
                 var img=new Image();

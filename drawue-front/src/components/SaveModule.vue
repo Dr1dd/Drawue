@@ -30,7 +30,7 @@
               </div>
               <div class="drawing-info">
                     <div class="drawing-title">
-                        <input type="text" placeholder="Title">
+                        <input type="text" placeholder="Title" v-model="drawing.title">
                     </div>
                     <div class="drawing-description">
                         <textarea name="Description" placeholder="Description"></textarea>
@@ -44,6 +44,7 @@
                             <input class="tag-input" type="text"  maxlength="16" id="tag-input" placeholder="Enter a tag" @keyup.space ="addTag" @keyup.enter ="addTag">
                         </div>
                     </div>
+                    <div class="btn" @click="publishDrawing">Publish</div>
               </div>
           </div>
       </div>
@@ -52,6 +53,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { mapGetters } from 'vuex';
 export default {
     name: 'SaveModule',
@@ -59,6 +61,11 @@ export default {
         return{
             isPublishing: false,
             tags: [],
+            drawing: {
+                title: '',
+                description: '',
+                tags: [],
+            }
         }
     },
     props: {
@@ -70,9 +77,7 @@ export default {
     },
     mounted(){
         window.addEventListener('click', function(e){
-            console.log(this.isPublishing);
             if(this.isPublishing && this.isPublishing!=undefined){
-            console.log(e)
                 var module = document.getElementsByClassName('save-module');
                 if(!module.contains(e.target)){
                     this.closeModule;
@@ -99,6 +104,53 @@ export default {
         addTag(e){
             this.tags.push(e.target.value);
             e.target.value = '';
+        },
+        publishDrawing(){
+            var title = this.drawing.title;
+            var description = this.drawing.description;
+            var tags = this.drawing.tags;
+            var blob = this.dataURItoBlob(this.drawingImage);
+            let formData = new FormData(document.forms[0]);
+            var resolution = localStorage.getItem('resolution');
+            resolution = resolution.split(',');
+            var resolutionString = resolution[0].toString() + 'x'+ resolution[1].toString();
+            
+            formData.append('file', blob);
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('tags', tags);
+            formData.append('resolution', resolutionString);
+
+            axios.post('/api/upload/drawing', formData, {
+                headers: {
+                    'Content-Type': `multipart/form-data; boundary=${formData._boundary}`
+                }
+            })
+                .then((res)=>{
+                    console.log(res);
+                })
+                .catch((err)=>{
+                    console.log(err.response.data);
+                });
+        },
+        dataURItoBlob(dataURI) {
+            // convert base64/URLEncoded data component to raw binary data held in a string
+            var byteString;
+            if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                byteString = atob(dataURI.split(',')[1]);
+            else
+                byteString = unescape(dataURI.split(',')[1]);
+
+            // separate out the mime component
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+            // write the bytes of the string to a typed array
+            var ia = new Uint8Array(byteString.length);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ia], {type:mimeString});
         }
     }
 
@@ -245,6 +297,10 @@ a{
         input{
             width: 100%;
         }
+    }
+    .btn{
+        margin: 15px 0 0 0;
+        justify-content: center;
     }
 
 }

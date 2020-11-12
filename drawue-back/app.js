@@ -21,6 +21,7 @@ var passwordChange = require('./routes/api/change-password');
 var callback = require('./routes/api/google/callback');
 var fbCallback = require('./routes/api/facebook/callback');
 
+var postDrawing = require('./routes/api/upload/postDrawing');
 var getProfilePic = require('./routes/api/upload/getImage');
 var uploadProfilePic = require('./routes/api/upload/profileImage');
 
@@ -74,6 +75,7 @@ app.use('/api/auth/facebook/callback', passport.authenticate('facebook'), fbCall
 // Uploads
 app.use('/api/uploads/getImage', getProfilePic);
 app.use('/api/upload/profile-pic', uploadProfilePic);
+app.use('/api/upload/drawing', postDrawing);
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));
