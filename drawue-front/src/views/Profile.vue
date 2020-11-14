@@ -1,94 +1,113 @@
 <template>
   <div class="profile-container">
-      <div class="profile-grid">
-        <div class="profile-module">
-            <transition name="appear">
-                <div v-if="uploadErrorMessage != ''" class="error-flash">
-                    <div class="close" @click ="uploadErrorMessage=''">
-                        <div></div>
-                        <div></div>
+      <div class="profile-wrapper">
+        <div class="profile-grid">
+            <div class="profile-module">
+                <transition name="appear">
+                    <div v-if="uploadErrorMessage != ''" class="error-flash">
+                        <div class="close" @click ="uploadErrorMessage=''">
+                            <div></div>
+                            <div></div>
+                        </div>
+                        {{ uploadErrorMessage }}
+                        
                     </div>
-                    {{ uploadErrorMessage }}
+                </transition>
+                <div class="user-details">
+                    <div class="picture-container">
+                        <div class="profile-picture">
+                            <!-- <div class="overlay"></div> -->
+                            <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="">
+                            <div class="change-pic" @click="$refs.file.click()"> 
+                                <svg height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m182.461 155.48 49.539-49.539v262.059a24 24 0 0 0 48 0v-262.059l49.539 49.539a24 24 0 1 0 33.941-33.941l-90.509-90.51a24 24 0 0 0 -33.942 0l-90.509 90.51a24 24 0 1 0 33.941 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
+                                Change photo
+                                <input type="file" ref="file" @change="handlePicUpload($event)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-username">
+                        <div>
+                            @{{ getUsername }} 
+                        
+                        <div class="edit-username">
+                            <svg viewBox="0 0 383.947 383.947" xml:space="preserve">
+                            <g>
+                                <g>
+                                    <g>
+                                        <polygon points="0,303.947 0,383.947 80,383.947 316.053,147.893 236.053,67.893 			"/>
+                                        <path d="M377.707,56.053L327.893,6.24c-8.32-8.32-21.867-8.32-30.187,0l-39.04,39.04l80,80l39.04-39.04
+                                            C386.027,77.92,386.027,64.373,377.707,56.053z"/>
+                                    </g>
+                                </g>
+                            </g>
+                            </svg>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="post-info">
+                        <div class="drawing-count">Drawings:</div>
+                        <div class="like-count">Likes:</div>
+                    </div>
+
+                </div>
+                <div class="password-change">
                     
                 </div>
-            </transition>
-            <div class="user-details">
-                <div class="picture-container">
-                    <div class="profile-picture">
-                        <!-- <div class="overlay"></div> -->
-                        <img :src="'/api/uploads/getImage/' + getProfilePic" alt="">
-                        <div class="change-pic" @click="$refs.file.click()"> 
-                            <svg height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m182.461 155.48 49.539-49.539v262.059a24 24 0 0 0 48 0v-262.059l49.539 49.539a24 24 0 1 0 33.941-33.941l-90.509-90.51a24 24 0 0 0 -33.942 0l-90.509 90.51a24 24 0 1 0 33.941 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
-                            Change photo
-                            <input type="file" ref="file" @change="handlePicUpload($event)">
+            </div>
+            <div class="change-info--container">
+                <div class="change-password--container">
+                    <div class="module-title">
+                        Change Password:
+                    </div>
+                    <div class="password-form">
+                        <input type="password" placeholder="Current Password" v-model.lazy="$v.password.currentPassword.$model" @blur="$v.password.currentPassword.$touch()">
+                        <transition name="fade">
+                            <div class="error" v-if="$v.password.currentPassword.$dirty && !$v.password.currentPassword.required">Field is required</div>
+                            <div class="error" v-else-if="backendError['currentPass']"> {{backendError['currentPass']}} </div>
+                        </transition>
+
+                        <input type="password" placeholder="New Password" v-model.lazy="$v.password.newPassword.$model" @blur="$v.password.newPassword.$touch()">
+                        <transition name="fade">
+                            <div class="error" v-if="$v.password.newPassword.$dirty && !$v.password.newPassword.required">Field is required</div>
+                            <div class="error" v-else-if="$v.password.newPassword.$dirty && !$v.password.newPassword.strongPassword">Strong passwords need to have a letter, a number, a special character, and be atleast 8 characters long.</div>
+                            <div class="error" v-else-if="$v.password.newPassword.$dirty && !$v.password.newPassword.maxLength"> Your new password should not exceed {{$v.password.newPassword.$params.maxLength.max}} characters </div>
+                            <div class="error" v-else-if="backendError['newPassword']"> {{backendError['newPassword']}} </div>
+                        </transition>
+
+                        <input type="password" placeholder="Confirm Password" v-model.lazy="$v.password.newPasswordConfirm.$model" @blur="$v.password.newPasswordConfirm.$touch()">
+                        <transition name="fade">
+                            <div class="error" v-if="$v.password.newPasswordConfirm.$dirty && !$v.password.newPasswordConfirm.required">Field is required</div>
+                            <div class="error" v-else-if="$v.password.newPasswordConfirm.$dirty && !$v.password.newPasswordConfirm.sameAsPassword">The passwords do not match.</div>
+                            <div class="error" v-else-if="backendError['newPasswordConfirm']"> {{backendError['newPasswordConfirm']}} </div>
+                        </transition>
+                    </div>
+                    <div class="btn" @click="changePassword" >{{btnText}}</div>
+                    <transition name="success">
+                        <div v-if="successMessage" class="success-flash"><strong>Success:  </strong> {{successMessage}} </div>
+                    </transition>
+                </div>
+            </div>
+            <div class="drawing-list--container">
+                <div class="module-title">
+                    Drawings:
+                </div>
+                <div class ="drawing-post--container">
+                    <div v-for="(drawing, index) in drawingPosts" :key="index" class="drawing-post">
+                        <div class="drawing-thumbnail"> 
+                            <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
+                        </div>
+                        <div class="drawing-info--container">
+                            <div class="drawing-title">
+                                Title:
+                                {{drawing.title}}
+                            </div>
+                            <div class="drawing-description">
+                                Description:
+                                {{drawing.description}}
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="profile-username">
-                    <div>
-                         @{{ getUsername }} 
-                    
-                    <div class="edit-username">
-                        <svg viewBox="0 0 383.947 383.947" xml:space="preserve">
-                        <g>
-                            <g>
-                                <g>
-                                    <polygon points="0,303.947 0,383.947 80,383.947 316.053,147.893 236.053,67.893 			"/>
-                                    <path d="M377.707,56.053L327.893,6.24c-8.32-8.32-21.867-8.32-30.187,0l-39.04,39.04l80,80l39.04-39.04
-                                        C386.027,77.92,386.027,64.373,377.707,56.053z"/>
-                                </g>
-                            </g>
-                        </g>
-                        </svg>
-                    </div>
-                    </div>
-                </div>
-                <div class="post-info">
-                    <div class="drawing-count">Drawings:</div>
-                    <div class="like-count">Likes:</div>
-                </div>
-
-            </div>
-            <div class="password-change">
-                
-            </div>
-        </div>
-        <div class="change-info--container">
-            <div class="change-password--container">
-                <div class="module-title">
-                    Change Password:
-                </div>
-                <div class="password-form">
-                    <input type="password" placeholder="Current Password" v-model.lazy="$v.password.currentPassword.$model" @blur="$v.password.currentPassword.$touch()">
-                    <transition name="fade">
-                        <div class="error" v-if="$v.password.currentPassword.$dirty && !$v.password.currentPassword.required">Field is required</div>
-                        <div class="error" v-else-if="backendError['currentPass']"> {{backendError['currentPass']}} </div>
-                    </transition>
-
-                    <input type="password" placeholder="New Password" v-model.lazy="$v.password.newPassword.$model" @blur="$v.password.newPassword.$touch()">
-                    <transition name="fade">
-                        <div class="error" v-if="$v.password.newPassword.$dirty && !$v.password.newPassword.required">Field is required</div>
-                        <div class="error" v-else-if="$v.password.newPassword.$dirty && !$v.password.newPassword.strongPassword">Strong passwords need to have a letter, a number, a special character, and be atleast 8 characters long.</div>
-                        <div class="error" v-else-if="$v.password.newPassword.$dirty && !$v.password.newPassword.maxLength"> Your new password should not exceed {{$v.password.newPassword.$params.maxLength.max}} characters </div>
-                        <div class="error" v-else-if="backendError['newPassword']"> {{backendError['newPassword']}} </div>
-                    </transition>
-
-                    <input type="password" placeholder="Confirm Password" v-model.lazy="$v.password.newPasswordConfirm.$model" @blur="$v.password.newPasswordConfirm.$touch()">
-                     <transition name="fade">
-                        <div class="error" v-if="$v.password.newPasswordConfirm.$dirty && !$v.password.newPasswordConfirm.required">Field is required</div>
-                        <div class="error" v-else-if="$v.password.newPasswordConfirm.$dirty && !$v.password.newPasswordConfirm.sameAsPassword">The passwords do not match.</div>
-                        <div class="error" v-else-if="backendError['newPasswordConfirm']"> {{backendError['newPasswordConfirm']}} </div>
-                    </transition>
-                </div>
-                <div class="btn" @click="changePassword" >{{btnText}}</div>
-                <transition name="success">
-                    <div v-if="successMessage" class="success-flash"><strong>Success:  </strong> {{successMessage}} </div>
-                </transition>
-            </div>
-        </div>
-        <div class="drawing-list--container">
-            <div class="module-title">
-                Drawings:
             </div>
         </div>
     </div>
@@ -117,6 +136,9 @@ export default {
                 newPassword: '',
                 newPasswordConfirm: '',
             },
+
+            drawingPosts: [],
+            drawingError: '',
         }
     },
     validations: {
@@ -199,7 +221,20 @@ export default {
                     this.btnText = "Change Password";
                    this.backendError = err.response.data
                 });
+        },
+        getDrawings(){
+            axios.get('/api/profile/drawings')
+                .then((res)=>{
+                    console.log(res.data);
+                    this.drawingPosts = res.data.drawingPosts;
+                })
+                .catch((err)=>{
+                    this.drawingError = err.response.error;
+                })
         }
+    },
+    mounted(){
+        this.getDrawings();
     },
     watch: {
         picFile: function(){
@@ -227,12 +262,13 @@ export default {
 
 <style lang="scss" scoped>
     .profile-container{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        padding-top: 80px;
         height: 100vh;
         width: 100%;
+    }
+    .profile-wrapper{
+        margin: 0 auto;
+        max-width: 670px;
     }
     .profile-grid{
         display: grid;
@@ -287,9 +323,9 @@ export default {
     }
     .drawing-list--container{
         grid-area: drawings;
-        height: 100px;
         text-align: left;
         background: white;
+        width: 630px;
         padding: 20px;
         box-shadow: 0px 0px 4px -2px #000000;
     }
@@ -480,4 +516,31 @@ export default {
         width: 90%;
     }
 
+    .drawing-post--container{
+        padding: 20px;
+    }
+    .drawing-post{
+        display: flex;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 2px solid #efefef;
+        max-height: 150px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 12px -10px #000000;
+        .drawing-thumbnail{
+            width: 227px;
+            img{
+                height: 100%;
+                box-shadow: 0px 0px 16px -13px #000000;
+                border-radius: 5px;
+                border: 1px solid #e5e5e5;
+            }
+        }
+        .drawing-info--container{
+            display: flex;
+            flex-direction: column;
+            color: #86a1b8;
+            padding: 10px;
+        }
+    }
 </style>

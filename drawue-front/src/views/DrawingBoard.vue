@@ -165,6 +165,8 @@ export default {
             this.canvas.width = 1080;
             localStorage.setItem('resolution', [this.canvas.width, this.canvas.height])
             var ctx = document.querySelector("#canvas").getContext('2d');
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             if(localStorage.getItem('imgCanvas') !== null){
                 var img=new Image();
                 img.onload=function(){

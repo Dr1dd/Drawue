@@ -1,6 +1,7 @@
 const multer = require('multer');
 const express = require('express');
 const { verifyToken } = require("../verifyToken");
+const { User } = require('../../../models/user');
 const { Drawings } = require('../../../models/drawing');
 const router = express.Router();
 var fs = require('fs');
@@ -40,34 +41,37 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
             return res.status(400).send({'error': 'Failed to upload the file.'});
         }
         var filename = req.file.filename;
-
-        fs.rename(DIRTemp +'/'+ filename, DIR +'/'+ req.body.resolution +'/'+ filename, function (err) {
+        fs.rename(DIRTemp +'/'+ filename, DIR +'/'+ req.body.resolution +'/'+ filename, async function (err) {
             if (err) {
                 console.log(err);
                 return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
             }
-            drawing = new Drawings({
-                userID: req.user._id,
-                title: req.body.title,
-                description: req.body.description,
-                drawing_path: file.filename,
-                tags: req.body.tags,
-            });
-            drawing.save()
-                .then(()=>{
-                    return res.status(200).send({'success': 'Your drawing has been successfully published!'});
-                })
-                .catch((err)=>{
-                    fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (err) => {
-                        if (err) {
-                          console.error(err)
-                          return
-                        }
-                      
-                      })
-                      console.log(err);
-                    return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+            await User.findOne({_id: req.user._id}, (err, user)=>{
+              if(err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+                drawing = new Drawings({
+                    userID: req.user._id,
+                    username: user.username,
+                    title: req.body.title,
+                    description: req.body.description,
+                    drawing_path: req.body.resolution+'/'+file.filename,
+                    tags: req.body.tags,
                 });
+                drawing.save()
+                    .then(()=>{
+                        return res.status(200).send({'success': 'Your drawing has been successfully published!'});
+                    })
+                    .catch((err)=>{
+                        fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (err) => {
+                            if (err) {
+                              console.error(err)
+                              return
+                            }
+                          
+                          })
+                          console.log(err);
+                        return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+                    });
+            });
         });
     }
     else return res.status(401).send({'error':'User not logged on.'});

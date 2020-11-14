@@ -22,8 +22,12 @@ var callback = require('./routes/api/google/callback');
 var fbCallback = require('./routes/api/facebook/callback');
 
 var postDrawing = require('./routes/api/upload/postDrawing');
-var getProfilePic = require('./routes/api/upload/getImage');
 var uploadProfilePic = require('./routes/api/upload/profileImage');
+//images
+var getImage= require('./routes/api/getImage');
+
+//drawings
+var drawingPosts = require('./routes/api/drawings/getDrawings');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -69,13 +73,16 @@ require('./routes/api/facebook/fbAuth');
 app.use(passport.initialize());
 app.get('/api/auth/google/authentication', passport.authenticate('google', {scope: ['profile', 'email']}));
 app.use('/api/auth/google/callback', passport.authenticate('google'), callback);
-
 app.get('/api/auth/facebook', passport.authenticate('facebook', { scope : ['email']}));
 app.use('/api/auth/facebook/callback', passport.authenticate('facebook'), fbCallback);
 // Uploads
-app.use('/api/uploads/getImage', getProfilePic);
 app.use('/api/upload/profile-pic', uploadProfilePic);
 app.use('/api/upload/drawing', postDrawing);
+//getImage
+app.use('/api/posts', getImage);
+
+//drawing posts
+app.use('/api/profile/drawings', drawingPosts);
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));

@@ -10,7 +10,7 @@
       <div v-else-if="getLoginState == true" class="profile-section">
         <div class="user">
           <div class="profile-pic">
-            <router-link to="/profile"><img :src="'/api/uploads/getImage/' + getProfilePic" alt="pic"> </router-link>
+            <router-link to="/profile"><img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic"> </router-link>
           </div>
           <div class="username" @click="dropDown = !dropDown">
             {{ getUsername }}
