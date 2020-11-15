@@ -102,7 +102,9 @@ export default {
             image.download = "Drawing.png";
         },
         addTag(e){
-            this.drawing.tags.push(e.target.value.slice(0, -1));
+            if(e.target.value != " " && e.target.value != ""){
+                this.drawing.tags.push(e.target.value.slice(0, -1));
+            }
             e.target.value = '';
         },
         publishDrawing(){
@@ -319,6 +321,7 @@ a{
         border: 3px solid $module-theme;
         padding: 5px;
         width: 100%;
+        min-height: 33px;
         .tag{
             display: inline;
             padding: 3px 5px;

@@ -63,6 +63,11 @@ const routes = [
         component: () => import("./views/Profile"),
     },
     {
+        path: '/gallery',
+        name: "Gallery",
+        component: () => import("./views/Gallery"),
+    },
+    {
         path: '/404',
         alias: '*',
         name: "Error",
