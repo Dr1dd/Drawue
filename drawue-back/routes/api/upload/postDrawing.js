@@ -5,6 +5,7 @@ const { User } = require('../../../models/user');
 const { Drawings } = require('../../../models/drawing');
 const router = express.Router();
 var fs = require('fs');
+const { isRef } = require('@hapi/joi');
 
 const DIRTemp = './uploads/drawings/temp';
 const DIR = './uploads/drawings';
@@ -34,7 +35,21 @@ var upload = multer({
     storage: storage,
     fileFilter: imageFilterHelper,
 });
-router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
+
+const checkPostLimit = (req, res, next) =>{
+  if(req.user){
+   Drawings.countDocuments({userID: req.user._id}).exec((err, count) => {
+     if(err){
+      return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+     }
+     if(count <15) next();
+     else return res.status(400).send({'limitReached':'Maximum number (15) of drawing posts has been reached.'});
+   });
+  }
+  else return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+};
+
+router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (req, res) => {
     if(req.user){
         const file = req.file
         if (!file) {
@@ -47,6 +62,7 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
                 return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
             }
             await User.findOne({_id: req.user._id}, (err, user)=>{
+              var tags = req.body.tags.split(",");
               if(err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
                 drawing = new Drawings({
                     userID: req.user._id,
@@ -54,7 +70,7 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
                     title: req.body.title,
                     description: req.body.description,
                     drawing_path: req.body.resolution+'/'+file.filename,
-                    tags: req.body.tags,
+                    tags: tags,
                 });
                 drawing.save()
                     .then(()=>{

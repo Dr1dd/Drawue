@@ -89,7 +89,8 @@
             </div>
             <div class="drawing-list--container">
                 <div class="module-title">
-                    Drawings:
+                    <div>Drawings:</div>
+                    <div>{{drawingPosts.length}}/15</div>
                 </div>
                 <div class ="drawing-post--container">
                     <div v-for="(drawing, index) in drawingPosts" :key="index" class="drawing-post">
@@ -331,11 +332,16 @@ export default {
     }
     .module-title{
         display: flex;
+        justify-content: space-between;
         font-weight: 700;
         color: #86a1b8;
         text-align: left;
         font-size: 20px;
         margin-bottom: 5px;
+        div:nth-child(2){
+            font-size: 14px;
+            align-self: center;
+        }
     }
     .picture-container{
         display: flex;

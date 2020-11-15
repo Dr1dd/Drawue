@@ -33,13 +33,13 @@
                         <input type="text" placeholder="Title" v-model="drawing.title">
                     </div>
                     <div class="drawing-description">
-                        <textarea name="Description" placeholder="Description"></textarea>
+                        <textarea name="Description" placeholder="Description" v-model="drawing.description"></textarea>
                     </div>
                     <div class="drawing-tags">
                         <div class="tag-container">
-                            <div class="tag" v-for="(tag, index) in tags" :key="index">
+                            <div class="tag" v-for="(tag, index) in drawing.tags" :key="index">
                                 <span class="tag-text"> {{tag}}</span>
-                                <span class="close-tag" @click="tags.splice(index, 1)"> <div></div> <div></div></span>
+                                <span class="close-tag" @click="drawing.tags.splice(index, 1)"> <div></div> <div></div></span>
                             </div>
                             <input class="tag-input" type="text"  maxlength="16" id="tag-input" placeholder="Enter a tag" @keyup.space ="addTag" @keyup.enter ="addTag">
                         </div>
@@ -102,7 +102,7 @@ export default {
             image.download = "Drawing.png";
         },
         addTag(e){
-            this.tags.push(e.target.value);
+            this.drawing.tags.push(e.target.value.slice(0, -1));
             e.target.value = '';
         },
         publishDrawing(){
@@ -114,11 +114,11 @@ export default {
             var resolution = localStorage.getItem('resolution');
             resolution = resolution.split(',');
             var resolutionString = resolution[0].toString() + 'x'+ resolution[1].toString();
-            
+            console.log(tags);
             formData.append('file', blob);
             formData.append('title', title);
             formData.append('description', description);
-            formData.append('tags', tags);
+            formData.append('tags', tags.join());
             formData.append('resolution', resolutionString);
 
             axios.post('/api/upload/drawing', formData, {
