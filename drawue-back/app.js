@@ -28,6 +28,7 @@ var getImage= require('./routes/api/getImage');
 
 //drawings
 var drawingPosts = require('./routes/api/drawings/getDrawings');
+var drawingList = require('./routes/api/drawings/drawingArray');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -83,6 +84,8 @@ app.use('/api/posts', getImage);
 
 //drawing posts
 app.use('/api/profile/drawings', drawingPosts);
+app.use('/api/posts/drawings', drawingList);
+
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));

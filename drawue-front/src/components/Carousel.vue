@@ -4,9 +4,9 @@
       @swiper="onSwiper"
       @slideChange="onSlideChange"
     >
-    <swiper-slide>Slide 1</swiper-slide>
-    <swiper-slide>Slide 2</swiper-slide>
-    <swiper-slide>Slide 3</swiper-slide>
+    <swiper-slide v-for="(drawing, index) in drawings" :key="index">
+      <img class="carousel-image" :src="'/api/posts/drawing/pic/'+drawing.drawing_path" alt="">
+    </swiper-slide>
     <div class="swiper-pagination bullet" slot="pagination" />
   </swiper>
 </template>
@@ -14,10 +14,10 @@
 
 <script>
 import SwiperCore, { Pagination } from 'swiper';
-  import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
-  import 'swiper/components/pagination/pagination.scss';
- import 'swiper/swiper-bundle.css'
-
+import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
+import 'swiper/components/pagination/pagination.scss';
+import 'swiper/swiper-bundle.css'
+import axios from 'axios'
 SwiperCore.use([ Pagination]);
   export default {
     name: 'Carousel',
@@ -31,15 +31,27 @@ SwiperCore.use([ Pagination]);
             clickable: true
           },
           // Some Swiper option/callback...
-        }
+        },
+        drawings: [],
       }
     },
     components: {
         Swiper,
         SwiperSlide
       },
-
+    mounted(){
+      this.getCarouselDrawings();
+    },
     methods: {
+      getCarouselDrawings(){
+        axios.get('/api/posts/drawings/carousel')
+          .then((res)=>{
+            this.drawings = res.data.drawingPosts;
+          })
+          .catch((err)=>{
+            console.log(err.response);
+          })
+      },
       onSwiper(swiper) {
         console.log(swiper)
       },
@@ -57,14 +69,15 @@ SwiperCore.use([ Pagination]);
 $font-size-huge: 16px;
   .swiper-container{
     min-height: 100%;
+    height: 100%;
     background: white;
   }
   .swiper-wrapper{
     background: white;
   }
-.swiper-container-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet{
-  background: #86a1b8;
-}
+  .swiper-container-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet{
+    background: #86a1b8;
+  }
   .swiper {
   height: 300px;
   width: 100%;
@@ -78,5 +91,8 @@ $font-size-huge: 16px;
     font-size: $font-size-huge * 2;
     background-color: #fff;
   }
+}
+.carousel-image{
+  height: 100%;
 }
 </style>
