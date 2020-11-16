@@ -90,6 +90,23 @@
                   </div>
               </div>
           </div>
+          <div class="resize-container">
+              <div class="resize-icon">
+                  <svg version="1.1"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                    <g><g><path d="M492,0H344.212c-11.046,0-20,8.954-20,20s8.954,20,20,20h99.503L283.394,200.322c-7.811,7.811-7.811,20.474,0,28.284
+                                c7.81,7.81,20.473,7.811,28.284,0L472,68.284v99.503c0,11.046,8.954,20,20,20c11.046,0,20-8.954,20-20V20
+                                C512,9.115,503.154,0,492,0z"/></g></g>
+                    <g><g><path d="M228.606,283.394c-7.811-7.81-20.474-7.811-28.284,0L40,443.716v-99.503c0-11.046-8.954-20-20-20s-20,8.954-20,20V492
+                                c0,10.866,8.853,20,20,20h147.788c11.046,0,20-8.954,20-20c0-11.046-8.954-20-20-20H68.284l160.322-160.322
+                                C236.417,303.867,236.417,291.204,228.606,283.394z"/></g></g>
+                  </svg>
+              </div>
+              <div class="resolution-container">
+                  <div v-for="(resolution, index) in resolutionArray" :key="index" @click ="resizeCanvas(resolution)">
+                      {{resolution.split('x')[0]}} <br/> x <br/> {{resolution.split('x')[1]}}
+                  </div>
+              </div>
+          </div>
           <div class="download-btn--container" @click ="saveCanvas">
               <div class="download-btn">
                   <svg  viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m239.029 384.97a24 24 0 0 0 33.942 0l90.509-90.509a24 24 0 0 0 0-33.941 24 24 0 0 0 -33.941 0l-49.539 49.539v-262.059a24 24 0 0 0 -48 0v262.059l-49.539-49.539a24 24 0 0 0 -33.941 0 24 24 0 0 0 0 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
@@ -134,7 +151,8 @@ export default {
             toolType: 'pencil',
             selectedShape: this.toolType == 'shapes' ? 'rectangle' : 'none',
             strokeArray: [5, 10, 15, 25, 30],
-
+            resolutionArray: ['1080x720', '1280x760', '1440x900', '1920x1080'],
+            selectedResolution: '',
             ctx: '',
             canvas: '',
             savedCanvasData: '',
@@ -154,16 +172,29 @@ export default {
     created(){
         window.addEventListener('beforeunload', this.localStorageCanvas);
     },
+    beforeDestroy(){
+        window.removeEventListener('resize', this.onResize);
+    },
     mounted(){
             this.canvasContainer = document.getElementsByClassName('canvas-container');
-            const toolBar = document.getElementsByClassName('tool-bar');
             this.canvas = document.querySelector("#canvas");
             this.ctx = this.canvas.getContext('2d');
             
+            this.$nextTick(() => {
+                window.addEventListener('resize', this.onResize);
+            })
             // Canvas size and localstorage loading
-            this.canvas.height = 720;
-            this.canvas.width = 1080;
-            localStorage.setItem('resolution', [this.canvas.width, this.canvas.height])
+            var resolutionStorage = localStorage.getItem('resolution');
+
+            this.selectedResolution = resolutionStorage != undefined ? resolutionStorage.split(',').map( Number ) : [1080, 720]; 
+            
+            this.canvas.height = this.selectedResolution[1];
+            this.canvas.width = this.selectedResolution[0];
+            localStorage.setItem('resolution', [this.canvas.width, this.canvas.height]);
+            this.onResize();
+            //this.marginVertical = 67/2*1.075;
+            this.canvas.style.margin = '7px 0px 0';
+
             var ctx = document.querySelector("#canvas").getContext('2d');
             ctx.fillStyle = "#fff";
             ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -174,10 +205,6 @@ export default {
                 }
                 img.src=localStorage.getItem("imgCanvas");
             }
-
-            // ToolBar position (left)
-            var toolBarPosLeft = (window.innerWidth - this.canvas.getBoundingClientRect().width) <=30 ? 53 : ((window.innerWidth - this.canvas.getBoundingClientRect().width)/2);
-            toolBar[0].setAttribute("style", "left:"+(toolBarPosLeft-15)+"px");
             
             //EventListeners
             
@@ -264,31 +291,30 @@ export default {
         },
         zoomIn(){
             // max 300% zoom
+            const DrawingBoard = document.getElementById("DrawingBoard");
             if(parseFloat(this.canvasScale.toFixed(2)) <= 2.9){
                 var Page = document.getElementById('canvas');
                 this.canvasScale = parseFloat(this.canvasScale.toFixed(2)) + 0.1;
                 Page.style.transform = 'scale('+this.canvasScale+')';
                 if(parseFloat(this.canvasScale.toFixed(2)) >1){
-                    document.body.style.width = (this.canvas.getBoundingClientRect().width+134)+'px';
-                    document.body.style.height = (this.canvas.getBoundingClientRect().height+134)+'px';
-                    this.marginVertical += 67/2*1.075;
-                    this.canvas.style.margin = this.marginVertical +'px 0';
+                    DrawingBoard.style.width = ((this.canvas.getBoundingClientRect().width+134) < window.innerWidth ? window.innerWidth : (this.canvas.getBoundingClientRect().width+134)) +'px';
+                    DrawingBoard.style.height = ((this.canvas.getBoundingClientRect().height+134) < window.innerHeight  ? window.innerHeight  : (this.canvas.getBoundingClientRect().height+134)) +'px';
                 }
                 
             }
         },
         zoomOut(){
             // min zoom-out: 100% -> 10%
+            const DrawingBoard = document.getElementById("DrawingBoard");
             if(parseFloat(this.canvasScale.toFixed(2)) > 0.1){
                 var Page = document.getElementById('canvas');
                 this.canvasScale = parseFloat(this.canvasScale.toFixed(2)) - 0.1;
                 Page.style.transform = 'scale('+this.canvasScale+')';
                 if(parseFloat(this.canvasScale.toFixed(2)) >1){
-                    document.body.style.width = (this.canvas.getBoundingClientRect().width+134)+'px';
-                    document.body.style.height = (this.canvas.getBoundingClientRect().height+134)+'px';
-                    if(window.screen.height)
-                    this.marginVertical -= 67/2*1.075;
-                    this.canvas.style.margin = this.marginVertical +'px 0';
+                    DrawingBoard.style.width = ((this.canvas.getBoundingClientRect().width+134) < window.innerWidth ? window.innerWidth : (this.canvas.getBoundingClientRect().width+134)) +'px';
+                    DrawingBoard.style.height = ((this.canvas.getBoundingClientRect().height+134) < window.innerHeight  ? window.innerHeight  : (this.canvas.getBoundingClientRect().height+134)) +'px';
+                    // this.marginVertical -= 67/2*1.075;
+                    // this.canvas.style.margin = (this.marginVertical+1) +'px 0 0';
                 }
             }
         },
@@ -304,15 +330,41 @@ export default {
             var img = this.canvas.toDataURL("image/png");
             this.imageDataURL = img;
         },
+        resizeCanvas(res){
+            var Page = document.getElementById('canvas');
+            this.selectedResolution = res;
+            var resolution = this.selectedResolution.split('x');
+            this.canvas.width = resolution[0];
+            this.canvas.height = resolution[1];
+            this.canvasScale = 1;
+            Page.style.transform = 'scale('+this.canvasScale+')';
+             this.onResize();
+           localStorage.setItem('resolution', [resolution[0], resolution[1]]);
+        },
+        onResize() {
+            if(this.canvasScale >=1){
+                const DrawingBoard = document.getElementById("DrawingBoard");
+                const toolBar = document.getElementsByClassName('tool-bar');
+                DrawingBoard.style.width = ((this.canvas.getBoundingClientRect().width+134) < window.innerWidth  ? window.innerWidth-15  : ((this.canvas.getBoundingClientRect().width+134)*this.canvasScale)) +'px';
+                DrawingBoard.style.height = ((this.canvas.getBoundingClientRect().height+134) < window.innerHeight  ? window.innerHeight-15  : ((this.canvas.getBoundingClientRect().height+134)*this.canvasScale)) +'px';
+                console.log(this.canvas.getBoundingClientRect().width);
+                var toolBarPosLeft = (DrawingBoard.style.width - this.canvas.getBoundingClientRect().width) <=30 ? 53 : ((DrawingBoard.offsetWidth - this.canvas.getBoundingClientRect().width)/2);
+                toolBar[0].setAttribute("style", "left:"+(toolBarPosLeft-15)+"px");
+            }
+        }
     },
 }
 </script>
 
 <style lang="scss">
 $default-icon-color: #2c3e50;
+@use '../sass/components/toolbar';
 #DrawingBoard{
-    width: 99vw;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 
 }
 .tool-bar{
@@ -322,7 +374,7 @@ $default-icon-color: #2c3e50;
     justify-content: space-around;
     align-items: center;
     min-height: 100px;
-    top: 40%;
+    top: 20rem;
     transform: translate(-50%, -50%);
     border-radius: 24px;
     background: white;
@@ -373,27 +425,17 @@ $default-icon-color: #2c3e50;
          fill: $default-icon-color;
      }
      .pencil-stroke--list{
-        display: flex;
-        position: absolute;
-        visibility: hidden;
-        left: 37px;
-        margin: -39px 2px;
-        padding: 5px 20px;
-        justify-content: space-around;
-        z-index: 101;
+        @include toolbar.tool-container;
+        padding: 5px 15px 5px 23px;
+         margin: -39px -1px;
          div{
-            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             width: 38px;
             height: 38px;
-            margin: 0 6px;
-            border-radius: 50%;
-            box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.8);
-            background: white;
-            transition: background 0.25s;
-             z-index: 101;
+            z-index: 101;
+            padding: 0;
             &:hover{
                background: #effbff; 
             }
@@ -426,26 +468,7 @@ $default-icon-color: #2c3e50;
          stroke: $default-icon-color;
      }
      .shape-type--container{
-        display: flex;
-        position: absolute;
-        visibility: hidden;
-        left: 37px;
-        margin: -2.5px 7px;
-        padding: 5px 15px;
-        justify-content: space-around;
-        z-index: 101;
-         div{
-            display: flex;
-            padding: 10px 10px;
-            border-radius: 50%;
-            margin: 0 6px;
-            box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
-            background: white;
-            transition: background 0.25s;
-            &:hover{
-                background: #f0f8ff; 
-            }
-         }
+        @include toolbar.tool-container;
      }
      &:hover{
          .shape-type--container{
@@ -466,22 +489,9 @@ $default-icon-color: #2c3e50;
 
      }
      .zoom-out{
-         position: absolute;
-         visibility: hidden;
-         right: -74px;
-         padding: 0px 25px;
-         margin-top: -5px;
-         z-index: 101;
-         
-         div{
-             background: white;
-             box-shadow: 0px 0px 2px 0px rgb(0 0 0 / 80%);
-             border-radius: 50%;
-             padding: 9px;
-             display: flex;
-             flex-direction: column;
-             justify-content: center;
-         }
+         @include toolbar.tool-container;
+         padding: 5px 15px 5px 23px;
+         margin: -12.5px -1px;
          svg{
              position: relative;
          }
@@ -512,12 +522,39 @@ $default-icon-color: #2c3e50;
          fill: $default-icon-color;
      }
  }
+ .resize-container{
+     display: flex;
+     cursor:pointer;
+     margin: 15px 0;
+     transition: all 0.25s;
+     svg{
+         width: 24px;
+         height: 24px;
+         fill: $default-icon-color;
+     }
+     .resolution-container{
+        @include toolbar.tool-container;
+        margin: -13.5px 0px;
+        padding: 5px 15px 5px 22px;
+        div{
+            padding: 6.5px 11px;
+            color: #2c3e50;
+            font-size: 6px;
+            font-weight: 900;
+        }
+     }
+    &:hover{
+         .resolution-container{
+             visibility: visible;
+         }
+    }
+ }
  .selected{
     background: #f0f8ff;
     box-shadow: inset 0px 0px 2px 0px #b4b4b4;
  }
  .selected-child{
-     background: #ddeaee !important;
+     background: #e6f3ff !important;
  }
 
 

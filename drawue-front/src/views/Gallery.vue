@@ -39,7 +39,6 @@ export default {
     
             axios.get('/api/posts/drawings')
                 .then((res)=>{
-                    console.log(res.data);
                     this.drawings = res.data.drawingPosts;
                 })
                 .catch((err)=>{

@@ -1,7 +1,12 @@
 <template>
   <div class="header">
-      <div class="site-logo">
-        <router-link to="/"><img src="@/assets/Drawue-logo.png"> </router-link>
+      <div class="gallery-section">
+        <div class="site-logo">
+          <router-link to="/"><img src="@/assets/Drawue-logo.png"> </router-link>
+        </div>
+        <div class="gallery-link">
+            <router-link to="/gallery"> Gallery </router-link>
+        </div>
       </div>
       <div class="auth-section" v-if="getLoginState === false">
         <router-link to="/login"><div class="sign-in"> Sign In</div></router-link>
@@ -47,7 +52,7 @@ export default {
       }
     },
     computed: {
-      ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername'])
+      ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername']),
     },
     methods:{
       logOut(){
@@ -67,21 +72,36 @@ export default {
     position: fixed;
     z-index: 999;
     box-shadow: 0px 0px 4px -2px #000000;
-    .site-logo{
-      height: 100%;
-      margin-left: 90px;
-      cursor: pointer;
-      a{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        height: 100%;
-      }
-      img{
-          height: 85%;
-      }
-    }
+  
  }
+ .gallery-section{
+   display: flex;
+   align-items: center;
+   height: 100%;
+   margin-left: 90px;
+  .site-logo{
+    height: 100%;
+    cursor: pointer;
+    a{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+    }
+    img{
+        height: 85%;
+    }
+  }
+  .gallery-link{
+    margin-left: 2rem;
+    a{
+      color: #86a1b8;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 600;
+    }
+  }
+}
  .auth-section{
     display: flex;
     justify-content: space-around;

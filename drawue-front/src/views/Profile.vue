@@ -226,7 +226,6 @@ export default {
         getDrawings(){
             axios.get('/api/profile/drawings')
                 .then((res)=>{
-                    console.log(res.data);
                     this.drawingPosts = res.data.drawingPosts;
                 })
                 .catch((err)=>{
