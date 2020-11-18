@@ -43,7 +43,7 @@ const checkPostLimit = (req, res, next) =>{
       return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
      }
      if(count <15) next();
-     else return res.status(400).send({'limitReached':'Maximum number (15) of drawing posts has been reached.'});
+     else return res.status(400).send({'error':'Maximum number (15) of drawing posts has been reached.'});
    });
   }
   else return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});

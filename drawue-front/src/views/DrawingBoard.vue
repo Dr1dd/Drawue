@@ -347,7 +347,6 @@ export default {
                 const toolBar = document.getElementsByClassName('tool-bar');
                 DrawingBoard.style.width = ((this.canvas.getBoundingClientRect().width+134) < window.innerWidth  ? window.innerWidth-15  : ((this.canvas.getBoundingClientRect().width+134)*this.canvasScale)) +'px';
                 DrawingBoard.style.height = ((this.canvas.getBoundingClientRect().height+134) < window.innerHeight  ? window.innerHeight-15  : ((this.canvas.getBoundingClientRect().height+134)*this.canvasScale)) +'px';
-                console.log(this.canvas.getBoundingClientRect().width);
                 var toolBarPosLeft = (DrawingBoard.style.width - this.canvas.getBoundingClientRect().width) <=30 ? 53 : ((DrawingBoard.offsetWidth - this.canvas.getBoundingClientRect().width)/2);
                 toolBar[0].setAttribute("style", "left:"+(toolBarPosLeft-15)+"px");
             }

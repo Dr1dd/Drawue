@@ -536,6 +536,7 @@ export default {
             width: 227px;
             img{
                 height: 100%;
+                width: 100%;
                 box-shadow: 0px 0px 16px -13px #000000;
                 border-radius: 5px;
                 border: 1px solid #e5e5e5;
