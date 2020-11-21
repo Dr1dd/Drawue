@@ -1,8 +1,8 @@
 <template>
 <transition name="fade-away">
-  <div v-if="isOpen" class="save-module--container">
-      <div class="save-module">
-          <div class="save-module--header"> 
+  <div v-if="isOpen" class="save-modal--container">
+      <div class="save-modal">
+          <div class="save-modal--header"> 
               <div v-if="isPublishing" class="arrow-back" @click="isPublishing = false">
                   <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                         viewBox="0 0 492 492" style="enable-background:new 0 0 492 492;" xml:space="preserve">
@@ -14,7 +14,7 @@
                                 C492,219.198,479.172,207.418,464.344,207.418z"/></g></g>
                   </svg>
               </div>
-              <div class="close-module" @click="closeModule">
+              <div class="close-modal" @click="closeModal">
                     <div></div>
                     <div></div>
               </div>
@@ -52,7 +52,7 @@
                   
               </div>
           </div>
-          <div v-else class="publish-module">
+          <div v-else class="publish-modal">
               <div class="drawing-container">
                 <div class="drawing-img"> <img :src="getCanvasImage" alt="Canvas Drawing"></div>
                 <div class="drawing-title" :class="{'form-error': titleError}">
@@ -92,7 +92,7 @@ import { mapGetters } from 'vuex';
 import { minLength, maxLength, required } from 'vuelidate/lib/validators'
 
 export default {
-    name: 'SaveModule',
+    name: 'SaveModal',
     data(){
         return{
             isPublishing: false,
@@ -131,9 +131,9 @@ export default {
     mounted(){
         window.addEventListener('click', function(e){
             if(this.isPublishing && this.isPublishing!=undefined){
-                var module = document.getElementsByClassName('save-module');
-                if(!module.contains(e.target)){
-                    this.closeModule;
+                var modal = document.getElementsByClassName('save-modal');
+                if(!modal.contains(e.target)){
+                    this.closeModal;
                 }
             }
         });
@@ -163,8 +163,8 @@ export default {
 
     },
     methods:{
-        closeModule(){
-            this.$emit('closingSaveModule');
+        closeModal(){
+            this.$emit('closingSaveModal');
         },
         downloadImage(){
             var image = document.getElementById('download');
@@ -190,6 +190,7 @@ export default {
             var title = this.drawing.title;
             var description = this.drawing.description;
             var tags = this.drawing.tags;
+            localStorage.setItem("imgCanvas",this.drawingImage);
             var blob = this.dataURItoBlob(this.drawingImage);
             let formData = new FormData(document.forms[0]);
             var resolution = localStorage.getItem('resolution');
@@ -242,12 +243,12 @@ export default {
 </script>
 
 <style lang="scss">
-$module-theme: #86a1b8;
+$modal-theme: #86a1b8;
 a{
-    color: $module-theme;
+    color: $modal-theme;
     text-decoration: none;
 }
-.save-module--container{
+.save-modal--container{
     display: flex;
     position: fixed;
     z-index: 999;
@@ -261,7 +262,7 @@ a{
     left: 0;
     transition: all 0.25s;
 }
-.save-module{
+.save-modal{
     display: flex;
     position: relative;
     flex-direction: column;
@@ -271,7 +272,7 @@ a{
     background: white;
     border-radius: 10px;
     padding: 20px;
-    .save-module--header{
+    .save-modal--header{
         margin-bottom: 10px;
         .arrow-back{
              position: absolute;
@@ -280,10 +281,10 @@ a{
             cursor: pointer;
             svg{
                 height: 20px;
-                fill: $module-theme;
+                fill: $modal-theme;
             }
         }
-        .close-module{
+        .close-modal{
             position: absolute;
             right: 20px;
             top: 8px;
@@ -311,7 +312,7 @@ a{
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: $module-theme;
+            color: $modal-theme;
             font-weight: 700;
             cursor: pointer;
             z-index: 1;
@@ -319,7 +320,7 @@ a{
                 height: 64px;
                 width: 64px;
                 margin-bottom: 10px;
-                fill: $module-theme;
+                fill: $modal-theme;
             }
         }
         .download-drawing, .publish-drawing{
@@ -368,7 +369,7 @@ a{
         }
     }
 }
-.publish-module{
+.publish-modal{
     display: flex;
     flex-direction: column;
     margin-top: 15px;
@@ -452,7 +453,7 @@ a{
     .tag-container{
         display: flex;
         flex-wrap: wrap;
-        border: 3px solid $module-theme;
+        border: 3px solid $modal-theme;
         padding: 5px;
         width: 100%;
         min-height: 33px;
@@ -475,7 +476,7 @@ a{
                     height: 10px;
                     right: 4px;
                     top: 1px;
-                    background: $module-theme;
+                    background: $modal-theme;
                     
                 }
                 div:nth-child(1){

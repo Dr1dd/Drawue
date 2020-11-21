@@ -129,18 +129,18 @@
       <div class="canvas-container">
          <canvas id="canvas" @mouseout="finishDrawing"></canvas> 
       </div>
-        <SaveModule :drawingImage="imageDataURL" :isOpen="saveModule" @closingSaveModule="saveModule=false"/>
+        <SaveModal :drawingImage="imageDataURL" :isOpen="saveModal" @closingSaveModal="saveModal=false"/>
   </div>
 </template>
 
 <script>
 import colorPicker from '@caohenghu/vue-colorpicker'
-import SaveModule from '../components/SaveModule'
+import SaveModal from '../components/SaveModal'
 export default {
     name: 'DrawingBoard',
     components:{
         colorPicker,
-        SaveModule
+        SaveModal
     },
     data() {
         return {
@@ -163,7 +163,7 @@ export default {
             scaledYTransformed: 0,
             canvasScale: 1,
             marginVertical: 0,
-            saveModule: false,
+            saveModal: false,
             selectedStrokeSize: 5,
 
             imageDataURL: '',
@@ -313,8 +313,6 @@ export default {
                 if(parseFloat(this.canvasScale.toFixed(2)) >1){
                     DrawingBoard.style.width = ((this.canvas.getBoundingClientRect().width+134) < window.innerWidth ? window.innerWidth : (this.canvas.getBoundingClientRect().width+134)) +'px';
                     DrawingBoard.style.height = ((this.canvas.getBoundingClientRect().height+134) < window.innerHeight  ? window.innerHeight  : (this.canvas.getBoundingClientRect().height+134)) +'px';
-                    // this.marginVertical -= 67/2*1.075;
-                    // this.canvas.style.margin = (this.marginVertical+1) +'px 0 0';
                 }
             }
         },
@@ -326,20 +324,32 @@ export default {
             localStorage.setItem("imgCanvas",this.canvas.toDataURL());
         },
         saveCanvas(){
-            this.saveModule = true;
+            this.saveModal = true;
             var img = this.canvas.toDataURL("image/png");
             this.imageDataURL = img;
         },
         resizeCanvas(res){
             var Page = document.getElementById('canvas');
+            var canvasImage = this.canvas.toDataURL();
+            localStorage.setItem("imgCanvas",this.canvas.toDataURL());
+            //changing canvas size
             this.selectedResolution = res;
             var resolution = this.selectedResolution.split('x');
             this.canvas.width = resolution[0];
             this.canvas.height = resolution[1];
             this.canvasScale = 1;
             Page.style.transform = 'scale('+this.canvasScale+')';
-             this.onResize();
-           localStorage.setItem('resolution', [resolution[0], resolution[1]]);
+            //loading old canvas image
+            var ctx = document.querySelector("#canvas").getContext('2d');
+            var img=new Image();
+            img.onload=function(){
+                ctx.drawImage(img,0,0);
+            }
+            img.src=canvasImage;
+            
+            this.onResize();
+            localStorage.setItem('resolution', [resolution[0], resolution[1]]);
+
         },
         onResize() {
             if(this.canvasScale >=1){

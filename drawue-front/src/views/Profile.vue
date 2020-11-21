@@ -325,6 +325,7 @@ export default {
         grid-area: drawings;
         text-align: left;
         background: white;
+        margin-bottom: 30px;
         width: 630px;
         padding: 20px;
         box-shadow: 0px 0px 4px -2px #000000;
@@ -537,6 +538,7 @@ export default {
             img{
                 height: 100%;
                 width: 100%;
+                min-width: 230px;
                 box-shadow: 0px 0px 16px -13px #000000;
                 border-radius: 5px;
                 border: 1px solid #e5e5e5;
@@ -549,4 +551,7 @@ export default {
             padding: 10px;
         }
     }
+.drawing-description{
+    word-break: break-all;
+}
 </style>

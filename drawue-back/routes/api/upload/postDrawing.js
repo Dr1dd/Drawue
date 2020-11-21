@@ -5,17 +5,21 @@ const { User } = require('../../../models/user');
 const { Drawings } = require('../../../models/drawing');
 const router = express.Router();
 var fs = require('fs');
+var rug = require('random-username-generator');
 const { isRef } = require('@hapi/joi');
 
 const DIRTemp = './uploads/drawings/temp';
 const DIR = './uploads/drawings';
+rug.setAdjectives(['pic', 'random', 'gen', 'drawing', 'draw', 'drawer', 'drew', 'art', 'Artistic', 'image']);
+rug.setSeperator('');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, DIRTemp);
     },
     filename: (req, file, cb) => {
-      const fileName = Date.now()+file.originalname.toLowerCase().split(' ').join('-')+'.png';
+      var new_fileName = rug.generate();
+      const fileName = Date.now()+new_fileName+'.png';
       cb(null, fileName)
     }
   });
@@ -56,7 +60,17 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
             return res.status(400).send({'error': 'Failed to upload the file.'});
         }
         var filename = req.file.filename;
-        fs.rename(DIRTemp +'/'+ filename, DIR +'/'+ req.body.resolution +'/'+ filename, async function (err) {
+        var path = DIR +'/'+ req.body.resolution +'/'+ filename;
+        try {
+          while (fs.existsSync(DIR +'/'+ req.body.resolution +'/'+ filename)) {
+            var new_fileName = rug.generate();
+            path = DIR +'/'+ req.body.resolution +'/'+ new_fileName;
+          } 
+        } catch(err) {
+          console.error(err)
+        }
+
+        fs.rename(DIRTemp +'/'+ filename, path, async function (err) {
             if (err) {
                 console.log(err);
                 return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
@@ -82,9 +96,8 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
                               console.error(err)
                               return
                             }
-                          
                           })
-                          console.log(err);
+                        console.log(err);
                         return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
                     });
             });
