@@ -22,6 +22,10 @@ const Drawings = mongoose.model('Drawings', new mongoose.Schema({
         type: String,
         required: true,
     },
+    like_count:{
+        type: Number,
+        default: 0,
+    },
     tags: [String],
 
 },{ timestamps: true }));

@@ -15,44 +15,50 @@
                 </div>
             </div>
         </div>
-        <div class="drawing-modal--container" v-if="selectedDrawing!=''">
-            <div class="drawing-modal">
-                <div class="close-drawing--modal" @click="selectedDrawing = ''">
-                    <div></div>
-                    <div></div>
-                </div>
-                <div class="modal-left--section">
-                    <div class="drawing-image">
-                        <img :src="'/api/posts/drawing/pic/'+selectedDrawing.drawing_path" alt="">
+        <transition name="fade-away">
+            <div class="drawing-modal--container" v-if="selectedDrawing!=''">
+                <div class="drawing-modal" v-on-clickaway="clickAwayModal" >
+                    <div class="close-drawing--modal" @click="selectedDrawing = ''">
+                        <div></div>
+                        <div></div>
                     </div>
-                    <div class="drawing-statistics"></div>
-                </div>
-                <div class="modal-right--section">
-                    <div class="drawing-info--container">
-                        <h3>Title:</h3>
-                        <div class="drawing-title">
-                            {{selectedDrawing.title}}
+                    <div class="modal-left--section">
+                        <div class="drawing-image" @dblclick="addLike(selectedDrawing._id)">
+                            <img :src="'/api/posts/drawing/pic/'+selectedDrawing.drawing_path" alt="">
                         </div>
-                        <h3>Description:</h3>
-                        <div class="drawing-description">
-                            {{selectedDrawing.description}}
+                        <div class="drawing-statistics">
+                            Likes:
+                            {{selectedDrawing.like_count !=undefined ? selectedDrawing.like_count : 0}}
                         </div>
-                        <h3>Tags:</h3>
-                        <div class="drawing-tags--container">
-                            <div class="drawing-tag" v-for="(tag, index) in selectedDrawing.tags" :key="index">
-                                {{tag}}
-                            </div>  
+                    </div>
+                    <div class="modal-right--section">
+                        <div class="drawing-info--container">
+                            <h3>Title:</h3>
+                            <div class="drawing-title">
+                                {{selectedDrawing.title}}
+                            </div>
+                            <h3>Description:</h3>
+                            <div class="drawing-description">
+                                {{selectedDrawing.description}}
+                            </div>
+                            <h3 v-if="selectedDrawing.tags!=''">Tags:</h3>
+                            <div class="drawing-tags--container" v-if="selectedDrawing.tags!=''">
+                                <div class="drawing-tag" v-for="(tag, index) in selectedDrawing.tags" :key="index">
+                                    {{tag}}
+                                </div>  
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 
 <script>
 import Carousel from '../components/Carousel.vue'
 import axios from 'axios'
+import { directive as onClickaway } from 'vue-clickaway';
 export default {
     name: 'Gallery',
     components:{
@@ -66,6 +72,12 @@ export default {
     },
     mounted(){
         this.getDrawings();
+        // if(this.selectedDrawing=='')
+        //this.popupItem = this.$el;
+        //console.log( this.popupItem);
+    },
+    directives: {
+        onClickaway: onClickaway,
     },
     methods: {
         getDrawings(){
@@ -77,8 +89,17 @@ export default {
                 .catch((err)=>{
                     console.log(err.response);
                 })
+        },
+        addLike(ID){
+            var postID = ID
+            axios.post('/api/posts/like', {postID})
+        },
+        clickAwayModal(){
+            if(this.selectedDrawing!='')
+             this.selectedDrawing = '';
         }
-    }
+    },
+
 }
 </script>
 

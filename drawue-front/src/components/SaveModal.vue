@@ -1,7 +1,7 @@
 <template>
 <transition name="fade-away">
   <div v-if="isOpen" class="save-modal--container">
-      <div class="save-modal">
+      <div class="save-modal" v-on-clickaway="closeModal">
           <div class="save-modal--header"> 
               <div v-if="isPublishing" class="arrow-back" @click="isPublishing = false">
                   <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -90,6 +90,7 @@
 import axios from 'axios';
 import { mapGetters } from 'vuex';
 import { minLength, maxLength, required } from 'vuelidate/lib/validators'
+import { directive as onClickaway } from 'vue-clickaway';
 
 export default {
     name: 'SaveModal',
@@ -114,6 +115,9 @@ export default {
             type: Boolean,
             default: false,
         }
+    },
+    directives: {
+        onClickaway: onClickaway,
     },
     validations: {
         drawing:{
@@ -236,7 +240,7 @@ export default {
             }
 
             return new Blob([ia], {type:mimeString});
-        }
+        },
     }
 
 }

@@ -8,6 +8,7 @@ var cors = require('cors');
 var cookieParser = require('cookie-parser')
 var passport = require('passport');
 var bodyParser = require('body-parser');
+const createError = require('http-errors');
 
 var register = require('./routes/api/register');
 var login = require('./routes/api/login');
@@ -29,7 +30,9 @@ var getImage= require('./routes/api/getImage');
 //drawings
 var drawingPosts = require('./routes/api/drawings/getDrawings');
 var drawingList = require('./routes/api/drawings/drawingArray');
+var likeDrawing = require('./routes/api/likes/likeDrawing');
 
+//likes
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
     process.exit(1);
@@ -85,7 +88,8 @@ app.use('/api/posts', getImage);
 //drawing posts
 app.use('/api/profile/drawings', drawingPosts);
 app.use('/api/posts/drawings', drawingList);
-
+//likes
+app.use('/api/posts/like', likeDrawing);
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));
@@ -105,7 +109,7 @@ if(process.env.NODE_ENV == 'production'){
     res.locals.error = req.app.get('env') === 'development' ? err : {};
   
     // render the error page
-    console.log(err.message);
+  console.log( res.locals);
     res.status(err.status || 500);
     //res.render('error');
   });
