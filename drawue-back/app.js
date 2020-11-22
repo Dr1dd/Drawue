@@ -28,7 +28,7 @@ var uploadProfilePic = require('./routes/api/upload/profileImage');
 var getImage= require('./routes/api/getImage');
 
 //drawings
-var drawingPosts = require('./routes/api/drawings/getDrawings');
+var userDrawingPosts = require('./routes/api/drawings/getUserDrawings');
 var drawingList = require('./routes/api/drawings/drawingArray');
 var likeDrawing = require('./routes/api/likes/likeDrawing');
 
@@ -86,7 +86,7 @@ app.use('/api/upload/drawing', postDrawing);
 app.use('/api/posts', getImage);
 
 //drawing posts
-app.use('/api/profile/drawings', drawingPosts);
+app.use('/api/profile/drawings', userDrawingPosts);
 app.use('/api/posts/drawings', drawingList);
 //likes
 app.use('/api/posts/like', likeDrawing);

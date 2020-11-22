@@ -66,6 +66,14 @@ const routes = [
         path: '/gallery',
         name: "Gallery",
         component: () => import("./views/Gallery"),
+        children: [
+            {
+              path: '/:username/drawing/:drawingID',
+              name: 'DrawingPost',
+              props: true,
+              component: () => import("./views/DrawingPost"),
+            }
+        ]
     },
     {
         path: '/404',
