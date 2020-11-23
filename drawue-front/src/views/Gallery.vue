@@ -11,12 +11,15 @@
                 <div class="drawing-container" v-for="(drawing, index) in drawings" :key="index" @click="selectedDrawing = drawing">
                  <router-link :to="{
                     name:'DrawingPost',
-                    params: {username:drawing.username, drawing: drawing, drawingID: drawing._id}
+                    params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: likedPosts.includes(drawing._id) }
                 }">
                     <div class="drawing-image">
                         <img :src="'/api/posts/drawing/pic/'+drawing.drawing_path" alt="">
                     </div>
                       </router-link>
+                </div>
+                <div class="load-posts" v-if="loading">
+                    <Loader loaderType="rain-drop" color="#88a2b9" />
                 </div>
             </div>
         </div>
@@ -27,16 +30,20 @@
 <script>
 import Carousel from '../components/Carousel.vue'
 import axios from 'axios'
+import Loader from 'vueloaderspinners'
 export default {
     name: 'Gallery',
     components:{
         Carousel,
+        Loader
     },
     data(){
         return{
             drawings: [],
             selectedDrawing: '',
             skip: 0,
+            loading: false,
+            likedPosts: [],
         }
     },
     mounted(){
@@ -52,12 +59,16 @@ export default {
     methods: {
         getDrawings(numOfPosts){
             var skip = numOfPosts;
+            this.loading=true;
             axios.post('/api/posts/drawings', {skip})
                 .then((res)=>{
                     this.drawings.push(...res.data.drawingPosts);
-                })
+                    this.likedPosts = res.data.likedPosts;
+                    this.loading=false;
+               })
                 .catch((err)=>{
                     console.log(err.response);
+                    this.loading=false;
                 })
         },
     },
@@ -117,6 +128,26 @@ export default {
         transform: scale(1.1);  
         box-shadow: 8px 8px 2px 1px #f5f5f5;
         z-index: 2;
+    }
+}
+.load-posts{
+    height: 164px;
+    width: 267px;
+    min-width: 267px;
+    margin: 5px;
+    max-width: 267px;
+    /* border: 2px solid #ededed; */
+    transition: all 0.3s;
+    cursor: pointer;
+    z-index: 1;
+    .loader-container{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .rain-drop{
+            width: 50%;
+            height: 50%;
+        }
     }
 }
 

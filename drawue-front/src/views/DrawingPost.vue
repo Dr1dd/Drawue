@@ -11,6 +11,7 @@
                         <img :src="'/api/posts/drawing/pic/'+selectedDrawing.drawing_path" alt="">
                     </div>
                     <div class="drawing-statistics">
+                        liked? {{likeStatus}}
                         Likes:
                         {{selectedDrawing.like_count !=undefined ? selectedDrawing.like_count : 0}}
                     </div>
@@ -46,6 +47,7 @@ export default {
     data(){
         return{
             selectedDrawing: '',
+            likeStatus: false
         }
     },
     props:{
@@ -54,6 +56,9 @@ export default {
         },
         drawingID:{
             type: String,
+        },
+        liked:{
+            type: Boolean,
         }
     },
     directives: {
@@ -77,17 +82,28 @@ export default {
                 axios.post('/api/posts/drawings/post-info', { drawingID })
                 .then((res)=>{
                     this.selectedDrawing = res.data.drawingPost;
+                    this.likeStatus = res.data.likeStatus;
                 })
                 .catch((err)=>{
                     console.log(err.response);
                 })
             }
-            else this.selectedDrawing = this.drawing;
+            else {
+                this.selectedDrawing = this.drawing;
+                if(this.liked !=undefined) this.likeStatus = this.liked;
+            }
         },
         addLike(ID){
             console.log(ID);
+            
             var postID = ID;
-            axios.post('/api/posts/like', {postID});
+            axios.post('/api/posts/like', {postID})
+            .then((res)=>{
+                this.selectedDrawing.like_count = res.data.status ? this.selectedDrawing.like_count +=1 : this.selectedDrawing.like_count -=1;
+            })
+            .catch((err)=>{
+                console.log(err.response);
+            });
         }
     }
 

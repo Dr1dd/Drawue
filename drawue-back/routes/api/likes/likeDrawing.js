@@ -2,7 +2,6 @@ const express = require('express');
 const { Likes } = require('../../../models/likes');
 const { Drawings } = require('../../../models/drawing');
 const { verifyToken } = require("../verifyToken");
-const e = require('express');
 
 const router = express.Router();
 
@@ -12,7 +11,7 @@ router.post('/', verifyToken, async (req, res) => {
         if(result.deletedCount != 0){
             Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (err, response)=>{
                 if(err) console.log(err);
-                else return res.status(200).end();
+                else return res.status(200).send({'status':false});
             });
         }
         else{
@@ -23,7 +22,7 @@ router.post('/', verifyToken, async (req, res) => {
             like.save().then(()=>{
                 Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: 1 }}, (err, response)=>{
                     if(err) console.log(err);
-                    else return res.status(200).end();
+                    else return res.status(200).send({'status':true});
                 });
             })
             .catch((err)=>{
