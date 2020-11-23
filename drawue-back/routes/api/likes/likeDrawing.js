@@ -7,6 +7,7 @@ const e = require('express');
 const router = express.Router();
 
 router.post('/', verifyToken, async (req, res) => {
+    console.log(req.body.postID);
     Likes.deleteOne({postID: req.body.postID, userID: req.user._id}).then(result => {
         if(result.deletedCount != 0){
             Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (err, response)=>{

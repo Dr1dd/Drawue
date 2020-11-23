@@ -36,24 +36,29 @@ export default {
         return{
             drawings: [],
             selectedDrawing: '',
+            skip: 0,
         }
     },
     mounted(){
-        this.getDrawings();
+        this.getDrawings(this.skip);
+        window.onscroll = () =>{
+            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight+20 > document.documentElement.offsetHeight;
+            if(bottomOfWindow){
+                this.skip += 30;
+                this.getDrawings(this.skip);
+            }
+        }
     },
     methods: {
-        getDrawings(){
-            axios.get('/api/posts/drawings')
+        getDrawings(numOfPosts){
+            var skip = numOfPosts;
+            axios.post('/api/posts/drawings', {skip})
                 .then((res)=>{
-                    this.drawings = res.data.drawingPosts;
+                    this.drawings.push(...res.data.drawingPosts);
                 })
                 .catch((err)=>{
                     console.log(err.response);
                 })
-        },
-        addLike(ID){
-            var postID = ID
-            axios.post('/api/posts/like', {postID})
         },
     },
 

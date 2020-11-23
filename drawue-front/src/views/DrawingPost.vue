@@ -83,6 +83,11 @@ export default {
                 })
             }
             else this.selectedDrawing = this.drawing;
+        },
+        addLike(ID){
+            console.log(ID);
+            var postID = ID;
+            axios.post('/api/posts/like', {postID});
         }
     }
 

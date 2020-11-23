@@ -2,19 +2,18 @@ const express = require('express');
 const router = express();
 const { Drawings } = require('../../../models/drawing');
 
-router.get('/', (req, res)=>{
-    var filter;
-    if(req.body.drawingID){
-        filter = {_id: req.body.drawingID, createdOn: { $lte: req.createdOnBefore } };
-    }
-    else filter = {createdOn: { $lte: req.createdOnBefore } };
+router.post('/', (req, res)=>{
+    var skip = req.body.skip;
+    if(skip === 0) var limit = 30;
+    else limit = 30;
     Drawings.find({createdOn: { $lte: req.createdOnBefore } }, (err, posts)=>{
         if(err){
             res.send({'error': 'No drawings found'});
         }
         res.send({'drawingPosts': posts})
     })
-    .limit( 15)
+    .skip(skip)
+    .limit(limit)
     .sort( '-createdOn' )
 });
 router.post('/post-info', (req, res)=>{
