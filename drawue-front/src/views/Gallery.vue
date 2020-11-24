@@ -11,7 +11,7 @@
                 <div class="drawing-container" v-for="(drawing, index) in drawings" :key="index" @click="selectedDrawing = drawing">
                  <router-link :to="{
                     name:'DrawingPost',
-                    params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: likedPosts.includes(drawing._id) }
+                    params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
                 }">
                     <div class="drawing-image">
                         <img :src="'/api/posts/drawing/pic/'+drawing.drawing_path" alt="">
@@ -63,7 +63,8 @@ export default {
             axios.post('/api/posts/drawings', {skip})
                 .then((res)=>{
                     this.drawings.push(...res.data.drawingPosts);
-                    this.likedPosts = res.data.likedPosts;
+                    this.likedPosts.push(...res.data.likedPosts);
+                    console.log(this.likedPosts);
                     this.loading=false;
                })
                 .catch((err)=>{

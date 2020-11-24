@@ -14,10 +14,13 @@ router.post('/', verifyToken, (req, res)=>{
             res.send({'error': 'No drawings found'});
         }
         if(req.user){
-            Likes.find({userID: req.user._id}, 'postID', (err, likedPosts)=>{
+            Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
                 var result =  likedPosts.map(({ postID }) => postID)
                 return res.send({'drawingPosts': posts, 'likedPosts': result});
-            });
+            })
+            .skip(skip)
+            .limit(limit)
+            .sort( '-createdOn' );
         }
         else{
             return res.send({'drawingPosts': posts}); 
