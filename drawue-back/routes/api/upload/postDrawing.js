@@ -88,7 +88,13 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
                 });
                 drawing.save()
                     .then(()=>{
-                        return res.status(200).send({'success': 'Your drawing has been successfully published!'});
+                        user.drawing_counter +=1;
+                        user.save().then(()=>{
+                          return res.status(200).send({'success': 'Your drawing has been successfully published!'});
+                        })
+                        .catch((err)=>{
+                          console.log(err);
+                        })
                     })
                     .catch((err)=>{
                         fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (err) => {

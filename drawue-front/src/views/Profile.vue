@@ -45,8 +45,8 @@
                         </div>
                     </div>
                     <div class="post-info">
-                        <div class="drawing-count">Drawings:</div>
-                        <div class="like-count">Likes:</div>
+                        <div class="drawing-count">Drawings: {{profileStats[1]}}</div>
+                        <div class="like-count">Likes: {{profileStats[0]}}</div>
                     </div>
 
                 </div>
@@ -94,24 +94,30 @@
                 </div>
                 <div class ="drawing-post--container">
                     <div v-for="(drawing, index) in drawingPosts" :key="index" class="drawing-post">
-                        <div class="drawing-thumbnail"> 
-                            <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
-                        </div>
-                        <div class="drawing-info--container">
-                            <div class="drawing-title">
-                                Title:
-                                {{drawing.title}}
+                        <router-link :to="{
+                            name: 'UserDrawingPost',
+                            params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
+                        }">
+                            <div class="drawing-thumbnail"> 
+                                <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
                             </div>
-                            <div class="drawing-description">
-                                Description:
-                                {{drawing.description}}
+                            <div class="drawing-info--container">
+                                <div class="drawing-title">
+                                    Title:
+                                    {{drawing.title}}
+                                </div>
+                                <div class="drawing-description">
+                                    Description:
+                                    {{drawing.description}}
+                                </div>
                             </div>
-                        </div>
+                        </router-link>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <router-view :key="$route.path"/>
   </div>
 </template>
 
@@ -140,6 +146,8 @@ export default {
 
             drawingPosts: [],
             drawingError: '',
+            profileInfo: '',
+            likedPosts: [],
         }
     },
     validations: {
@@ -175,7 +183,7 @@ export default {
         }
     },
     computed: {
-      ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername'])
+      ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername', 'profileStats'])
     },
     methods: {
         handlePicUpload(event){
@@ -227,11 +235,12 @@ export default {
             axios.get('/api/profile/drawings')
                 .then((res)=>{
                     this.drawingPosts = res.data.drawingPosts;
+                    this.likedPosts.push(...res.data.likedPosts);
                 })
                 .catch((err)=>{
                     this.drawingError = err.response.error;
                 })
-        }
+        },
     },
     mounted(){
         this.getDrawings();

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="carousel-container">
-            <Carousel/>
+            <Carousel />
         </div>
         <div class="drawing-list--container">
             <div class="filter-container">
@@ -44,10 +44,12 @@ export default {
             skip: 0,
             loading: false,
             likedPosts: [],
+            carouselDrawings: [],
         }
     },
     mounted(){
         this.getDrawings(this.skip);
+        //this.getCarouselDrawings();
         window.onscroll = () =>{
             let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight+20 > document.documentElement.offsetHeight;
             if(bottomOfWindow){
@@ -64,7 +66,6 @@ export default {
                 .then((res)=>{
                     this.drawings.push(...res.data.drawingPosts);
                     this.likedPosts.push(...res.data.likedPosts);
-                    console.log(this.likedPosts);
                     this.loading=false;
                })
                 .catch((err)=>{

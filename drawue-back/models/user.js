@@ -33,6 +33,12 @@ const User = mongoose.model('User', new mongoose.Schema({
     },
     resetPasswordExpires: {
         type: Date,
+    },
+    total_like_count:{
+      type: Number,
+    },
+    drawing_counter:{
+      type: Number,
     }
 },{ timestamps: true }));
  

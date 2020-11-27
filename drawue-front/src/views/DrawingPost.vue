@@ -57,6 +57,7 @@ export default {
         return{
             selectedDrawing: '',
             likeStatus: false,
+            author_username: '',
         }
     },
     props:{
@@ -68,13 +69,15 @@ export default {
         },
         liked:{
             type: Boolean,
+        },
+        username:{
+            type: String,
         }
     },
     directives: {
         onClickaway: onClickaway,
     },
     mounted(){
-
         this.selectDrawing(this.drawingID);
     },
     methods:{
@@ -82,13 +85,20 @@ export default {
             if(this.selectedDrawing!='')
                 this.selectedDrawing = '';
             if(this.drawing == undefined){
-                this.$router.push({name: 'Gallery'});
+                switch(this.$parent.$route.name){
+                    case 'DrawingPost':
+                         this.$router.push({name: 'Gallery'});
+                         break;
+                    case 'UserDrawingPost':
+                        this.$router.push({name: 'Profile'});
+                        break;
+                }
             }
             else this.$router.go(-1);
         },
         selectDrawing(ID){
              if(this.drawing == undefined){
-                 var drawingID = ID
+                 var drawingID = ID;
                 axios.post('/api/posts/drawings/post-info', { drawingID })
                 .then((res)=>{
                     this.selectedDrawing = res.data.drawingPost;
@@ -96,11 +106,12 @@ export default {
                 })
                 .catch((err)=>{
                     console.log(err.response);
-                })
+                });
             }
             else {
                 this.selectedDrawing = this.drawing;
             }
+            this.author_username = this.username;
         },
         addLike(ID){
             this.selectedDrawing.liked = !this.selectedDrawing.liked
@@ -113,7 +124,8 @@ export default {
             else{
                 this.$parent.likedPosts.push(postID);
             }
-            axios.post('/api/posts/like', {postID})
+            var author_username = this.author_username;
+            axios.post('/api/posts/like', {postID, author_username})
         }
     }
 

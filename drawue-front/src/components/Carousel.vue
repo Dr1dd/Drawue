@@ -5,7 +5,12 @@
       @slideChange="onSlideChange"
     >
     <swiper-slide v-for="(drawing, index) in drawings" :key="index">
-      <img class="carousel-image" :src="'/api/posts/drawing/pic/'+drawing.drawing_path" alt="">
+      <router-link :to="{
+        name:'DrawingPost',
+        params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
+      }">
+           <img class="carousel-image" :src="'/api/posts/drawing/pic/'+drawing.drawing_path" alt="">
+      </router-link>
     </swiper-slide>
     <div class="swiper-pagination bullet" slot="pagination" />
   </swiper>
@@ -33,6 +38,8 @@ SwiperCore.use([ Pagination]);
           // Some Swiper option/callback...
         },
         drawings: [],
+        likedPosts: [],
+        
       }
     },
     components: {
@@ -46,7 +53,10 @@ SwiperCore.use([ Pagination]);
       getCarouselDrawings(){
         axios.get('/api/posts/drawings/carousel')
           .then((res)=>{
-            this.drawings = res.data.drawingPosts;
+            this.drawings.push(...res.data.drawingPosts);
+            this.likedPosts.push(...res.data.likedPosts);
+            console.log(this.drawings);
+            console.log(this.likedPosts);
           })
           .catch((err)=>{
             console.log(err.response);
@@ -58,6 +68,7 @@ SwiperCore.use([ Pagination]);
       onSlideChange() {
         console.log('slide change')
       },
+
     },
   }
 </script>

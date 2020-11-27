@@ -61,6 +61,14 @@ const routes = [
             requiresAuth: true,
         },
         component: () => import("./views/Profile"),
+        children: [
+            {
+              path: ':username/drawing/:drawingID',
+              name: 'UserDrawingPost',
+              props: true,
+              component: () => import("./views/DrawingPost"),
+            }
+        ]
     },
     {
         path: '/gallery',

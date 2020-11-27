@@ -49,12 +49,22 @@ router.post('/post-info', verifyToken, (req, res)=>{
         }
     })
 });
-router.get('/carousel', (req, res)=>{
+router.get('/carousel', verifyToken, (req, res)=>{
     Drawings.find({ createdOn: { $lte: req.createdOnBefore } }, (err, posts)=>{
         if(err){
             res.send({'error': 'No drawings found'});
         }
-        res.send({'drawingPosts': posts})
+        else{
+            if(req.user){
+                Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
+                    var result =  likedPosts.map(({ postID }) => postID)
+                    return res.send({'drawingPosts': posts, 'likedPosts': result});
+                })
+                .limit(10)
+                .sort( '-createdOn' );
+            }
+            else return res.send({'drawingPosts': posts, 'likedPosts': []});
+        }
     })
     .limit(10)
     .sort( '-createdOn' )
