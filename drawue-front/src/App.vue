@@ -91,10 +91,11 @@ textarea{
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
       opacity: 0;
   }
-  .fade-enter{
+  .fader-enter{
       transform: translateX(-5px);
   }
   .fade-leave-to{
       transform: translateX(5px);
   }
+
 </style>
