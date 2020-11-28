@@ -29,11 +29,17 @@
       <div class="comment-list--container">
           <div class="comment-container" v-for="(comment, index) in commentArray" :key="index">
               <div class="resize-comment">
-
+                  <span>&#8722; &#43;</span>
               </div>
               <div class="comment-wrapper">
-                  <div class="author-pic">
+                  <div class="comment-author--container">
                       <img :src="'/api/posts/profile/pic/' + comment.profilePic" alt="pic">
+                      <div class="comment-author">
+                          {{comment.username}}
+                      </div>
+                  </div>
+                  <div class="comment-text">
+                      {{comment.comment.text}}
                   </div>
               </div>
           </div>
@@ -85,6 +91,7 @@ export default {
             axios.post('/api/posts/comments', {postID})
             .then((res)=>{
                 this.commentArray.push(...res.data.commentArray);
+                console.log(res.data.commentArray);
                 //this.userArray.push(...res.data.userArray);
                 console.log(res.data.commentArray);
                 //console.log(res.data.userArray);
@@ -98,6 +105,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$module-theme: #86a1b8;
     .comment-section--container{
         display: flex;
         flex-direction: column;
@@ -179,5 +187,55 @@ export default {
     .drop-down-enter, .drop-down-leave-to {
         opacity: 0;
         transform: translateY(0px);
+    }
+    .comment-container{
+        display: flex;
+        flex-direction: column;
+        min-height: 150px;
+        height: 150px;     
+        align-items: flex-start;
+        padding: 5px;
+        .resize-comment{
+            display: flex;
+            justify-content: flex-end;
+            height: 25px;
+            width: 100%;
+            font-size: 33px;
+            align-items: center;
+            line-height: 0.5;
+            color: $module-theme;
+            cursor: pointer;
+        }
+    }
+    .comment-wrapper{
+        display: flex;
+        box-sizing: border-box;
+        height: 100%;
+        width: 100%;
+        padding: 15px;
+        border-bottom: 2px solid #f1f1f1;
+        .comment-author--container{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            img{
+                height: 36px;
+                width: 36px;
+                border-radius: 50%;
+            }
+            .comment-author{
+                font-size: 12px;
+                font-weight: 700;
+                color: $module-theme;
+                margin: 5px 0;
+            }
+        }
+        .comment-text{
+            display: flex;
+            width: 100%;
+            padding: 15px;
+            color: #888888;
+        }
     }
 </style>

@@ -15,6 +15,7 @@ router.post('/', verifyToken, async (req, res) => {
             User.find({_id: {$in: result}, }, (err, users)=>{
                 if(err) console.log(err);
                 if(users){
+                    //console.log(comments);
                     const getData = async () => {
                         return Promise.all(comments.map(x => {
                             return users.map(y => {
@@ -25,7 +26,8 @@ router.post('/', verifyToken, async (req, res) => {
                         }));
                     };
                     getData().then((merged)=>{
-                        res.status(200).send({'commentArray': merged[0]});
+                        const fixedArray = merged.map(x => x[0]);
+                        res.status(200).send({'commentArray': fixedArray});
                     });
                 }
             })

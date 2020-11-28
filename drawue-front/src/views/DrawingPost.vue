@@ -143,11 +143,7 @@ export default {
 
 <style scoped lang="scss">
 .drawing-modal--container{
-    display: flex;
     position: fixed;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     background: #a3e3e338;
     z-index: 999;
     height: 100%;
@@ -159,12 +155,15 @@ export default {
     .drawing-modal{
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-self: center;
         position: relative;
         padding: 20px;
         background: white;
         border-radius: 15px;
+        width: 94%;
         max-width: 1070px;
-        margin: 15% 13px 0px;
+        margin: 3rem auto 3rem;
         border: 1px solid #eaebec;
         transition: all 0.25s;
         .close-drawing--modal{
