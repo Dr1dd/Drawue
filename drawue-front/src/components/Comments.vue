@@ -28,7 +28,14 @@
       </div>
       <div class="comment-list--container">
           <div class="comment-container" v-for="(comment, index) in commentArray" :key="index">
-              {{comment.text}}
+              <div class="resize-comment">
+
+              </div>
+              <div class="comment-wrapper">
+                  <div class="author-pic">
+                      <img :src="'/api/posts/profile/pic/' + comment.profilePic" alt="pic">
+                  </div>
+              </div>
           </div>
       </div>
   </div>
@@ -45,6 +52,7 @@ export default {
             inputFocus: false,
             commentText: '',
             commentArray: [],
+            userArray: [],
         }
     },
     validations: {
@@ -76,8 +84,10 @@ export default {
             var postID = this.$route.params.drawingID;
             axios.post('/api/posts/comments', {postID})
             .then((res)=>{
-                this.commentArray = res.data.commentArray;
-                console.log(this.commentArray);
+                this.commentArray.push(...res.data.commentArray);
+                //this.userArray.push(...res.data.userArray);
+                console.log(res.data.commentArray);
+                //console.log(res.data.userArray);
             })
             .catch((err)=>{
                 console.log(err.response);
