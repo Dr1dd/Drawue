@@ -23,4 +23,21 @@ router.post('/', verifyToken, async (req, res) => {
     })
 
 });
+router.post('/reply', verifyToken, async (req, res) => {
+    console.log(req.body);
+    await Drawings.find({_id: req.body.commentID})
+    comment = new Comments({
+        postID: req.body.postID,
+        userID: req.user._id,
+        text: req.body.text,
+    });
+    comment.save()
+    .then(()=>{
+        res.status(200).send({'success': 'Comment has been added.'});
+    })  
+    .catch((err)=>{
+        console.log(err);
+    })
+
+});
 module.exports = router;

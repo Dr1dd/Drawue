@@ -27,6 +27,9 @@ router.post('/', verifyToken, async (req, res) => {
                     };
                     getData().then((merged)=>{
                         const fixedArray = merged.map(x => x[0]);
+                        fixedArray.forEach(function (comment) {
+                            comment.expanded = true;
+                        });
                         res.status(200).send({'commentArray': fixedArray});
                     });
                 }
