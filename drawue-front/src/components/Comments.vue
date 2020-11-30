@@ -27,7 +27,7 @@
           </div>
       </div>
       <div class="comment-list--container">
-          <div class="comment-container" v-for="(commentObj, index) in commentArray" :key="index" :class="{'minimized': !commentObj.expanded}">
+          <div class="comment-container" v-for="(commentObj, index) in parentArray" :key="index" :class="{'minimized': !commentObj.expanded}">
               <div class="resize-comment" @click="commentObj.expanded = !commentObj.expanded">
                   <span>{{commentObj.expanded ? '&#8722;' : '&#43;'}}</span>
               </div>
@@ -55,7 +55,7 @@
                             </g>
                         </g>
                       </svg>
-                      <div class="close-reply" v-else>
+                      <div class="close-reply" v-else @click="isReplying =-1">
                           <div></div>
                           <div></div>
                       </div>
@@ -68,10 +68,10 @@
                             </div>
                             <div class="comment-input">
                                 <div class="text-area">
-                                    <span class="reply-text" contenteditable="true" name="comment"></span>
+                                    <span class="reply-text" contenteditable="true" :name='index'></span>
                                     <transition name="drop-down">
                                         <div class="comment-edit--overlay">
-                                            <div class="send-icon" @click="sendReply(commentObj.comment.postID)">
+                                            <div class="send-icon" @click="sendReply($event, commentObj.comment._id, commentObj.comment.postID, index)">
                                                 <svg width="536" height="536" viewBox="0 0 536 536" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <g clip-path="url(#clip0)">
                                                     <path d="M0 457.82C0 476.486 19.0853 489.071 36.2419 481.718L535.5 267.75L36.2418 53.7822C19.0853 46.4294 0 59.0142 0 77.68V193.987C0 207.018 9.64679 218.036 22.5637 219.758L382.5 267.75L22.5638 315.741C9.64681 317.464 0 328.482 0 341.513V457.82Z" fill="#86A1B8"/>
@@ -91,6 +91,9 @@
                     </div>
                   </div>
               </div>
+              <div class="replies-container" v-if ="commentObj.expanded">
+                <Reply @updateThread="threadUpdate" v-for="reply in commentObj.comment.children" :key="reply" :commentArray="commentArray" :replyID="reply" :replyLevel=1 />
+              </div>
           </div>
       </div>
   </div>
@@ -99,14 +102,19 @@
 <script>
 import { mapGetters } from 'vuex';
 import { minLength, maxLength } from 'vuelidate/lib/validators'
+import Reply from './Reply'
 import axios from 'axios';
 export default {
     name:"CommentSection",
+    components:{
+        Reply
+    },
     data(){
         return{
             inputFocus: false,
             commentText: '',
             commentArray: [],
+            parentArray: [],
             userArray: [],
             isReplying: -1,
             replyText: '',
@@ -135,42 +143,60 @@ export default {
             var postID = this.$route.params.drawingID;
             axios.post('/api/posts/comment', {postID, text})
             .then((res)=>{
-                console.log(res.data);
+                var comment = {};
+                this.$set(comment, 'username', this.getUsername);
+                this.$set(comment, 'profilePic', this.getProfilePic);
+                this.$set(comment, 'expanded', true);
+                this.$set(comment, 'comment', res.data.comment);
+                this.commentArray.push(comment);
+                this.getParentArray();
             })
             .catch((err)=>{
                 console.log(err.response);
             })
         },
-        sendReply(postID){
-            console.log(postID);
-            // var text = this.commentText;
-            // var postID = this.$route.params.drawingID;
-            // axios.post('/api/posts/comment/reply', {postID, text})
-            // .then((res)=>{
-            //     console.log(res.data);
-            // })
-            // .catch((err)=>{
-            //     console.log(err.response);
-            // })
+        sendReply(event, commentID, postID, index){
+             var textArea = event.target.closest('.text-area');
+            var text = textArea.firstChild.textContent;
+            axios.post('/api/posts/comment/reply', {postID, commentID, text})
+            .then((res)=>{
+                 this.commentArray[index].comment.children.push(res.data.reply._id);
+                 this.threadUpdate(res.data.reply);
+                 this.isReplying = -1;
+            })
+            .catch((err)=>{
+                console.log(err.response);
+            })
         },
         getComments(){
             var postID = this.$route.params.drawingID;
             axios.post('/api/posts/comments', {postID})
             .then((res)=>{
                 this.commentArray.push(...res.data.commentArray);
-                console.log(this.commentArray);
+                this.getParentArray();
             })
             .catch((err)=>{
                 console.log(err.response);
             })
         },
-
+        getParentArray(){
+            this.parentArray = this.commentArray.filter(obj => { return obj.comment.parent == null});
+        },
+        threadUpdate(comment){
+            var reply = {};
+            this.$set(reply, 'username', this.getUsername);
+            this.$set(reply, 'profilePic', this.getProfilePic);
+            this.$set(reply, 'expanded', true);
+            this.$set(reply, 'comment', comment);
+            this.commentArray.push(reply);
+        },
     }
 }
 </script>
 
 <style lang="scss" scoped>
 $module-theme: #86a1b8;
+@use '../sass/components/_commentReply';
     .comment-section--container{
         display: flex;
         flex-direction: column;
@@ -305,111 +331,15 @@ $module-theme: #86a1b8;
         }
     }
     .comment-interact{
-        display: flex;
-        justify-content: flex-end;
-        width: 100%;
-        padding-bottom: 5px;
-        .comment-reply{
-            height: 20px;
-            width: 20px;
-            padding-right: 15px;
-            cursor: pointer;
-            svg{
-                fill: $module-theme;
-                height: 100%;
-                width: 100%;
-            }
-        }
-        .close-reply{
-            position: relative;
-            height: 20px;
-            width: 20px;
-            div{
-                position: absolute;
-                width: 2px;
-                height: 100%;
-                background: $module-theme;
-                transform: rotate(45deg);
-                right: 0;
-                left: 0;
-                margin: 0 auto;
-            }
-            div:nth-child(2){
-                transform: rotate(-45deg);
-            }
-       }
+        @include commentReply.comment-interact;
     }
     .minimized{
-        flex-direction: row-reverse;
-        width: 100%;
-        min-height: 40px;
-        .comment-wrapper{
-            padding: 0 0 0 15px;
-        }
-        .comment-author--container{
-            flex-direction: row;
-            img{
-                height: 24px;
-                width: 24px;
-            }
-            .comment-author{
-                margin: 5px 10px;
-            }
-        }
-
+        @include commentReply.minimized;
     }
     .replying{
-        display: block;
-        border-top: 2px solid #f1f1f1;
-        margin-top: 5px;
-        padding-top: 5px;
-        .comment-reply{
-            float: right;
-        }
-        .write-reply{
-            display: flex;
-            min-height: 50px;
-            max-height: 400px;
-            padding: 7px 7px 7px 60px;
-            .user-img{
-                display: flex;
-                align-self: center;
-                img{
-                    height: 36px;
-                    width: 36px;
-                    border-radius: 50%;
-                }
-            }
-        }
-        .comment-input{
-            width: 92%;
-        }
-        .comment-edit--overlay{
-            background: initial;
-            transform: translateY(0);
-        }
-        .send-icon{
-            position: absolute;
-            right: -15px;
-            bottom: 0px;
-        }
-        .text-area{
-            .reply-text{
-                box-sizing: border-box;
-                min-height: 35px;
-                max-height: 150px;
-                max-width: 97%;
-                border-radius: 8px;
-                border: 2px solid #d6dbda;
-                width: 100%;
-                margin: 0;
-                z-index: 2;
-                padding: 5px;
-                &:focus{
-                    outline: none;
-                    box-shadow: 0px 0px 0px 0px;
-                }
-            }
-        }
+       @include commentReply.replying;
+    }
+    .replies-container{
+        width: 100%;
     }
 </style>

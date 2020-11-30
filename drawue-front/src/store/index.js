@@ -68,7 +68,7 @@ export default new Vuex.Store({
         },
         UpdateProfilePic( {commit, path} ){
             commit('SET_PROFILE_PIC', path);
-        }
+        },
     },
     getters:{
         getLoginState: state => {
@@ -82,6 +82,6 @@ export default new Vuex.Store({
         },
         profileStats: state =>{
             return [state.totalLikes, state.totalDrawings];
-        }
+        },
     }
 })

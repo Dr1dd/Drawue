@@ -13,7 +13,10 @@ const Comments = mongoose.model('Comments', new mongoose.Schema({
     text:{
         type: String,
     },
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }],
+    parent:{
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    children: [mongoose.Schema.Types.ObjectId],
 
 },{ timestamps: true }));
 exports.Comments = Comments;
