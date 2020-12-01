@@ -150,6 +150,8 @@ export default {
                 this.$set(comment, 'comment', res.data.comment);
                 this.commentArray.push(comment);
                 this.getParentArray();
+                this.commentText = '';
+                this.inputFocus = false;
             })
             .catch((err)=>{
                 console.log(err.response);

@@ -35,6 +35,9 @@ var likeDrawing = require('./routes/api/likes/likeDrawing');
 //comments
 var addComment = require('./routes/api/comments/addComment');
 var getComments = require('./routes/api/comments/getComments');
+//filters
+var getTags = require('./routes/api/filters/getTags');
+var filterDrawings = require('./routes/api/filters/getDrawingsByTags');
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');
@@ -96,6 +99,9 @@ app.use('/api/posts/like', likeDrawing);
 //comments
 app.use('/api/posts/comment', addComment);
 app.use('/api/posts/comments', getComments);
+//filters
+app.use('/api/posts/get-tags', getTags);
+app.use('/api/posts/drawings/filter', filterDrawings);
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));

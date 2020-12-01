@@ -26,6 +26,10 @@ const Drawings = mongoose.model('Drawings', new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    comment_count:{
+        type: Number,
+        default: 0,
+    },
     tags: [String],
 
 },{ timestamps: true }));

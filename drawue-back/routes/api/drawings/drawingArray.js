@@ -13,6 +13,7 @@ router.post('/', verifyToken, (req, res)=>{
         if(err){
             res.send({'error': 'No drawings found'});
         }
+        if(posts.length == 0) return res.send({'notFound': true});
         if(req.user){
             Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
                 var result =  likedPosts.map(({ postID }) => postID)
@@ -69,5 +70,25 @@ router.get('/carousel', verifyToken, (req, res)=>{
     .limit(10)
     .sort( '-createdOn' )
 });
+// router.get('/filter-tags', verifyToken, (req, res)=>{
+//     Drawings.find({ createdOn: { $lte: req.createdOnBefore } }, (err, posts)=>{
+//         if(err){
+//             res.send({'error': 'No drawings found'});
+//         }
+//         else{
+//             if(req.user){
+//                 Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
+//                     var result =  likedPosts.map(({ postID }) => postID)
+//                     return res.send({'drawingPosts': posts, 'likedPosts': result});
+//                 })
+//                 .limit(10)
+//                 .sort( '-createdOn' );
+//             }
+//             else return res.send({'drawingPosts': posts, 'likedPosts': []});
+//         }
+//     })
+//     .limit(10)
+//     .sort( '-createdOn' )
+// });
 
 module.exports = router;

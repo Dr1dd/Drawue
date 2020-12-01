@@ -5,7 +5,36 @@
         </div>
         <div class="drawing-list--container">
             <div class="filter-container">
-
+                <div class="filter" @click ="isFiltering = !isFiltering">
+                    <div class="filter-icon">
+                        <svg id="Capa_1" enable-background="new 0 0 512 512" viewBox="0 0 512 512"  xmlns="http://www.w3.org/2000/svg"><g><path d="m420.404 0h-328.808c-50.506 0-91.596 41.09-91.596 91.596v328.809c0 50.505 41.09 91.595 91.596 91.595h328.809c50.505 0 91.595-41.09 91.595-91.596v-328.808c0-50.506-41.09-91.596-91.596-91.596zm61.596 420.404c0 33.964-27.632 61.596-61.596 61.596h-328.808c-33.964 0-61.596-27.632-61.596-61.596v-328.808c0-33.964 27.632-61.596 61.596-61.596h328.809c33.963 0 61.595 27.632 61.595 61.596z"/><path d="m432.733 112.467h-228.461c-6.281-18.655-23.926-32.133-44.672-32.133s-38.391 13.478-44.672 32.133h-35.661c-8.284 0-15 6.716-15 15s6.716 15 15 15h35.662c6.281 18.655 23.926 32.133 44.672 32.133s38.391-13.478 44.672-32.133h228.461c8.284 0 15-6.716 15-15s-6.716-15-15.001-15zm-273.133 32.133c-9.447 0-17.133-7.686-17.133-17.133s7.686-17.133 17.133-17.133 17.133 7.686 17.133 17.133-7.686 17.133-17.133 17.133z"/><path d="m432.733 241h-35.662c-6.281-18.655-23.927-32.133-44.672-32.133s-38.39 13.478-44.671 32.133h-228.461c-8.284 0-15 6.716-15 15s6.716 15 15 15h228.461c6.281 18.655 23.927 32.133 44.672 32.133s38.391-13.478 44.672-32.133h35.662c8.284 0 15-6.716 15-15s-6.716-15-15.001-15zm-80.333 32.133c-9.447 0-17.133-7.686-17.133-17.133s7.686-17.133 17.133-17.133 17.133 7.686 17.133 17.133-7.686 17.133-17.133 17.133z"/><path d="m432.733 369.533h-164.194c-6.281-18.655-23.926-32.133-44.672-32.133s-38.391 13.478-44.672 32.133h-99.928c-8.284 0-15 6.716-15 15s6.716 15 15 15h99.928c6.281 18.655 23.926 32.133 44.672 32.133s38.391-13.478 44.672-32.133h164.195c8.284 0 15-6.716 15-15s-6.716-15-15.001-15zm-208.866 32.134c-9.447 0-17.133-7.686-17.133-17.133s7.686-17.133 17.133-17.133 17.133 7.685 17.133 17.132-7.686 17.134-17.133 17.134z"/></g></svg>
+                    </div>
+                    <div class="filter-label">
+                        Filter
+                    </div>
+                </div>
+                <transition name="fade">
+                    <div v-if="isFiltering" class="filter-wrapper" >
+                        <div class="tags-container">
+                            <div class="filter-label">
+                                Tags:
+                            </div>
+                            <div class="tag-list">
+                                <div class="tag" v-for="(tag, index) in filterTags" :key="index">
+                                   <label class="container">{{tag}}
+                                        <input type="checkbox" :value="tag" v-model="checkedTags">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+                <transition name="fade">
+                    <div class="filter-button" v-if="isFiltering" @click="changeFilter">
+                        {{checkedTags.length}} tags <font-awesome-icon :icon="['fas', 'filter']" />
+                    </div>
+                </transition>
             </div>
             <div class="drawing-list--wrapper">
                 <div class="drawing-container" v-for="(drawing, index) in drawings" :key="index" @click="selectedDrawing = drawing">
@@ -31,6 +60,7 @@
 import Carousel from '../components/Carousel.vue'
 import axios from 'axios'
 import Loader from 'vueloaderspinners'
+
 export default {
     name: 'Gallery',
     components:{
@@ -45,27 +75,37 @@ export default {
             loading: false,
             likedPosts: [],
             carouselDrawings: [],
-        }
+            isFiltering: false,
+            filterTags: [],
+            checkedTags: [],
+            postLimit: false,
+            axiosUrl: '/api/posts/drawings',
+       }
     },
     mounted(){
         this.getDrawings(this.skip);
+        this.getTags();
         //this.getCarouselDrawings();
         window.onscroll = () =>{
             let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight+20 > document.documentElement.offsetHeight;
             if(bottomOfWindow){
-                this.skip += 30;
-                this.getDrawings(this.skip);
+                if(!this.postLimit){
+                    this.skip += 30;
+                    this.getDrawings(this.skip);
+                }
             }
         }
     },
     methods: {
         getDrawings(numOfPosts){
             var skip = numOfPosts;
+            if(this.checkedTags) var tags = this.checkedTags;
             this.loading=true;
-            axios.post('/api/posts/drawings', {skip})
+            axios.post(this.axiosUrl, {skip, tags})
                 .then((res)=>{
-                    this.drawings.push(...res.data.drawingPosts);
-                    this.likedPosts.push(...res.data.likedPosts);
+                    if(res.data.notFound == true) this.postLimit = true;
+                    if(res.data.drawingPosts) this.drawings.push(...res.data.drawingPosts);
+                    if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
                     this.loading=false;
                })
                 .catch((err)=>{
@@ -73,12 +113,30 @@ export default {
                     this.loading=false;
                 })
         },
+        getTags(){
+            axios.get('/api/posts/get-tags')
+                .then((res)=>{
+                    this.filterTags = res.data.tagArray;
+                })
+                .catch((err)=>{
+                    console.log(err.response);
+                })
+        },
+        changeFilter(){
+            this.drawings = [];
+            this.likedPosts = [];
+            this.skip= 0; 
+            if(this.checkedTags.length == 0) this.axiosUrl='/api/posts/drawings'; 
+            else this.axiosUrl='/api/posts/drawings/filter'; 
+            this.getDrawings(this.skip);
+        }
     },
 
 }
 </script>
 
 <style lang="scss" scoped>
+$module-theme: #86a1b8;
  .carousel-container{
     padding-top: 65px;
     min-height: 17rem;
@@ -93,11 +151,133 @@ export default {
     min-height: 17rem;
  }
  .filter-container{
-    padding: 20px;
-    height: 2rem;
+    display: flex;
+    padding: 16px;
     border-bottom: 1px solid #cfcfcf78;
     background: #ededed;
+    .filter{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 9px;
+        cursor: pointer;
+        .filter-icon{
+            fill: $module-theme;
+            height: 24px;
+            width: 24px;
+        }
+        .filter-label{
+            font-size: 12px;
+            color: $module-theme;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+    }
+    .filter-button{
+        background: #a3bed7;
+        border-radius: 10px;
+        color: white;
+        font-weight: 700;
+        padding: 6px 8px;
+        font-size: 13px;
+        height: fit-content;
+        place-self: flex-end;
+        margin: 5px;
+        border: 2px solid #90abc4;
+        cursor: pointer;
+    }
  }
+    .filter-wrapper{
+        position: relative;
+        max-width: 400px;
+        min-height: 50px;
+        background: white;
+        border: 2px solid $module-theme;
+        border-radius: 10px;
+        margin-left: 10px;
+    .tags-container{
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        .filter-label{
+            display: flex;
+            flex: 1;
+            color: $module-theme;
+            padding: 5px 0 0 10px;
+        }
+        .tag-list{
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 8px;
+            .tag{
+                display: flex;
+                margin: 5px;
+                .container {
+                    display: block;
+                    position: relative;
+                    margin-bottom: 12px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    padding-left: 30px;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                    color: #a1aec0;
+                }
+                .container input {
+                    position: absolute;
+                    opacity: 0;
+                    cursor: pointer;
+                    height: 0;
+                    width: 0;
+                }
+                .checkmark {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    min-height: 20px;
+                    min-width: 20px;
+                    background-color: #eee;
+                }
+                .container:hover input ~ .checkmark {
+                    background-color: #ccc;
+                }
+                .container input:checked ~ .checkmark {
+                    background-color: #93adc6;
+                }
+                .checkmark:after {
+                    content: "";
+                    position: absolute;
+                    display: none;
+                }
+                .container input:checked ~ .checkmark:after {
+                    display: block;
+                }
+                .container .checkmark:after {
+                    left: 6px;
+                    top: 2px;
+                    width: 5px;
+                    height: 10px;
+                    border: solid white;
+                    border-width: 0 3px 3px 0;
+                    transform: rotate(45deg);
+                }
+            }
+        }
+        &::after{
+            content:'';
+            position: absolute;
+            padding: 6px;
+            top: 12px;
+            left: -8px;
+            background: white;
+            border-left: 2px solid #86a1b8;
+            border-bottom: 2px solid #86a1b8;
+            transform: rotate(45deg);
+        }
+    }
+}
  .drawing-list--wrapper{
      display: flex;
      flex-direction: row;

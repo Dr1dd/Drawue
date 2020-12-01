@@ -4,6 +4,7 @@ const { Drawings } = require('../../../models/drawing');
 const { User } = require('../../../models/user');
 const { Comments } = require('../../../models/comment');
 const { verifyToken } = require("../verifyToken");
+const { isRef } = require('@hapi/joi');
 
 const router = express.Router();
 
@@ -18,7 +19,10 @@ router.post('/', verifyToken, async (req, res) => {
     });
     comment.save()
     .then(()=>{
-        res.status(200).send({'comment': comment});
+        Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { comment_count: 1 }}, (err, response)=>{
+            if(err) console.log(err);
+            else  res.status(200).send({'comment': comment});
+        });
     })  
     .catch((err)=>{
         console.log(err);
@@ -41,7 +45,10 @@ router.post('/reply', verifyToken, async (req, res) => {
                 comment.children.push(r._id)
                 comment.save()
                 .then(()=>{
-                    res.status(200).send({'reply': reply});
+                    Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { comment_count: 1 }}, (err, response)=>{
+                        if(err) console.log(err);
+                        else res.status(200).send({'reply': reply});
+                    });
                 })
                 .catch((err)=>{
                     console.log(err);

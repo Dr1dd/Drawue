@@ -88,7 +88,8 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
                 });
                 drawing.save()
                     .then(()=>{
-                        user.drawing_counter +=1;
+                      if(user.drawing_counter == null || user.drawing_counter == undefined) user.drawing_counter = 1;
+                      else user.drawing_counter +=1;
                         user.save().then(()=>{
                           return res.status(200).send({'success': 'Your drawing has been successfully published!'});
                         })
