@@ -55,6 +55,24 @@
                     </div>
                 </div>
                 </transition>
+                <div class="sort-container">
+                      <span @click="sortOpen = !sortOpen">{{sort == '' ? 'Sort by' : 'Sorted by: '+sort}}
+                          <div class="arrow" :class="{'up': sortOpen, 'down': !sortOpen}">
+                          </div>
+                      </span>
+                      <transition name="expand">
+                        <div v-if="sortOpen" class="sort-list">
+                            <ul>
+                                <li @click="sortDrawings('Recent')">
+                                    Recent
+                                </li>
+                                <li @click="sortDrawings('Likes')">
+                                    Most Liked
+                                </li>
+                            </ul>
+                        </div>
+                      </transition>
+                </div>
             </div>
             <div class="drawing-list--wrapper">
                 <div class="drawing-container" v-for="(drawing, index) in drawings" :key="index" @click="selectedDrawing = drawing">
@@ -100,6 +118,8 @@ export default {
             checkedTags: [],
             postLimit: false,
             personal: 'default',
+            sort:'',
+            sortOpen: false,
             axiosUrl: '/api/posts/drawings',
        }
     },
@@ -124,16 +144,33 @@ export default {
             var skip = numOfPosts;
             if(this.checkedTags) var tags = this.checkedTags;
             this.loading=true;
-            axios.post(this.axiosUrl, {skip, tags})
+            var filter = this.personal;
+            var sort = this.sort;
+            axios.post(this.axiosUrl, {skip, tags, filter, sort})
                 .then((res)=>{
                     if(res.data.notFound == true) this.postLimit = true;
-                    if(res.data.drawingPosts) this.drawings.push(...res.data.drawingPosts);
-                    if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
-                    if(this.personal == 'liked'){
-                        var filtered;
-                        filtered = this.drawings.filter((drawing) => this.likedPosts.includes(drawing._id));
-                        this.drawings = [...filtered];
-                    }
+                    var filtered;
+                    var allDrawings
+                    switch(this.personal){
+                        case 'liked':
+                            allDrawings = [...res.data.drawingPosts];
+                            if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
+                            filtered = allDrawings.filter((drawing) => this.likedPosts.includes(drawing._id));
+                            this.drawings.push(...filtered);
+                            break;
+                        case 'commented':
+                            if(res.data.commentedPosts) {
+                                allDrawings = [...res.data.drawingPosts];
+                                var commentedPosts = [...res.data.commentedPosts];
+                                filtered = allDrawings.filter((drawing) => commentedPosts.includes(drawing._id));
+                                this.drawings.push(...filtered);
+                            }
+                            break;
+                        case 'default':
+                            if(res.data.drawingPosts) this.drawings.push(...res.data.drawingPosts);
+                            if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
+                            break;
+                  }
                     this.loading=false;
                })
                 .catch((err)=>{
@@ -152,20 +189,20 @@ export default {
         },
         changeFilter(){
             this.postLimit=false;
-            if(this.drawings.length != 0 && this.checkedTags.length == 0 && this.personal == 'liked'){
-                var filtered;
-                filtered = this.drawings.filter((drawing) => this.likedPosts.includes(drawing._id));
-                this.drawings = [...filtered];
-                console.log(this.drawings);
-            }
-            else{
-                this.drawings = [];
-                this.likedPosts = [];
-                this.skip= 0; 
-                if(this.checkedTags.length == 0) this.axiosUrl='/api/posts/drawings'; 
-                else this.axiosUrl='/api/posts/drawings/filter'; 
-                this.getDrawings(this.skip);
-            }
+            this.axiosUrl = (this.checkedTags.length != 0) ? '/api/posts/drawings/filter/tags' : '/api/posts/drawings'; 
+            this.drawings = [];
+            this.likedPosts = [];
+            this.skip= 0;
+            this.getDrawings(this.skip);        
+        },
+        sortDrawings(sortType){
+            this.sortOpen = !this.sortOpen;
+            this.sort = sortType;
+            this.postLimit=false;
+            this.drawings = [];
+            this.likedPosts = [];
+            this.skip= 0;
+            this.getDrawings(this.skip); 
         }
     },
 
@@ -192,6 +229,7 @@ $module-theme: #86a1b8;
  }
  .filter-container{
     display: flex;
+    position: relative;
     padding: 16px;
     border-bottom: 1px solid #cfcfcf78;
     background: radial-gradient(circle, rgba(255,255,255,1) 14%, rgba(242,245,249,1) 83%);
@@ -226,6 +264,46 @@ $module-theme: #86a1b8;
         margin: 5px;
         border: 2px solid #90abc4;
         cursor: pointer;
+    }
+    .sort-container{
+        display: flex;
+        position: relative;
+        right: 20px;
+        bottom: 5px;
+        position: absolute;
+        align-self: flex-end;
+        cursor: pointer;
+        span{
+            color: $module-theme;
+            .arrow{
+                border-color: $module-theme;
+                margin: 0 0px;
+            }
+        }
+        .sort-list{
+            position: absolute;
+            top: 23px;
+            right: -7px;
+            max-width: 200px;
+            min-width: 111px;
+            background: white;
+            box-shadow: 0px 0px 4px -2px #000000;
+            transform-origin: top right;
+            z-index: 999;
+            ul{
+                list-style-type: none;
+                padding: 0;
+                text-align: left;
+                margin: 0;
+                li{
+                    color: #8ba5bb;
+                    padding: 5px 10px;
+                    &:hover{
+                        background: #eaeff3;
+                    }
+                }
+            }
+        }
     }
  }
  .transition-container{

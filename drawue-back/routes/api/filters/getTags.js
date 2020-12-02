@@ -7,7 +7,8 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     await Drawings.aggregate([
         {'$unwind': "$tags"},
-        {'$group': {_id:"$tags", count:{$sum:1}}}
+        {'$group': {_id:"$tags", count:{$sum:1}}},
+        {'$sort': {count: -1}}
     ], (err, tags)=>{
         var filtered = tags.filter(function (tag) {
             return tag._id !='';
@@ -17,6 +18,6 @@ router.get("/", async (req, res) => {
             filteredArray.push(filtered[i]._id);
         }
         return res.status(200).send({'tagArray': filteredArray});
-    }).limit(11).sort({count: -1});
+    }).limit(11);
 });
 module.exports = router;

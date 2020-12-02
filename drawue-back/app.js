@@ -101,7 +101,7 @@ app.use('/api/posts/comment', addComment);
 app.use('/api/posts/comments', getComments);
 //filters
 app.use('/api/posts/get-tags', getTags);
-app.use('/api/posts/drawings/filter', filterDrawings);
+app.use('/api/posts/drawings/filter/tags', filterDrawings);
 
 if(process.env.NODE_ENV == 'production'){
     app.use(express.static(__dirname+'/public/'));
