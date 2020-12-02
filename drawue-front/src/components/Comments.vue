@@ -219,6 +219,7 @@ $module-theme: #86a1b8;
                 height: 60px;
                 width: 60px;
                 border-radius: 50%;
+                border: 1px solid #e1e4e4;
             }
         }
     }
@@ -317,6 +318,7 @@ $module-theme: #86a1b8;
                 height: 36px;
                 width: 36px;
                 border-radius: 50%;
+                border: 1px solid #e1e4e4;
             }
             .comment-author{
                 font-size: 12px;

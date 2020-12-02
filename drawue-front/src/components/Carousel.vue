@@ -55,8 +55,6 @@ SwiperCore.use([ Pagination]);
           .then((res)=>{
             this.drawings.push(...res.data.drawingPosts);
             this.likedPosts.push(...res.data.likedPosts);
-            console.log(this.drawings);
-            console.log(this.likedPosts);
           })
           .catch((err)=>{
             console.log(err.response);
@@ -82,6 +80,8 @@ $font-size-huge: 16px;
     min-height: 100%;
     height: 100%;
     background: white;
+    border: 1px solid #d4d4d4;
+    box-shadow: 2px 2px 4px 2px rgba(173, 173, 173, 0.2);
   }
   .swiper-wrapper{
     background: white;

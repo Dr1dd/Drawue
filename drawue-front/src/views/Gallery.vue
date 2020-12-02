@@ -13,8 +13,9 @@
                         Filter
                     </div>
                 </div>
-                <transition name="fade">
-                    <div v-if="isFiltering" class="filter-wrapper" >
+                <transition name="expand">
+                <div v-if="isFiltering" class="transition-container">
+                    <div class="filter-wrapper" >
                         <div class="tags-container">
                             <div class="filter-label">
                                 Tags:
@@ -28,12 +29,31 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="personal-container" v-if="getLoginState">
+                            <div class="filter-label">
+                                Personal:
+                            </div>
+                            <div class="personal-filter">
+                                <div class="radio-filter">
+                                    <input type="radio" id="personal1" value="default" name="filter" v-model="personal" checked>
+                                    <label for="personal1">All drawings (default)</label>
+                                </div>
+                                <div class="radio-filter">
+                                    <input type="radio" id="personal2" value="liked" name="filter" v-model="personal">
+                                    <label for="personal2">Drawings I liked</label>
+                                </div>
+                                <div class="radio-filter">
+                                    <input type="radio" id="personal3" value="commented" name="filter" v-model="personal">
+                                    <label for="personal3">Drawings I commented on</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </transition>
-                <transition name="fade">
-                    <div class="filter-button" v-if="isFiltering" @click="changeFilter">
+            
+                    <div class="filter-button" @click="changeFilter">
                         {{checkedTags.length}} tags <font-awesome-icon :icon="['fas', 'filter']" />
                     </div>
+                </div>
                 </transition>
             </div>
             <div class="drawing-list--wrapper">
@@ -60,7 +80,7 @@
 import Carousel from '../components/Carousel.vue'
 import axios from 'axios'
 import Loader from 'vueloaderspinners'
-
+import { mapGetters } from 'vuex';
 export default {
     name: 'Gallery',
     components:{
@@ -79,13 +99,16 @@ export default {
             filterTags: [],
             checkedTags: [],
             postLimit: false,
+            personal: 'default',
             axiosUrl: '/api/posts/drawings',
        }
+    },
+    computed:{
+        ...mapGetters(['getLoginState']),
     },
     mounted(){
         this.getDrawings(this.skip);
         this.getTags();
-        //this.getCarouselDrawings();
         window.onscroll = () =>{
             let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight+20 > document.documentElement.offsetHeight;
             if(bottomOfWindow){
@@ -106,6 +129,11 @@ export default {
                     if(res.data.notFound == true) this.postLimit = true;
                     if(res.data.drawingPosts) this.drawings.push(...res.data.drawingPosts);
                     if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
+                    if(this.personal == 'liked'){
+                        var filtered;
+                        filtered = this.drawings.filter((drawing) => this.likedPosts.includes(drawing._id));
+                        this.drawings = [...filtered];
+                    }
                     this.loading=false;
                })
                 .catch((err)=>{
@@ -123,12 +151,21 @@ export default {
                 })
         },
         changeFilter(){
-            this.drawings = [];
-            this.likedPosts = [];
-            this.skip= 0; 
-            if(this.checkedTags.length == 0) this.axiosUrl='/api/posts/drawings'; 
-            else this.axiosUrl='/api/posts/drawings/filter'; 
-            this.getDrawings(this.skip);
+            this.postLimit=false;
+            if(this.drawings.length != 0 && this.checkedTags.length == 0 && this.personal == 'liked'){
+                var filtered;
+                filtered = this.drawings.filter((drawing) => this.likedPosts.includes(drawing._id));
+                this.drawings = [...filtered];
+                console.log(this.drawings);
+            }
+            else{
+                this.drawings = [];
+                this.likedPosts = [];
+                this.skip= 0; 
+                if(this.checkedTags.length == 0) this.axiosUrl='/api/posts/drawings'; 
+                else this.axiosUrl='/api/posts/drawings/filter'; 
+                this.getDrawings(this.skip);
+            }
         }
     },
 
@@ -149,12 +186,15 @@ $module-theme: #86a1b8;
     background: white;
     margin: 20px auto 0px;
     min-height: 17rem;
+    margin-bottom: 50px;
+    border: 1px solid #d4d4d4;
+    box-shadow: 2px 2px 4px 2px rgba(173, 173, 173, 0.2);
  }
  .filter-container{
     display: flex;
     padding: 16px;
     border-bottom: 1px solid #cfcfcf78;
-    background: #ededed;
+    background: radial-gradient(circle, rgba(255,255,255,1) 14%, rgba(242,245,249,1) 83%);
     .filter{
         display: flex;
         flex-direction: column;
@@ -174,6 +214,7 @@ $module-theme: #86a1b8;
         }
     }
     .filter-button{
+        text-align: center;
         background: #a3bed7;
         border-radius: 10px;
         color: white;
@@ -187,24 +228,28 @@ $module-theme: #86a1b8;
         cursor: pointer;
     }
  }
+ .transition-container{
+     display: flex;
+     transform-origin: top left;
+ }
     .filter-wrapper{
+        display: flex;
         position: relative;
-        max-width: 400px;
+        max-width: 600px;
         min-height: 50px;
         background: white;
         border: 2px solid $module-theme;
         border-radius: 10px;
         margin-left: 10px;
+        .filter-label{
+            display: flex;
+            color: $module-theme;
+            padding: 5px 0 0 10px;
+        }
     .tags-container{
         display: flex;
         flex-direction: column;
         flex: 1;
-        .filter-label{
-            display: flex;
-            flex: 1;
-            color: $module-theme;
-            padding: 5px 0 0 10px;
-        }
         .tag-list{
             display: flex;
             flex-wrap: wrap;
@@ -277,6 +322,35 @@ $module-theme: #86a1b8;
             transform: rotate(45deg);
         }
     }
+    .personal-container{
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        .personal-filter{
+            display: flex;
+            flex-direction: column;
+            place-items: flex-start;
+            margin-left: 10px;
+            .radio-filter{
+                margin: 5px 0;
+                input{
+                    border-radius: 50%;
+                    padding: 4px;
+                    margin: 0 5px;
+                    border: 2px solid #c0cedb;
+                    appearance: none;
+                    &:checked{
+                        background: radial-gradient(circle, rgba(122,163,201,1) 6%, rgba(255,255,255,1) 55%);
+                        background-position: center;
+                        background-size: 100% 100%;
+                    }
+                }
+                label{
+                    color: #a1aec0;
+                }
+            }
+        }
+    }
 }
  .drawing-list--wrapper{
      display: flex;
@@ -332,5 +406,15 @@ $module-theme: #86a1b8;
         }
     }
 }
+  .expand-enter-active, .expand-leave-active {
+      transition: all .4s ease;
+      max-height: 350px;
+  }
+  .expand-enter, .expand-leave-to /* .fade-leave-active below version 2.1.8 */ {
+      opacity: 0;
+      transform: scale(0,0);
+      max-height: 0px;
+    
+  }
 
 </style>

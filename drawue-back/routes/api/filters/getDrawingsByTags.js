@@ -10,7 +10,6 @@ router.post("/", verifyToken,  async (req, res) => {
     var skip = req.body.skip;
     if(skip === 0) var limit = 30;
     else limit = 30;
-    console.log(tags);
     await Drawings.find({tags: {$in: tags }}, (err, posts)=>{
         if(err){
             res.send({'error': 'No drawings found'});

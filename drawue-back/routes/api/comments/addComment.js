@@ -1,15 +1,11 @@
 const express = require('express');
-const { Likes } = require('../../../models/likes');
 const { Drawings } = require('../../../models/drawing');
-const { User } = require('../../../models/user');
 const { Comments } = require('../../../models/comment');
 const { verifyToken } = require("../verifyToken");
-const { isRef } = require('@hapi/joi');
 
 const router = express.Router();
 
 router.post('/', verifyToken, async (req, res) => {
-    console.log(req.body);
     comment = new Comments({
         postID: req.body.postID,
         userID: req.user._id,

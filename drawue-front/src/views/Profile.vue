@@ -439,6 +439,7 @@ export default {
             position: relative;
             width: fit-content;
             justify-content: center;
+            font-weight: 700;
             &:hover{
                 .edit-username{
                      opacity: 1;
@@ -463,6 +464,7 @@ export default {
         flex-direction: column;
         margin-top: 10px;
         text-align: left;
+        color: #89a3ba;
     }
     .error-flash{
         position: absolute;
@@ -541,14 +543,18 @@ export default {
         border: 2px solid #efefef;
         max-height: 150px;
         border-radius: 5px;
-        box-shadow: 0px 0px 12px -10px #000000;
+        // box-shadow: 0px 0px 12px -10px #000000;
+        a{
+            display: flex;
+            width: 100%;
+        }
         .drawing-thumbnail{
             width: 227px;
             img{
                 height: 100%;
                 width: 100%;
                 min-width: 230px;
-                box-shadow: 0px 0px 16px -13px #000000;
+                // box-shadow: 0px 0px 16px -13px #000000;
                 border-radius: 5px;
                 border: 1px solid #e5e5e5;
             }
@@ -557,7 +563,7 @@ export default {
             display: flex;
             flex-direction: column;
             color: #86a1b8;
-            padding: 10px;
+            padding: 10px 15px;
         }
     }
 .drawing-description{

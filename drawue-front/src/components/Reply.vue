@@ -156,6 +156,7 @@ $module-theme: #86a1b8;
                 height: 36px;
                 width: 36px;
                 border-radius: 50%;
+                border: 1px solid #e1e4e4;
             }
         }
     }
@@ -249,6 +250,7 @@ $module-theme: #86a1b8;
                 img{
                     height: 24px;
                     width: 24px;
+                    border: 2px solid #e1e4e4;
                 }
                 .reply-author{
                     margin: 5px 10px;
