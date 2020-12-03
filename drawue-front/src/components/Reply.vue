@@ -6,9 +6,10 @@
         </div>
         <div class="reply-wrapper">
                 <div class="user-img">
-                    <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic">
+                    <img :src="'/api/posts/profile/pic/' + currentReply[0].profilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                     <div class="reply-author">
                         {{currentReply[0].username}}
+                        
                     </div>
                 </div>
                 <div class="reply-text" v-if="currentReply[0].expanded">
@@ -37,7 +38,7 @@
                     <div class="reply-input--container">
                         <div class="write-reply">
                             <div class="user-img">
-                                <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic">
+                                <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                             </div>
                             <div class="comment-input">
                                 <div class="text-area">
@@ -68,12 +69,14 @@
                 <Reply v-for="(reply, index) in currentReply[0].comment.children" :key="index" :commentArray="commentArray" :replyID="reply" :replyLevel="level+1" />
         </div>
       </div>
+      <ErrorModal v-if="replyErrorText !=''" @close="replyErrorText =''" > {{replyErrorText}} </ErrorModal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import axios from 'axios';
+import ErrorModal from './ErrorModal'
 export default {
     name: 'Reply',
     data(){
@@ -82,7 +85,11 @@ export default {
             level:  this.replyLevel,
             isReplying: false,
             comments: [],
+            replyErrorText: '',
         }
+    },
+    components:{
+        ErrorModal,
     },
     props:{
         commentArray:{
@@ -103,22 +110,36 @@ export default {
     },
     methods:{
         sendReply(commentID, postID){
-             var textArea = event.target.closest('.text-area');
-            var text = textArea.firstChild.textContent;
-            axios.post('/api/posts/comment/reply', {postID, commentID, text})
-            .then((res)=>{
-                 var reply = {};
-                this.$set(reply, 'username', this.getUsername);
-                this.$set(reply, 'profilePic', this.getProfilePic);
-                this.$set(reply, 'expanded', true);
-                this.$set(reply, 'comment', res.data.reply);
-                this.comments.push(reply);
-                this.currentReply[0].comment.children.push(res.data.reply._id);
-                this.isReplying = false;
-            })
-            .catch((err)=>{
-                console.log(err.response);
-            })
+                if(this.getLoginState){
+                    var textArea = event.target.closest('.text-area');
+                    var text = textArea.firstChild.textContent;
+                    if(text.length <2){
+                        this.replyErrorText = "Reply must have atleast 2 characters";
+                        return;
+                    }
+                    if(text.length >1000){
+                        this.replyErrorText = "Reply should not have more than 1000 characters";
+                        return;
+                    }
+                    axios.post('/api/posts/comment/reply', {postID, commentID, text})
+                    .then((res)=>{
+                        var reply = {};
+                        this.$set(reply, 'username', this.getUsername);
+                        this.$set(reply, 'profilePic', this.getProfilePic);
+                        this.$set(reply, 'expanded', true);
+                        this.$set(reply, 'comment', res.data.reply);
+                        this.comments.push(reply);
+                        this.currentReply[0].comment.children.push(res.data.reply._id);
+                        this.isReplying = false;
+                        this.replyErrorText = '';
+                    })
+                    .catch((err)=>{
+                        console.log(err.response);
+                    });
+                }
+                else{
+                    this.replyErrorText = 'You must be logged in to reply!';
+                }
         },
     }
 }
@@ -264,5 +285,12 @@ $module-theme: #86a1b8;
     }
     .replies-container{
         width: 100%;
+    }
+    .reply-error{
+        position: absolute;
+        bottom: -3px;
+        font-size: 12px;
+        left: 7rem;
+        color: #ff5454;
     }
 </style>

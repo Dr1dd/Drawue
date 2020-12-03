@@ -161,6 +161,7 @@ export default {
                         case 'commented':
                             if(res.data.commentedPosts) {
                                 allDrawings = [...res.data.drawingPosts];
+                                if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
                                 var commentedPosts = [...res.data.commentedPosts];
                                 filtered = allDrawings.filter((drawing) => commentedPosts.includes(drawing._id));
                                 this.drawings.push(...filtered);

@@ -54,6 +54,7 @@
 <script>
 import { directive as onClickaway } from 'vue-clickaway';
 import CommentSection from '../components/Comments'
+import { mapGetters } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -77,6 +78,9 @@ export default {
         username:{
             type: String,
         }
+    },
+    computed:{
+        ...mapGetters(['getLoginState']),
     },
     components:{
         CommentSection,
@@ -123,18 +127,20 @@ export default {
             this.author_username = this.username;
         },
         addLike(ID){
-            this.selectedDrawing.liked = !this.selectedDrawing.liked
-            this.selectedDrawing.like_count = this.selectedDrawing.liked ? this.selectedDrawing.like_count+=1 : this.selectedDrawing.like_count-=1; 
-            var postID = ID;
-            var index = this.$parent.likedPosts.indexOf(postID);
-            if (index !== -1) {
-                this.$parent.likedPosts.splice(index, 1);
+            if(this.getLoginState){
+                this.selectedDrawing.liked = !this.selectedDrawing.liked
+                this.selectedDrawing.like_count = this.selectedDrawing.liked ? this.selectedDrawing.like_count+=1 : this.selectedDrawing.like_count-=1; 
+                var postID = ID;
+                var index = this.$parent.likedPosts.indexOf(postID);
+                if (index !== -1) {
+                    this.$parent.likedPosts.splice(index, 1);
+                }
+                else{
+                    this.$parent.likedPosts.push(postID);
+                }
+                var author_username = this.author_username;
+                axios.post('/api/posts/like', {postID, author_username})
             }
-            else{
-                this.$parent.likedPosts.push(postID);
-            }
-            var author_username = this.author_username;
-            axios.post('/api/posts/like', {postID, author_username})
         }
     }
 

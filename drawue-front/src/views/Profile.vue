@@ -27,21 +27,23 @@
                     </div>
                     <div class="profile-username">
                         <div>
-                            @{{ getUsername }} 
-                        
-                        <div class="edit-username">
-                            <svg viewBox="0 0 383.947 383.947" xml:space="preserve">
-                            <g>
-                                <g>
+                            @<span :contenteditable="editUsername" ref="username" maxlength="22">{{ getUsername }}</span>
+                             <div v-if="!editUsername" class="edit-username" @click="editUser">
+                                    <svg viewBox="0 0 383.947 383.947" xml:space="preserve">
                                     <g>
-                                        <polygon points="0,303.947 0,383.947 80,383.947 316.053,147.893 236.053,67.893 			"/>
-                                        <path d="M377.707,56.053L327.893,6.24c-8.32-8.32-21.867-8.32-30.187,0l-39.04,39.04l80,80l39.04-39.04
-                                            C386.027,77.92,386.027,64.373,377.707,56.053z"/>
+                                        <g>
+                                            <g>
+                                                <polygon points="0,303.947 0,383.947 80,383.947 316.053,147.893 236.053,67.893 			"/>
+                                                <path d="M377.707,56.053L327.893,6.24c-8.32-8.32-21.867-8.32-30.187,0l-39.04,39.04l80,80l39.04-39.04
+                                                    C386.027,77.92,386.027,64.373,377.707,56.053z"/>
+                                            </g>
+                                        </g>
                                     </g>
-                                </g>
-                            </g>
-                            </svg>
-                        </div>
+                                    </svg>
+                                </div>
+                                <div v-else class="edit-username checkmark" @click="saveUsername">
+                                    ✓
+                            </div>
                         </div>
                     </div>
                     <div class="post-info">
@@ -148,6 +150,7 @@ export default {
             drawingError: '',
             profileInfo: '',
             likedPosts: [],
+            editUsername: false,
         }
     },
     validations: {
@@ -241,6 +244,22 @@ export default {
                     this.drawingError = err.response.error;
                 })
         },
+        editUser(){
+            this.editUsername = true; 
+            var username = this.$refs.username;
+            username.focus();
+        },
+        saveUsername(){
+            var username = event.target.previousSibling;
+            username = username.textContent;
+           // username = username.substring(0,username.length-1);
+            console.log(username);
+            var patt = new RegExp(/^[a-zA-Z0-9]+$/);
+            var validation = patt.test(username);
+            if(username.length < 6) validation = false;
+            if(username.length > 22) validation = false;
+            console.log(validation);
+        }
     },
     mounted(){
         this.getDrawings();
@@ -442,12 +461,20 @@ export default {
             font-weight: 700;
             &:hover{
                 .edit-username{
+                    color: green;
                      opacity: 1;
                 }
             }
         }
+        span{
+            word-break: break-all;
+            &:focus{
+                outline: none;
+            }
+        }
         .edit-username{
             opacity: 0;
+            top: 0;
             position: absolute;
             right: -18px;
             cursor: pointer;
@@ -457,6 +484,12 @@ export default {
                 height: 14px;
                 width: 14px;
             }
+        }
+        .checkmark{
+            opacity: 1;
+            color: #51bc51;
+            line-height: 1;
+            right: -16px;
         }
     }
     .post-info{

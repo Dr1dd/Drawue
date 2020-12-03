@@ -2,13 +2,16 @@
   <div class="comment-section--container">
       <div class="write-comment" :class="{'focus': inputFocus}">
           <div class="user-img">
-              <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic">
+              <img :src="'/api/posts/profile/pic/' +  getProfilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
           </div>
           <div class="comment-input" @focus="inputFocus = true">
               <div class="text-area">
-                    <textarea name="comment" :class="{'focus': inputFocus}" @focus="inputFocus = true" v-model="$v.commentText.$model"></textarea>
+                    <textarea name="comment" :class="{'focus': inputFocus}" @focus="getLoginState ? inputFocus = true : inputFocus = false" v-model="$v.commentText.$model" :readonly="!getLoginState" :placeholder="getLoginState ? 'Write a comment' : 'You must be logged in to write a comment!'" @blur="$v.commentText.$touch()"></textarea>
                     <transition name="drop-down">
                         <div class="comment-edit--overlay" v-if="inputFocus">
+                            <div v-if="commentError != ''" class="comment-error">
+                                    {{commentError}}
+                            </div>
                             <div class="send-icon" @click="saveComment">
                                 <svg width="536" height="536" viewBox="0 0 536 536" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g clip-path="url(#clip0)">
@@ -33,7 +36,7 @@
               </div>
               <div class="comment-wrapper">
                   <div class="comment-author--container">
-                      <img :src="'/api/posts/profile/pic/' + commentObj.profilePic" alt="pic">
+                      <img :src="'/api/posts/profile/pic/' + commentObj.profilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                       <div class="comment-author">
                           {{commentObj.username}}
                       </div>
@@ -43,8 +46,8 @@
                   </div>
               </div>
               <div class="comment-interact" v-if="commentObj.expanded" :class="{'replying': isReplying == index }">
-                  <div class="comment-reply" @click="isReplying = index">
-                      <svg v-if="isReplying != index" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                  <div class="comment-reply">
+                      <svg v-if="isReplying != index" @click="isReplying = index" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                             viewBox="0 0 511.992 511.992" style="enable-background:new 0 0 511.992 511.992;" xml:space="preserve">
                         <g>
                             <g>
@@ -55,7 +58,7 @@
                             </g>
                         </g>
                       </svg>
-                      <div class="close-reply" v-else @click="isReplying =-1">
+                      <div v-else class="close-reply" @click="isReplying = -1">
                           <div></div>
                           <div></div>
                       </div>
@@ -64,7 +67,7 @@
                     <div class="reply-input--container">
                          <div class="write-reply">
                             <div class="user-img">
-                                <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic">
+                                <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                             </div>
                             <div class="comment-input">
                                 <div class="text-area">
@@ -87,6 +90,9 @@
                                     </transition>   
                                 </div>
                             </div>
+                            <div v-if="replyErrorText !=''" class="reply-error">
+                                {{replyErrorText}}
+                            </div>
                          </div>
                     </div>
                   </div>
@@ -96,18 +102,21 @@
               </div>
           </div>
       </div>
+      <ErrorModal v-if="errorModal" @close="errorModal=false" > {{errorContent}} </ErrorModal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import { minLength, maxLength } from 'vuelidate/lib/validators'
+import ErrorModal from './ErrorModal'
 import Reply from './Reply'
 import axios from 'axios';
 export default {
     name:"CommentSection",
     components:{
-        Reply
+        Reply,
+        ErrorModal
     },
     data(){
         return{
@@ -118,6 +127,10 @@ export default {
             userArray: [],
             isReplying: -1,
             replyText: '',
+            commentError: '',
+            errorModal: false,
+            errorContent: '',
+            replyErrorText: '',
         }
     },
     validations: {
@@ -125,11 +138,6 @@ export default {
             minLength: minLength(2),
             maxLength: maxLength(1000),
         },
-        replyText: {
-            minLength: minLength(2),
-            maxLength: maxLength(1000),
-        },
-
     },
     mounted(){
         this.getComments();
@@ -137,8 +145,20 @@ export default {
     computed: {
       ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername']),
     },
+    watch: {
+        '$v.commentText.$error': function textCheck () {
+            this.commentError = '';
+                if(!this.$v.commentText.minLength) this.commentError = "Comment must have at least "+this.$v.commentText.$params.minLength.min+ " characters.";
+                if(!this.$v.commentText.maxLength) this.commentError = "Comment should not have more than "+this.$v.commentText.$params.maxLength.max+ " characters.";
+        },
+
+    },
     methods:{
         saveComment(){
+            this.$v.commentText.$touch();
+            if (this.$v.commentText.$invalid) {
+                return;
+            }
             var text = this.commentText;
             var postID = this.$route.params.drawingID;
             axios.post('/api/posts/comment', {postID, text})
@@ -158,17 +178,31 @@ export default {
             })
         },
         sendReply(event, commentID, postID, index){
-             var textArea = event.target.closest('.text-area');
-            var text = textArea.firstChild.textContent;
-            axios.post('/api/posts/comment/reply', {postID, commentID, text})
-            .then((res)=>{
-                 this.commentArray[index].comment.children.push(res.data.reply._id);
-                 this.threadUpdate(res.data.reply);
-                 this.isReplying = -1;
-            })
-            .catch((err)=>{
-                console.log(err.response);
-            })
+            if(this.getLoginState){
+                var textArea = event.target.closest('.text-area');
+                var text = textArea.firstChild.textContent;
+                if(text.length <2){
+                    this.replyErrorText = "Reply must have atleast 2 characters";
+                    return;
+                }
+                if(text.length >1000){
+                    this.replyErrorText = "Reply should not have more than 1000 characters";
+                    return;
+                }
+                axios.post('/api/posts/comment/reply', {postID, commentID, text})
+                .then((res)=>{
+                    this.commentArray[index].comment.children.push(res.data.reply._id);
+                    this.threadUpdate(res.data.reply);
+                    this.isReplying = -1;
+                })
+                .catch((err)=>{
+                    console.log(err.response);
+                })
+            }
+            else{
+                this.errorModal = true;
+                this.errorContent = 'You must be logged in to reply!';
+            }
         },
         getComments(){
             var postID = this.$route.params.drawingID;
@@ -345,5 +379,14 @@ $module-theme: #86a1b8;
     }
     .replies-container{
         width: 100%;
+    }
+    .comment-error{
+        position: absolute;
+        left: 10px;
+        bottom: 7px;
+        color: #ff5454;
+    }
+    .reply-error{
+        @include commentReply.replyError;
     }
 </style>

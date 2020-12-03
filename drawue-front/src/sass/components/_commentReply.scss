@@ -8,6 +8,7 @@ $module-theme: #86a1b8;
         float: right;
     }
     .write-reply{
+        position: relative;
         display: flex;
         min-height: 50px;
         max-height: 400px;
@@ -52,6 +53,8 @@ $module-theme: #86a1b8;
             margin: 0;
             z-index: 2;
             padding: 5px;
+            word-break: break-word;
+            overflow: auto;
             &:focus{
                 outline: none;
                 box-shadow: 0px 0px 0px 0px;
@@ -112,4 +115,11 @@ $module-theme: #86a1b8;
             margin: 5px 10px;
         }
     }
+}
+@mixin replyError{
+    position: absolute;
+    bottom: -3px;
+    font-size: 12px;
+    left: 7rem;
+    color: #ff5454;
 }
