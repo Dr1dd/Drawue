@@ -163,18 +163,19 @@ export default {
                 });
         },
         resendEmail(){
-            var email = 'perter@gmail.com';
+            var email = this.user.email;
             this.loading = true;
             axios.post('/api/auth/register/resend', { email }, {})
             .then((res) => {
                 if (res.data) {
                     this.successMessage = res.data.successSend;
+                    this.loading = false;
                 }
             })
             .catch((err) => {
                 this.successMessage = err.response.data
+                this.loading = false;
             });
-            this.loading = false;
         }
     }
 }

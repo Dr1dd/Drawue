@@ -16,7 +16,6 @@
                 <div class="user-details">
                     <div class="picture-container">
                         <div class="profile-picture">
-                            <!-- <div class="overlay"></div> -->
                             <img :src="'/api/posts/profile/pic/' + getProfilePic" alt="">
                             <div class="change-pic" @click="$refs.file.click()"> 
                                 <svg height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m182.461 155.48 49.539-49.539v262.059a24 24 0 0 0 48 0v-262.059l49.539 49.539a24 24 0 1 0 33.941-33.941l-90.509-90.51a24 24 0 0 0 -33.942 0l-90.509 90.51a24 24 0 1 0 33.941 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
@@ -52,9 +51,8 @@
                     </div>
 
                 </div>
-                <div class="password-change">
-                    
-                </div>
+                <div class="resend-email" v-if="emailStatus == false" @click="resendEmail"> <a> Resend email confirmation </a></div>
+
             </div>
             <div class="change-info--container">
                 <div class="change-password--container">
@@ -119,6 +117,7 @@
             </div>
         </div>
     </div>
+    <ErrorModal v-if="emailConfirm" @close="emailConfirm = false" > Confirmation email has been sent to: {{getEmail}} </ErrorModal>
     <router-view :key="$route.path"/>
   </div>
 </template>
@@ -127,6 +126,7 @@
 import axios from 'axios';
 import { required, maxLength, sameAs } from 'vuelidate/lib/validators'
 import { mapGetters } from 'vuex';
+import ErrorModal from '../components/ErrorModal'
 export default {
     name: 'Profile',
     data(){
@@ -151,7 +151,11 @@ export default {
             profileInfo: '',
             likedPosts: [],
             editUsername: false,
+            emailConfirm: false,
         }
+    },
+    components:{
+        ErrorModal,
     },
     validations: {
         password:{
@@ -186,7 +190,7 @@ export default {
         }
     },
     computed: {
-      ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername', 'profileStats'])
+      ...mapGetters(['getLoginState', 'getProfilePic', 'getEmail', 'getUsername', 'profileStats', 'emailStatus'])
     },
     methods: {
         handlePicUpload(event){
@@ -259,6 +263,19 @@ export default {
             if(username.length < 6) validation = false;
             if(username.length > 22) validation = false;
             console.log(validation);
+        },
+        resendEmail(){
+            this.emailConfirm = true;
+            var email = this.getEmail;
+            axios.post('/api/auth/register/resend', { email }, {})
+            .then((res) => {
+                if (res.data) {
+                    this.successMessage = res.data.successSend;
+                }
+            })
+            .catch((err) => {
+                this.successMessage = err.response.data
+            });
         }
     },
     mounted(){
@@ -317,6 +334,19 @@ export default {
         .user-details{
             display: flex;
             flex-direction: column;
+        }
+        .resend-email{
+            display: flex;
+            position: absolute;
+            justify-content: center;
+            bottom: 5px;
+            width: 100%;
+            left: 0;
+            margin: 0 auto;
+            cursor: pointer;
+            a{
+                text-decoration: underline;
+            }
         }
     }
     .change-info--container{

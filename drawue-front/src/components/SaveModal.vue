@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <div class="btn" @click="publishDrawing">{{loadingText}}</div>
-                    <div v-if="error" class="error">
+                    <div v-if="error" class="modal-error">
                         {{error}}
                     </div>
               </div>
@@ -507,7 +507,7 @@ a{
     }
 }
 
-.error{
+.modal-error{
     justify-content: center;
     position: absolute;
     left: 0;

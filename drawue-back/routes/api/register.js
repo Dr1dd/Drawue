@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const config = require('config');
 const express = require('express');
+const nodemailer = require('nodemailer');
 const router = express.Router();
 const { User, validate } = require('../../models/user');
 
@@ -31,31 +32,10 @@ router.post('/', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
         await user.save();
+        
         jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{
-            // var transport = nodemailer.createTransport({
-            //     host: "localhost",
-            //     port: 1025,
-            //     auth: {
-            //       user: "project.1",
-            //       pass: "secret.1"
-            //     }
-            //   });
-               console.log("http://localhost:5000/verification/"+emailToken);
-            //   const email = new Email({
-            //     transport: transporter,
-            //     send: true,
-            //     preview: false,
-            //   });
-            //   email.send({
-            //     message: {
-            //       to: 'd91f7b2ef5-3de0db@inbox.mailtrap.io',
-            //       subject: 'Confirm Email',
-            //       text: 'https://localhost.com/api/confirmation/'+emailToken,
-            //     },
-            //   })
-            //   .then(() => res.status(200).send({"successSend": "Confirmation email has been sent to:  "+req.body.email}))
-            //   .catch((err) => console.log(err)); 
-            res.status(200).send({"successSend": "Confirmation email has been sent to:  "+req.body.email});
+            sendEmail(req.body.email, emailToken);
+            res.status(200).send({"successSend": "Confirmation email has been sent to:  "+req.body.email})
         });
     }
 });
@@ -63,9 +43,28 @@ router.post('/resend', async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
     if(!user) res.send({"successSend": "User was not found"});
     jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{     
-        console.log("http://localhost:5000/verification/"+emailToken);
+        sendEmail(req.body.email, emailToken);
         res.send({"successSend": "Email has been resent!"});
     });
 });
  
+async function sendEmail(emailAddress, emailToken){
+    return new Promise((resolve,reject)=>{
+        var transporter = nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            auth: {
+                user: 'breanna47@ethereal.email',
+                pass: 'GATtSQuHj6xhXkCdRS'
+            }
+          });
+          transporter.sendMail({
+            from: '"Alphonso DuBuque" alphonso.dubuque@ethereal.email', // sender address
+            to: emailAddress, // list of receivers
+            subject: "Confirm Email Address", // Subject line
+            text: "http://localhost:5000/verification/"+emailToken, // plain text body
+            html: "<b>http://localhost:5000/verification/"+emailToken+"</b>", // html body
+          });
+    });
+}
 module.exports = router;

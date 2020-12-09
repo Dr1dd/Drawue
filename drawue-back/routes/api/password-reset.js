@@ -20,8 +20,22 @@ router.post('/', async (req, res) =>{
         user.resetPasswordExpires = Date.now() + 3600000;
         user.save(function(err) {
             if(err) console.log(err);
-
-            console.log('http://localhost:5000/reset/'+token);
+            var transporter = nodemailer.createTransport({
+                host: 'smtp.ethereal.email',
+                port: 587,
+                auth: {
+                    user: 'breanna47@ethereal.email',
+                    pass: 'GATtSQuHj6xhXkCdRS'
+                }
+              });
+              transporter.sendMail({
+                from: '"Alphonso DuBuque" alphonso.dubuque@ethereal.email', // sender address
+                to: req.body.restoreEmail, // list of receivers
+                subject: "Reset password", // Subject line
+                text: "http://localhost:5000/reset/"+token, // plain text body
+                html: "<b>http://localhost:5000/reset"+token+"</b>", // html body
+              });
+            return res.status(200).send("Reset token has been sent to"+ req.body.restoreEmail)
         });
         res.end();
     

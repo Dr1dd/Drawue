@@ -147,7 +147,7 @@ export default {
             .catch((err) => {
                 this.backendError = err.response.data.sendError;
             });
-        }
+        },
     }
 
 }

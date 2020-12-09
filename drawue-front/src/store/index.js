@@ -15,6 +15,7 @@ export default new Vuex.Store({
         email: '',
         totalLikes: 0,
         totalDrawings: 0,
+        emailConfirmed: ''
     },
     mutations:{
         SET_STATE(state, bool){
@@ -35,6 +36,9 @@ export default new Vuex.Store({
         SET_DRAWINGS_COUNT(state, drawings){
             state.totalDrawings = drawings;
         },
+        SET_EMAIL_STATUS(state, status){
+            state.emailConfirmed = status;
+        },
     },
     actions:{
         UpdateLoginState({ commit }){
@@ -48,6 +52,7 @@ export default new Vuex.Store({
                     if(res.data.email) commit('SET_EMAIL', res.data.email);
                     if(res.data.totalLikes) commit('SET_LIKE_COUNT', res.data.totalLikes);
                     if(res.data.totalDrawings) commit('SET_DRAWINGS_COUNT', res.data.totalDrawings);
+                    if(res.data.emailStatus) commit('SET_EMAIL_STATUS', res.data.emailStatus);
                     resp();
                 })
                 .catch((err) =>{
@@ -80,8 +85,14 @@ export default new Vuex.Store({
         getUsername: state =>{
             return state.username;
         },
+        getEmail: state =>{
+            return state.email;
+        },
         profileStats: state =>{
             return [state.totalLikes, state.totalDrawings];
         },
+        emailStatus: state =>{
+            return state.emailConfirmed;
+        }
     }
 })

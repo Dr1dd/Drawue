@@ -11,6 +11,21 @@ router.post("/", verifyToken,  async (req, res) => {
     var skip = req.body.skip;
     if(skip === 0) var limit = 30;
     else limit = 30;
+    var sort = {};
+    switch(req.body.sort){
+        case '':
+            sort['createdAt'] = -1;
+            break;
+        case 'Recent':
+            sort['createdAt'] = -1;
+            break;
+        case 'Likes':
+            sort['like_count'] = -1;
+            break;
+        default:
+            sort['createdAt'] = -1;
+            break;
+    }
     await Drawings.find({tags: {$in: tags }}, (err, posts)=>{
         if(err){
             res.send({'error': 'No drawings found'});
@@ -28,13 +43,13 @@ router.post("/", verifyToken,  async (req, res) => {
                     })
                     .skip(skip)
                     .limit(limit)
-                    .sort( '-createdOn' );
+                    .sort({'createdAt': -1});
                 }
                 else return res.send({'drawingPosts': posts, 'likedPosts': result});
             })
             .skip(skip)
             .limit(limit)
-            .sort( '-createdOn' );
+            .sort( {'createdAt': -1});
         }
         else{
             return res.send({'drawingPosts': posts}); 
@@ -42,6 +57,6 @@ router.post("/", verifyToken,  async (req, res) => {
     })
     .skip(skip)
     .limit(limit)
-    .sort( '-createdOn' );
+    .sort(sort);
 });
 module.exports = router;
