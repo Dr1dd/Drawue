@@ -412,12 +412,14 @@ export default {
         align-self: center;
         margin-top: 10px;
         color: #86a1b8;
+        
         div{
             display: flex;
             position: relative;
             width: fit-content;
             justify-content: center;
             font-weight: 700;
+            text-overflow: ellipsis;
             &:hover{
                 .edit-username{
                     color: green;
@@ -457,6 +459,7 @@ export default {
         margin-top: 10px;
         text-align: left;
         color: #89a3ba;
+        margin: 10px auto 0 2rem;
     }
     .error-flash{
         position: absolute;
