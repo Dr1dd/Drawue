@@ -49,22 +49,20 @@ router.post('/resend', async (req, res) => {
 });
  
 async function sendEmail(emailAddress, emailToken){
-    return new Promise((resolve,reject)=>{
         var transporter = nodemailer.createTransport({
             host: 'smtp.ethereal.email',
             port: 587,
             auth: {
-                user: 'breanna47@ethereal.email',
-                pass: 'GATtSQuHj6xhXkCdRS'
+                user: 'lavonne.block@ethereal.email',
+                pass: '2TGmPQD75dXpCQKna8'
             }
           });
           transporter.sendMail({
-            from: '"Alphonso DuBuque" alphonso.dubuque@ethereal.email', // sender address
+            from: '"Lavonne Block" lavonne.block@ethereal.email', // sender address
             to: emailAddress, // list of receivers
             subject: "Confirm Email Address", // Subject line
             text: "http://localhost:5000/verification/"+emailToken, // plain text body
             html: "<b>http://localhost:5000/verification/"+emailToken+"</b>", // html body
           });
-    });
 }
 module.exports = router;

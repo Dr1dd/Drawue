@@ -306,6 +306,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use '../sass/abstracts/_profile';
     .profile-container{
         padding-top: 80px;
         height: 100vh;
@@ -402,79 +403,7 @@ export default {
         }
     }
     .picture-container{
-        display: flex;
-        justify-content: center;
-        align-self: center;
-        max-height: 125px;
-        max-width: 125px;
-        border-radius: 50%;
-        border: 1px solid #ededed;
-         box-shadow: 0px 0px 8px -4px #bdbdbd;
-        .profile-picture{
-           position: relative;
-           height: 125px;
-           width: 125px;
-           cursor: pointer;
-           clip-path: circle(60px at center);
-            img{
-                height: 100%;
-                width: inherit;
-            }
-            &::before{
-                content:'\A';
-                position:absolute;
-                width:99%; height:99%;
-                top:0; left:0;
-                background: rgb(252 252 152 / 85%);
-                opacity:0;
-                transition: all 0.5s;
-                clip-path: circle(63.0% at 50% 105%);
-                -webkit-transition: all 0.5s;
-                transition: all 0.5s;
-            }
-            &::after{
-                content:'\A';
-                position:absolute;
-                width:100%; height:100%;
-                top:0; left:0;
-                background: rgb(252 252 252 / 85%);
-                opacity:0;
-                transition: all 0.5s;
-                clip-path: circle(63.0% at 50% 105%);
-                -webkit-transition: all 0.5s;
-                transition: all 0.5s;
-            }
-            &:hover{
-                &::after{
-                    opacity:1;
-                }
-                .change-pic{
-                    opacity:1;
-                }
-            }
-            .change-pic{
-                position: absolute;
-                display: flex;
-                justify-content: center;
-                flex-direction: column;
-                align-items: center;
-                left: 0;
-                right: 0;
-                opacity: 0;
-                bottom: 24px;
-                font-size: 12px;
-                font-weight: 700;
-                transition: all 0.5s;
-                user-select: none;
-                color: #8f90a5;
-                z-index: 2;
-                svg{
-                    height: 20px;
-                    width: 20px;
-                    fill: #8f90a5;
-                }
-            }
-        }
+        @include profile.profile-pic("true");
     }
     input[type=file]{
         display: none;
