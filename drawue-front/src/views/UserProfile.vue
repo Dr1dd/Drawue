@@ -6,6 +6,14 @@
                 <div class="drawing-thumbnail"> 
                     <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
                 </div>
+                <div class="drawing-info">
+                    <div class="drawing-title">
+                        {{drawing.title}}
+                    </div>
+                    <div class="drawing-description">
+                        {{drawing.description}}
+                    </div>
+                </div>
               </div>
           </div>
          <div class="profile-info--container">
@@ -23,6 +31,11 @@
                     <div class="drawing-count">Drawings: {{drawingCount}}</div>
                     <div class="like-count">Likes: {{likeCount}}</div>
                 </div>
+         </div>
+         <div class="md-title">
+             <div>
+                Drawings:
+             </div>
          </div>
       </div>
   </div>
@@ -108,6 +121,7 @@ export default {
      max-width: 40rem;
      margin: 6rem 0 5rem 0;
      padding: 20px;
+     background-color: #fafdff;
      position: relative;
      box-shadow: 0px 1px 7px 2px rgba(173, 173, 173, 0.2);
  }
@@ -115,19 +129,24 @@ export default {
     display: flex;
     flex-direction: column;
     position: fixed;
-    background: white;
     padding: 20px;
     box-shadow: 0px 1px 7px 2px rgba(173, 173, 173, 0.2);
     top: 0px;
     margin-top: 6rem;
     left: 50%;
-    margin-left: -25rem;
+    margin-left: -30rem;
     height: fit-content;
     width: fit-content;
     color: #86a1b8;
+    background: url('~@/assets/wave.svg');
+    background-repeat-y: no-repeat;
+    background-position-y: bottom;
+    background-size: 102%;
+    background-color: #fafdff;
     .profile-username{
         font-weight: 700;
         padding-top: 5px;
+        text-overflow: ellipsis;
     }
     .post-info{
         margin: 15px 0 5px 0;
@@ -137,21 +156,69 @@ export default {
  }
  .picture-container{
      @include profile.profile-pic("false");
+     box-shadow: 0px 0px 10px -2px #d8e5f1;
  }
  .drawing-container{
      flex-direction: column;
      margin: 0;
+     width: inherit;
+     max-width: 550px;
+      color: #86a1b8;
+     .drawing-title{
+        align-self: flex-start;
+        margin: 0;
+        width: 100%;
+        border-bottom: 2px solid #f6f6f6;
+        padding: 0 0 5px 0;
+     }
  }
  .drawing-post{
      display: flex;
-     height: 150px;
-     padding: 5px;
-         border-bottom: 1px solid whitesmoke;
+    height: 150px;
+    padding: 5px;
+    margin: 5px 0;
+    background: white;
+    box-shadow: 0px 0px 6px -4px rgba(50, 50, 50, 0.75);
+    border-bottom: 1px solid whitesmoke;
      .drawing-thumbnail{
-         height: 100%;
+         max-width: 250px;
+         min-width: 250px;
          img{
              height: 100%;
+             width: 100%;
          }
      }
+ }
+
+ .drawing-info{
+     display: flex;
+     flex-direction: column;
+     border-left: 2px solid #f6f6f6;
+     min-width: initial;
+     max-width: initial;
+     padding: 6px 0 6px 20px;
+ }
+ .drawing-description{
+     text-overflow: ellipsis;
+     word-break: break-all;
+     padding: 5px 0 0 0;
+     min-height: initial;
+     height: 100%;
+ }
+ .md-title{
+    position: absolute;
+    top: -2.9rem;
+    left: -7px;
+    font-size: 19px;
+    color: #8ca6bc;
+    padding: 7px 7px 0px 7px;
+    font-weight: 700;
+    overflow: hidden;
+    div{
+        box-shadow: 0px 1px 7px 2px rgba(173, 173, 173, 0.2);
+        height: 20px;
+        padding: 10px 15px 10px 10px;
+        background: #fafdff;
+    }
  }
 </style>
