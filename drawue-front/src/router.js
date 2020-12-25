@@ -64,7 +64,7 @@ const routes = [
         children: [
             {
               path: ':username/drawing/:drawingID',
-              name: 'UserDrawingPost',
+              name: 'ProfileDrawingPost',
               props: true,
               component: () => import("./views/DrawingPost"),
             }
@@ -74,6 +74,14 @@ const routes = [
         path: '/user/:username',
         name: "UserProfile",
         component: () => import("./views/UserProfile"),
+        children: [
+            {
+              path: '/user/:username/drawing/:drawingID',
+              name: 'UserDrawingPost',
+              props: true,
+              component: () => import("./views/DrawingPost"),
+            }
+        ]
     },
     {
         path: '/gallery',

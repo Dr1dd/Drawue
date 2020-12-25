@@ -157,6 +157,7 @@ export default {
             canvas: '',
             savedCanvasData: '',
             canvasContainer: '',
+            points: [],
             positionX: 0,
             positionY: 0,
             scaledXTransformed: 0,
@@ -168,9 +169,6 @@ export default {
 
             imageDataURL: '',
         }
-    },
-    created(){
-        window.addEventListener('beforeunload', this.localStorageCanvas);
     },
     beforeDestroy(){
         window.removeEventListener('resize', this.onResize);
@@ -228,19 +226,24 @@ export default {
         },
         draw(e){
             if(!this.painting) return;
+            //var tmp = this.ctx;
             this.ctx.strokeStyle = this.color;
             this.ctx.lineWidth = this.selectedStrokeSize;
+            this.ctx.lineJoin = 'round';
             this.ctx.lineCap = "round";
             var mousePos = this.getMousePosition(e);
+            //var len = points.length;
+            var temp = this.ctx;
+            this.points.push(mousePos);
             switch(this.toolType){
                 case 'shapes':
                     this.drawShape(e);
                     break;
                 case 'pencil':
-                    this.ctx.lineTo(mousePos[0], mousePos[1]);
-                    this.ctx.stroke();
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(mousePos[0], mousePos[1]);
+                    temp.lineTo(mousePos[0], mousePos[1]);
+                    temp.stroke();
+                    temp.beginPath();
+                    temp.moveTo(mousePos[0], mousePos[1]);
                     break;
             }
         },
@@ -278,7 +281,29 @@ export default {
         },
         finishDrawing(){
             this.painting = false;
+            if(this.toolType == "pencil" && this.points.length > 1){
+                this.ctx.putImageData(this.savedCanvasData, 0, 0);
+                var tmp = this.ctx;
+                tmp.beginPath();
+                tmp.moveTo(this.points[0][0], this.points[0][1]);
+                for (var i = 1; i < this.points.length - 2; i++) {
+                    var c = (this.points[i][0] + this.points[i + 1][0]) / 2;
+                    var d = (this.points[i][1] + this.points[i + 1][1]) / 2;
+                
+                    tmp.quadraticCurveTo(this.points[i][0], this.points[i][1], c, d);
+                }
+                tmp.quadraticCurveTo(
+                    this.points[i][0],
+                    this.points[i][1],
+                    this.points[i + 1][0],
+                    this.points[i + 1][1]
+                );
+                tmp.stroke();
+                this.savedCanvasData = this.ctx.getImageData(0,0, this.canvas.clientWidth, this.canvas.clientHeight);
+            }
             this.ctx.beginPath();
+            this.localStorageCanvas();
+            this.points = [];
         },
         getMousePosition(e){
             this.positionX = (document.body.scrollWidth - this.canvas.getBoundingClientRect().width)/2;

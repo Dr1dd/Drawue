@@ -95,7 +95,7 @@
                 <div class ="drawing-post--container">
                     <div v-for="(drawing, index) in drawingPosts" :key="index" class="drawing-post">
                         <router-link :to="{
-                            name: 'UserDrawingPost',
+                            name: 'ProfileDrawingPost',
                             params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
                         }">
                             <div class="drawing-thumbnail"> 

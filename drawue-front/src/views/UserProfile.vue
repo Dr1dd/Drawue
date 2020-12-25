@@ -3,6 +3,10 @@
       <div class="user-profile-md">
           <div class="drawing-container">
               <div class="drawing-post" v-for="(drawing, index) in drawings" :key="index">
+                <router-link :to="{
+                    name: 'UserDrawingPost',
+                    params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likes.includes(drawing._id) }
+                }">
                 <div class="drawing-thumbnail"> 
                     <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
                 </div>
@@ -14,6 +18,7 @@
                         {{drawing.description}}
                     </div>
                 </div>
+                </router-link>
               </div>
           </div>
          <div class="profile-info--container">
@@ -38,6 +43,7 @@
              </div>
          </div>
       </div>
+      <router-view :key="$route.path"/>
   </div>
 </template>
 
@@ -119,6 +125,8 @@ export default {
      display: flex;
      background: white;
      max-width: 40rem;
+     min-width: 550px;
+     min-height: 100vh;
      margin: 6rem 0 5rem 0;
      padding: 20px;
      background-color: #fafdff;
@@ -166,6 +174,7 @@ export default {
       color: #86a1b8;
      .drawing-title{
         align-self: flex-start;
+        font-weight: 700;
         margin: 0;
         width: 100%;
         border-bottom: 2px solid #f6f6f6;
@@ -180,6 +189,11 @@ export default {
     background: white;
     box-shadow: 0px 0px 6px -4px rgba(50, 50, 50, 0.75);
     border-bottom: 1px solid whitesmoke;
+    cursor: pointer;
+    a{
+        display: flex;
+        width: 100%;
+    }
      .drawing-thumbnail{
          max-width: 250px;
          min-width: 250px;
@@ -204,6 +218,7 @@ export default {
      padding: 5px 0 0 0;
      min-height: initial;
      height: 100%;
+     text-align: initial;
  }
  .md-title{
     position: absolute;
