@@ -4,8 +4,8 @@
         <div class="resize-reply" @click="currentReply[0].expanded= !currentReply[0].expanded">
             <span>{{currentReply[0].expanded ? '&#8722;' : '&#43;'}}</span>
         </div>
-        <div class="reply-wrapper">
-                <div class="user-img">
+        <div class="reply-wrapper" >
+                <div class="user-img" @click ="$router.push({ name: 'UserProfile', params: currentReply[0].username })">
                     <img :src="'/api/posts/profile/pic/' + currentReply[0].profilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                     <div class="reply-author">
                         {{currentReply[0].username}}
@@ -67,6 +67,9 @@
         </div>
         <div class="replies-container" v-if ="currentReply[0].expanded">
                 <Reply v-for="(reply, index) in currentReply[0].comment.children" :key="index" :commentArray="commentArray" :replyID="reply" :replyLevel="level+1" />
+        </div>
+        <div class="resize-border" @click="currentReply[0].expanded= !currentReply[0].expanded">
+            <div></div>
         </div>
       </div>
       <ErrorModal v-if="replyErrorText !=''" @close="replyErrorText =''" > {{replyErrorText}} </ErrorModal>
@@ -157,6 +160,7 @@ $module-theme: #86a1b8;
         width: 100%;
     }
     .reply{
+        position: relative;
         width: 100%;
         border-top: 2px solid #f1f1f1;
     }
@@ -167,11 +171,14 @@ $module-theme: #86a1b8;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-left: 7px;
+            cursor: pointer;
             .reply-author{
                 font-size: 12px;
                 font-weight: 700;
                 color: #86a1b8;
                 margin: 5px 0;
+                cursor: pointer;
             }
             img{
                 height: 36px;
@@ -292,5 +299,26 @@ $module-theme: #86a1b8;
         font-size: 12px;
         left: 7rem;
         color: #ff5454;
+    }
+    .resize-border{
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        left: -6px;
+        top: -1px;
+        height: 100%;
+        width: 4px;
+        padding: 0 5px;
+        cursor: pointer;
+        transition: 0.25s all;
+        div{
+            width: 2px;
+            background: #f1f1f1;
+        }
+        &:hover{
+            div{
+                 background: #d3d3d3;
+            }
+        }
     }
 </style>

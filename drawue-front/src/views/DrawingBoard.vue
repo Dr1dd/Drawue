@@ -112,7 +112,7 @@
                   <svg  viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><g id="Solid"><path d="m239.029 384.97a24 24 0 0 0 33.942 0l90.509-90.509a24 24 0 0 0 0-33.941 24 24 0 0 0 -33.941 0l-49.539 49.539v-262.059a24 24 0 0 0 -48 0v262.059l-49.539-49.539a24 24 0 0 0 -33.941 0 24 24 0 0 0 0 33.941z"/><path d="m464 232a24 24 0 0 0 -24 24v184h-368v-184a24 24 0 0 0 -48 0v192a40 40 0 0 0 40 40h384a40 40 0 0 0 40-40v-192a24 24 0 0 0 -24-24z"/></g></svg>
               </div>
           </div>
-          <div class="clear-container" @click = "clearCanvas">
+          <div class="clear-container" @click = "clearCanvasModal = true">
               <div class="clear-canvas">
                 <svg width="24" height="24" viewBox="0 0 364 454" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M80.6599 116.5H283.488C306.591 116.5 324.763 136.242 322.852 159.267L302.978 398.767C301.279 419.245 284.162 435 263.614 435H99.1867C78.553 435 61.3957 419.119 59.8043 398.546L41.2776 159.046C39.5025 136.099 57.644 116.5 80.6599 116.5Z" stroke-width="37"/>
@@ -130,17 +130,25 @@
          <canvas id="canvas" @mouseout="finishDrawing"></canvas> 
       </div>
         <SaveModal :drawingImage="imageDataURL" :isOpen="saveModal" @closingSaveModal="saveModal=false"/>
+        <InfoModal v-if="clearCanvasModal" @close ="clearCanvasModal = false">
+            <div class="content-container">
+                <p> Do you really want to clear the canvas? </p> 
+                <div class="btn" @click ="clearCanvas" >Confirm</div>
+            </div>
+        </InfoModal>
   </div>
 </template>
 
 <script>
 import colorPicker from '@caohenghu/vue-colorpicker'
 import SaveModal from '../components/SaveModal'
+import InfoModal from '../components/InfoModal'
 export default {
     name: 'DrawingBoard',
     components:{
         colorPicker,
-        SaveModal
+        SaveModal,
+        InfoModal
     },
     data() {
         return {
@@ -168,6 +176,7 @@ export default {
             selectedStrokeSize: 5,
 
             imageDataURL: '',
+            clearCanvasModal: false,
         }
     },
     beforeDestroy(){
@@ -347,6 +356,7 @@ export default {
         clearCanvas(){
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             localStorage.setItem("imgCanvas",this.canvas.toDataURL());
+            this.clearCanvasModal = false;
         },
         saveCanvas(){
             this.saveModal = true;
@@ -428,9 +438,9 @@ $default-icon-color: #2c3e50;
     }
 }
  .color-picker--container{
-        position: absolute;
-        left: 58px;
-        margin-top: -27px;
+    position: absolute;
+    left: 62px;
+    margin-top: -27px;
 }
 .color-picker{
     cursor: pointer;
@@ -590,6 +600,16 @@ $default-icon-color: #2c3e50;
  .selected-child{
      background: #e6f3ff !important;
  }
+.content-container{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    .btn{
+        width: fit-content;
+    }
 
+}
 
 </style>

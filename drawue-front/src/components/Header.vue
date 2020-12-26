@@ -160,7 +160,7 @@ export default {
    }
    .drop-down{
      position: absolute;
-     padding: 20px;
+     padding: 20px 20px 15px 20px;
      top: 40px;
      right: -3px;
      max-width: 200px;

@@ -35,7 +35,7 @@
                   <span>{{commentObj.expanded ? '&#8722;' : '&#43;'}}</span>
               </div>
               <div class="comment-wrapper">
-                  <div class="comment-author--container">
+                  <div class="comment-author--container" @click ="$router.push({ name: 'UserProfile', params: commentObj.username })">
                       <img :src="'/api/posts/profile/pic/' + commentObj.profilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                       <div class="comment-author">
                           {{commentObj.username}}
@@ -348,6 +348,8 @@ $module-theme: #86a1b8;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
+            padding-left: 5px;
+            cursor: pointer;
             img{
                 height: 36px;
                 width: 36px;
@@ -359,6 +361,7 @@ $module-theme: #86a1b8;
                 font-weight: 700;
                 color: $module-theme;
                 margin: 5px 0;
+                cursor: pointer;
             }
         }
         .comment-text{

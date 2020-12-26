@@ -40,7 +40,7 @@
                         <div class="error" v-else-if="$v.login.password.$dirty && !$v.login.password.minLength">Password must have at least {{$v.login.password.$params.minLength.min}} characters.</div>
                     </transition>
                 </div>
-                <div class="btn loader" @click="userLogin">
+                <div class="btn loader" @click="userLogin" @keyup.enter='userLogin'>
                     <div class="login-loader" v-if="loading">
                         <Loader color="white" loaderType="bubble" />
                     </div>
@@ -52,17 +52,18 @@
             </div>
             <div class="social-form">
                 <div class="social-buttons">
-                    <div>
+                    <a href="api/auth/facebook">
                         <img src="../assets/facebook.jpg" alt="">
-                        <a href="api/auth/facebook">Sign in with Facebook </a>
-                    </div>
-                    <div>
-                        <img src="../assets/google.jpg" alt="">
-                        <a href="api/auth/google/authentication">Sign in with Google </a>
-                    </div>
-                    <a class="forgot-password" @click ="forgotPassword = true">
-                            Forgot password? 
+                        <span>Sign in with Facebook </span>
+                  
                     </a>
+                    <a href="api/auth/google/authentication">
+                        <img src="../assets/google.jpg" alt="">
+                        <span>Sign in with Google </span>
+                    </a>
+                    <span class="forgot-password" @click ="forgotPassword = true">
+                            Forgot password? 
+                    </span>
                 </div>
             </div>
           </div>
@@ -207,7 +208,7 @@ $module-theme: #86a1b8;
 .social-buttons{
     display: grid;
     grid-row-gap: 12px;
-    div{
+    a{
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -222,7 +223,7 @@ $module-theme: #86a1b8;
         img{
             height: 100%;
         }
-        a{
+        span{
             color: #fff;
             text-decoration: none;
             line-height: 1;

@@ -25,6 +25,9 @@
                             </div>
 
                         </div>
+                        <div class="post-author" @click ="$router.push({ name: 'UserProfile', params: selectedDrawing.username })">
+                          @{{selectedDrawing.username}}
+                        </div>
                     </div>
                     <div class="modal-right--section">
                         <div class="drawing-info--container">
@@ -202,10 +205,12 @@ export default {
 }
 .drawing-info--wrapper{
     display: flex;
+    position: relative;
 }
 .modal-left--section{
     display: flex;
     flex-direction: column;
+    position: relative;
     flex: 6;
     .drawing-image{
         border: 1px solid #e2e2e2;
@@ -268,6 +273,15 @@ export default {
         box-shadow: inset 7px 8px 12px #f0f0f0;
         }
     }
+}
+.post-author{
+    display: flex;
+    position: absolute;
+    bottom: 22px;
+    right: 5px;
+    color: #86a1b8;
+    font-size: 12px;
+    cursor: pointer;
 }
 .drawing-title{
     word-break: break-all;
