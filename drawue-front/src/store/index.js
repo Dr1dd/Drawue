@@ -15,7 +15,8 @@ export default new Vuex.Store({
         email: '',
         totalLikes: 0,
         totalDrawings: 0,
-        emailConfirmed: ''
+        emailConfirmed: '',
+        canvasBg: 'white',
     },
     mutations:{
         SET_STATE(state, bool){
@@ -39,6 +40,9 @@ export default new Vuex.Store({
         SET_EMAIL_STATUS(state, status){
             state.emailConfirmed = status;
         },
+        SET_CANVAS_BG(state, color){
+            state.canvasBg = color;
+        }
     },
     actions:{
         UpdateLoginState({ commit }){
@@ -74,6 +78,9 @@ export default new Vuex.Store({
         UpdateProfilePic( {commit, path} ){
             commit('SET_PROFILE_PIC', path);
         },
+        setCanvasBg( {commit, color}){
+            commit('SET_CANVAS_BG', color);
+        }
     },
     getters:{
         getLoginState: state => {
@@ -93,6 +100,9 @@ export default new Vuex.Store({
         },
         emailStatus: state =>{
             return state.emailConfirmed;
+        },
+        getCanvasBg: state =>{
+            return state.canvasBg;
         }
     }
 })

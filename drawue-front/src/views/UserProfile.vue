@@ -113,6 +113,7 @@ export default {
 
 <style scoped lang="scss">
 @use '../sass/abstracts/_profile';
+@use '../sass/components/_drawingPost';
  .user-profile--container{
      display: flex;
      min-height: 100vh;
@@ -172,54 +173,11 @@ export default {
      width: inherit;
      max-width: 550px;
       color: #86a1b8;
-     .drawing-title{
-        align-self: flex-start;
-        font-weight: 700;
-        margin: 0;
-        width: 100%;
-        border-bottom: 2px solid #f6f6f6;
-        padding: 0 0 5px 0;
-     }
  }
  .drawing-post{
-     display: flex;
-    height: 150px;
-    padding: 5px;
-    margin: 5px 0;
-    background: white;
-    box-shadow: 0px 0px 6px -4px rgba(50, 50, 50, 0.75);
-    border-bottom: 1px solid whitesmoke;
-    cursor: pointer;
-    a{
-        display: flex;
-        width: 100%;
-    }
-     .drawing-thumbnail{
-         max-width: 250px;
-         min-width: 250px;
-         img{
-             height: 100%;
-             width: 100%;
-         }
-     }
+    @include drawingPost.drawingPost;
  }
 
- .drawing-info{
-     display: flex;
-     flex-direction: column;
-     border-left: 2px solid #f6f6f6;
-     min-width: initial;
-     max-width: initial;
-     padding: 6px 0 6px 20px;
- }
- .drawing-description{
-     text-overflow: ellipsis;
-     word-break: break-all;
-     padding: 5px 0 0 0;
-     min-height: initial;
-     height: 100%;
-     text-align: initial;
- }
  .md-title{
     position: absolute;
     top: -2.9rem;

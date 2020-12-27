@@ -182,6 +182,13 @@ export default {
     beforeDestroy(){
         window.removeEventListener('resize', this.onResize);
     },
+    watch: {
+        '$store.state.canvasBg': function() {
+            var ctx = document.querySelector("#canvas").getContext('2d');
+            ctx.fillStyle = this.$store.state.canvasBg;
+            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    },
     mounted(){
             this.canvasContainer = document.getElementsByClassName('canvas-container');
             this.canvas = document.querySelector("#canvas");

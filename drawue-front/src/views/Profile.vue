@@ -93,26 +93,24 @@
                     <div>{{drawingPosts.length}}/15</div>
                 </div>
                 <div class ="drawing-post--container">
-                    <div v-for="(drawing, index) in drawingPosts" :key="index" class="drawing-post">
-                        <router-link :to="{
-                            name: 'ProfileDrawingPost',
-                            params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
-                        }">
-                            <div class="drawing-thumbnail"> 
-                                <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
-                            </div>
-                            <div class="drawing-info--container">
-                                <div class="drawing-title">
-                                    Title:
-                                    {{drawing.title}}
-                                </div>
-                                <div class="drawing-description">
-                                    Description:
-                                    {{drawing.description}}
-                                </div>
-                            </div>
-                        </router-link>
+                  <div class="drawing-post" v-for="(drawing, index) in drawingPosts" :key="index">
+                    <router-link :to="{
+                        name: 'UserDrawingPost',
+                        params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
+                    }">
+                    <div class="drawing-thumbnail"> 
+                        <img :src="'/api/posts/profile/drawing/'+drawing.drawing_path" alt="">
                     </div>
+                    <div class="drawing-info">
+                        <div class="drawing-title">
+                            {{drawing.title}}
+                        </div>
+                        <div class="drawing-description">
+                            {{drawing.description}}
+                        </div>
+                    </div>
+                    </router-link>
+                 </div>
                 </div>
             </div>
         </div>
@@ -307,6 +305,7 @@ export default {
 
 <style lang="scss" scoped>
 @use '../sass/abstracts/_profile';
+@use '../sass/components/_drawingPost';
     .profile-container{
         padding-top: 80px;
         height: 100vh;
@@ -532,36 +531,7 @@ export default {
         padding: 20px;
     }
     .drawing-post{
-        display: flex;
-        margin-bottom: 15px;
-        padding: 15px;
-        border: 2px solid #efefef;
-        max-height: 150px;
-        border-radius: 5px;
-        // box-shadow: 0px 0px 12px -10px #000000;
-        a{
-            display: flex;
-            width: 100%;
-        }
-        .drawing-thumbnail{
-            width: 227px;
-            img{
-                height: 100%;
-                width: 100%;
-                min-width: 230px;
-                // box-shadow: 0px 0px 16px -13px #000000;
-                border-radius: 5px;
-                border: 1px solid #e5e5e5;
-            }
-        }
-        .drawing-info--container{
-            display: flex;
-            flex-direction: column;
-            color: #86a1b8;
-            padding: 10px 15px;
-        }
+       @include drawingPost.drawingPost;
+        margin: 10px 0;
     }
-.drawing-description{
-    word-break: break-all;
-}
 </style>

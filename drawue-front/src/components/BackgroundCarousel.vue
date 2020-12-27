@@ -1,18 +1,14 @@
-<template>
+<template v-show="$route.name == 'DrawingBoard'">
     <swiper ref="mySwiper"
       :options="swiperOptions"
       @swiper="onSwiper"
       @slideChange="onSlideChange"
     >
-    <swiper-slide v-for="(drawing, index) in drawings" :key="index">
-      <router-link :to="{
-        name:'DrawingPost',
-        params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
-      }">
-           <img class="carousel-image" :src="'/api/posts/drawing/pic/'+drawing.drawing_path" alt="">
-      </router-link>
+    <swiper-slide v-for="(color, index) in colors" :key="index">
+        <div class="bg-color" :style="{'background': color}" @click="changeCanvasBg(color)">
+        </div>
     </swiper-slide>
-    <div class="swiper-pagination bullet" slot="pagination" />
+    <!-- <div class="swiper-pagination bullet" slot="pagination" /> -->
   </swiper>
 </template>
 
@@ -22,51 +18,34 @@ import SwiperCore, { Pagination } from 'swiper';
 import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
 import 'swiper/components/pagination/pagination.scss';
 import 'swiper/swiper-bundle.css'
-import axios from 'axios'
 SwiperCore.use([ Pagination]);
   export default {
-    name: 'Carousel',
+    name: 'BGSwiper',
     data() {
       return {
         swiperOptions: {
           slidesPerView: "3",
-          loop: true,
-          pagination: {
-            el: '.swiper-pagination',
-            clickable: true
-          },
+
           // Some Swiper option/callback...
         },
-        drawings: [],
-        likedPosts: [],
-        
+        colors: ['white', 'black', '#ff7b25', '#a2b9bc', '#b2ad7f', '#878f99', '#b5e7a0', '#e6e2d3', '#eea29a', '#50394c', '#f18973'],
       }
     },
     components: {
         Swiper,
         SwiperSlide
       },
-    mounted(){
-      this.getCarouselDrawings();
-    },
     methods: {
-      getCarouselDrawings(){
-        axios.get('/api/posts/drawings/carousel')
-          .then((res)=>{
-            this.drawings.push(...res.data.drawingPosts);
-            this.likedPosts.push(...res.data.likedPosts);
-          })
-          .catch((err)=>{
-            console.log(err.response);
-          })
-      },
       onSwiper(swiper) {
         console.log(swiper)
       },
       onSlideChange() {
         console.log('slide change')
       },
-
+      changeCanvasBg(color){
+          console.log(color);
+          this.$store.commit('SET_CANVAS_BG', color);
+      }
     },
   }
 </script>
@@ -77,10 +56,11 @@ SwiperCore.use([ Pagination]);
 
 $font-size-huge: 16px;
   .swiper-container{
-    min-height: 100%;
-    height: 100%;
+    width: 150px;
+    height: 30px;
     background: white;
-    border: 1px solid #d4d4d4;
+    border: 1px solid #92aabf4f;
+    border-radius: 9px;
     box-shadow: 2px 2px 4px 2px rgba(173, 173, 173, 0.2);
   }
   .swiper-wrapper{
@@ -90,8 +70,8 @@ $font-size-huge: 16px;
     background: #86a1b8;
   }
   .swiper {
-  height: 300px;
-  width: 100%;
+  height: 50px;
+  width: 150px;
 
   .swiper-slide {
     display: flex;
@@ -103,7 +83,19 @@ $font-size-huge: 16px;
     background-color: #fff;
   }
 }
-.carousel-image{
-  height: 100%;
+.swiper-slide {
+    display: flex;
+    width: 54px;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    cursor: grab;
+}
+.bg-color{
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #89a4ba;
+    cursor: pointer;
 }
 </style>

@@ -33,10 +33,9 @@
             </transition>
           </div>
         </div>
-        <!-- <div class="logout" @click="logOut">
-          Logout
-        </div>
-        <router-link to="/profile"><div> Profile</div></router-link> -->
+      </div>
+      <div class="swiper-header">
+        <BGSwiper v-show="$route.name == 'DrawingBoard'"/>
       </div>
   </div>
 </template>
@@ -44,6 +43,7 @@
 <script>
 
 import { mapGetters } from 'vuex';
+import BGSwiper from './BackgroundCarousel';
 export default {
     name: 'Header',
     data(){
@@ -51,13 +51,16 @@ export default {
         dropDown: false,
       }
     },
+    components:{
+      BGSwiper,
+    },
     computed: {
       ...mapGetters(['getLoginState', 'getProfilePic', 'getUsername']),
     },
     methods:{
       logOut(){
         this.$store.dispatch('Logout');
-      }
+      },
     }
 }
 </script>
@@ -207,6 +210,14 @@ export default {
       background: #ffffff;
      }
    }
+ }
+ .swiper-header{
+   position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    top: 0.5rem;
+    width: 150px;
  }
 .arrow {
   border: solid #b0aeae;
