@@ -97,6 +97,11 @@ const routes = [
         ]
     },
     {
+        path: '/gallery3D',
+        name: "Gallery3D",
+        component: () => import('./views/3DGallery')
+    },
+    {
         path: '/404',
         alias: '*',
         name: "Error",
