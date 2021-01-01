@@ -6,6 +6,7 @@
 
 <script>
 import * as THREE from "three";
+import axios from 'axios';
 export default {
     name: 'Gallery3D',
     data(){
@@ -22,11 +23,15 @@ export default {
             material: '',
             cube: '',
             meshFloor: '',
+            drawings: [],
+            drawingPathArray: [],
+            pathArray: [],
         }
     },
     mounted(){
+        this.loadImages();
         this.galleryObj = document.getElementById('3DGallery');
-         this.initialize();
+        //  this.initialize();
          window.addEventListener('keydown', (e)=>{
              switch(e.key){
                 case 'w':
@@ -67,10 +72,26 @@ export default {
                 new THREE.PlaneGeometry(10, 10, 15, 15),
                 new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false})
             );
-            meshFloor.rotation.x -= Math.PI /2;
+
+            var l = this.pathArray.length;
+            for(var i = 0; i < l; i++){
+                var mesh = new THREE.Mesh(
+                    new THREE.PlaneGeometry(3, 2, 1, 1),
+                    this.pathArray[i]                    
+                );
+                mesh.position.set(((l-1)*4)/2-(i*4), 2, 0);
+                mesh.rotation.x -= Math.PI;
+                mesh.rotation.z -= Math.PI;
+                scene.add(mesh);
+            }
+
+             meshFloor.rotation.x -= Math.PI /2;
+            
             scene.add( meshFloor );
+            
             camera.position.set(0, this.player.height, -5);
             camera.lookAt(new THREE.Vector3(0, this.player.height, 0));
+            
             this.scene = scene;
             this.camera = camera;
             this.renderer = renderer;
@@ -80,6 +101,27 @@ export default {
             this.meshFloor = meshFloor;
             this.animate();
 
+        },
+        loadImages(){
+            var skip = 0;
+            var sort = 'Likes';
+             axios.post('/api/posts/drawings', {skip, sort})
+             .then((res)=>{
+                 this.drawings = [...res.data.drawingPosts];
+                 var loader = new THREE.TextureLoader();
+                 loader.crossOrigin = true;
+                 this.drawings.forEach(drawing =>{
+                     this.drawingPathArray.push(drawing.drawing_path);
+                     this.pathArray.push(new THREE.MeshBasicMaterial({map: loader.load( '/api/posts/drawing/pic/'+drawing.drawing_path) }))
+                 })
+                this.initialize();
+                 console.log(this.pathArray);
+             })
+             .catch((err)=>{
+                 console.log(err);
+             })
+
+            
         },
         animate(){
             requestAnimationFrame( this.animate );
