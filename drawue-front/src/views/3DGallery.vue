@@ -1,5 +1,5 @@
 <template>
-    <div id="3D">
+    <div class="gallery3d" id="3D">
     </div>
 
 </template>
@@ -23,6 +23,8 @@ export default {
             material: '',
             cube: '',
             meshFloor: '',
+            mouse: '',
+            raycaster: '',
             drawings: [],
             drawingPathArray: [],
             pathArray: [],
@@ -30,8 +32,11 @@ export default {
     },
     mounted(){
         this.loadImages();
-        this.galleryObj = document.getElementById('3DGallery');
-        //  this.initialize();
+
+        var canvas = document.getElementById('3D');
+        canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+        document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+
          window.addEventListener('keydown', (e)=>{
              switch(e.key){
                 case 'w':
@@ -52,6 +57,18 @@ export default {
                      break;
              }
          })
+         canvas.onclick = function(){
+             canvas.requestPointerLock();
+         }
+         document.addEventListener('pointerlockchange',  ()=>{
+             if (document.pointerLockElement === canvas ||
+                document.mozPointerLockElement === canvas) {
+                document.addEventListener("mousemove", this.lookAround, false);
+            } else {
+                document.removeEventListener("mousemove", this.lookAround, false);
+            }
+         }, false);
+
     },
     methods:{
         initialize(){
@@ -91,7 +108,13 @@ export default {
             
             camera.position.set(0, this.player.height, -5);
             camera.lookAt(new THREE.Vector3(0, this.player.height, 0));
-            
+
+            var raycaster = new THREE.Raycaster();
+            var mouse = new THREE.Vector2(); 
+            raycaster.setFromCamera( mouse, camera );
+            //const intersects = raycaster.intersectObjects( scene.children );
+            this.mouse = mouse;
+            this.raycaster = raycaster;
             this.scene = scene;
             this.camera = camera;
             this.renderer = renderer;
@@ -115,13 +138,21 @@ export default {
                      this.pathArray.push(new THREE.MeshBasicMaterial({map: loader.load( '/api/posts/drawing/pic/'+drawing.drawing_path) }))
                  })
                 this.initialize();
-                 console.log(this.pathArray);
+                 //console.log(this.pathArray);
              })
              .catch((err)=>{
                  console.log(err);
              })
 
             
+        },
+        lookAround(e){
+                this.mouse.x = ( e.clientX / this.renderer.domElement.clientWidth ) * 2 - 1;
+                this.mouse.y = - ( e.clientY / this.renderer.domElement.clientHeight ) * 2 + 1;
+
+                this.camera.rotation.y += e.movementX * Math.PI / 180;
+                this.camera.rotation.x += e.movementY * Math.PI / 180;
+        
         },
         animate(){
             requestAnimationFrame( this.animate );
@@ -131,34 +162,7 @@ export default {
 
             this.renderer.render( this.scene, this.camera );
         },
-        galleryStart(){
-            this.movingCam = true;
-            console.log(this.camera.x, this.camera.y);
-            this.galleryObj.addEventListener('mouseup',this.galleryFinish);
-            this.galleryObj.addEventListener('mousemove',function(event){
-                if(!this.movingCam) return;
-                var camera = this.camera;
-                var res = this.cameraMove(event, camera);
-                this.camera = res;
-                console.log(this.camera);
-                }.bind(this), false);
-        },
-        galleryFinish(){
-            this.movingCam = false;
-            this.galleryObj.removeEventListener('mousemove',this.cameraMove);
-            this.X = this.camera.x;
-            this.Y = this.camera.y;
-        },
-        cameraMove: function(e, camera){
-            var rect = e.target.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
-            camera.x = (parseInt(camera.x) + x/rect.width).toString();
-            camera.y = (parseInt(camera.y) + y/rect.height).toString();
-            console.log(x/rect.width);
-            console.log("Left? : " + camera.x);
-            return camera;
-        }
+
     }
 }
 </script>
@@ -172,4 +176,5 @@ export default {
     height: 100vh;
     width: 100vw;
 }
+
 </style>
