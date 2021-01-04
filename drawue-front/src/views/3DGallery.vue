@@ -1,5 +1,15 @@
 <template>
     <div class="gallery3d" id="3D">
+        <div class="crosshair"></div>
+        <div class="overlay">
+            <div class="instructions">
+                <div class="unlock-pointer">
+                    Click to start
+                </div>
+                <div class="item">Move: WASD</div>
+                <div class="item">Jump: Space</div>
+            </div>
+        </div>
     </div>
 
 </template>
@@ -60,13 +70,13 @@ export default {
         canvas.addEventListener( 'click', function(){
             controls.lock();
         }, false);
-
+        var overlay = document.getElementsByClassName('overlay')[0];
         controls.addEventListener('lock', function(){
-            console.log("Locked");
+            overlay.style.display = 'none';
         });
 
         controls.addEventListener( 'unlock', function () {
-            console.log("Unlocked");
+            overlay.style.display = '';
         });
         scene.add( controls.getObject() );
         
@@ -122,8 +132,16 @@ export default {
                 this.scene.add(mesh);
                 objects.push(mesh);
             }
+            //Skybox
 
-            
+            var skyboxImage = "bluecloud";
+            const materialArray = this.createMaterialArray(skyboxImage);
+
+            var skyboxGeo = new THREE.BoxGeometry(500, 500, 500);
+            var skybox = new THREE.Mesh(skyboxGeo, materialArray);
+            this.scene.add(skybox);
+
+            //Renderer
             this.renderer.setPixelRatio( window.devicePixelRatio );
             this.renderer.setSize( window.innerWidth, window.innerHeight );
             var Three = document.getElementById('3D');
@@ -193,6 +211,25 @@ export default {
                     break;
 
             }
+        },
+        createPathStrings: function(filename) {
+            const basePath = "assets/skybox/";
+            const baseFilename = basePath + filename;
+            const fileType = ".jpg";
+            const sides = ["ft", "bk", "up", "dn", "rt", "lf"];
+            const pathStings = sides.map(side => {
+                return baseFilename + "_" + side + fileType;
+            });
+            return pathStings;
+        },
+        createMaterialArray: function(filename) {
+            const skyboxImagepaths = this.createPathStrings(filename);
+            const materialArray = skyboxImagepaths.map(image => {
+                image = require(`@/${image}`)
+                let texture = new THREE.TextureLoader().load(image);
+                return new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
+            });
+            return materialArray;
         },
         onWindowResize() {
 
@@ -285,6 +322,53 @@ export default {
 .scene{
     height: 100vh;
     width: 100vw;
+}
+.gallery3d{
+    display: flex;
+    position: relative;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.crosshair{
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    height: 5px;
+    width: 5px;
+    border-radius: 50%;
+    border: 1px solid rgb(148, 148, 148);
+    background: white;
+}
+.overlay{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(55deg, rgba(122,163,201,0.6091387238489145) 41%, rgba(161,187,212,0.4186625333727241) 68%);
+}
+.instructions{
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    cursor: pointer;
+    .unlock-pointer{
+        font-size: 34px;
+        font-weight: 700;
+        color: white;
+        margin: 15px;
+    }
+    .item{
+        font-size: 20px;
+        color: #f4f4f4;
+    }
+}
+.locked{
+    display: none;
 }
 
 </style>
