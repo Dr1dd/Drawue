@@ -110,15 +110,35 @@ export default {
             const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
             light.position.set( 0.5, 1, 0.75 );
             this.scene.add( light );
-            //Floor
-            const meshFloor = new THREE.Mesh(
-                new THREE.PlaneGeometry(10, 10, 15, 15),
-                new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false})
-            );
-            meshFloor.rotation.x -= Math.PI /2;
-            this.scene.add( meshFloor );
-            objects.push(meshFloor);
+
+             // Room
+            var wall_texture = new THREE.TextureLoader().load(require('@/assets/wall.jpg'));
+            wall_texture.wrapS = THREE.RepeatWrapping;
+            wall_texture.wrapT = THREE.RepeatWrapping;
+            wall_texture.repeat.set( 8, 8 );
+            var floor_texture = new THREE.TextureLoader().load(require('@/assets/floor.jpg'));
+            floor_texture.wrapS = THREE.RepeatWrapping;
+            floor_texture.wrapT = THREE.RepeatWrapping;
+            floor_texture.repeat.set( 16, 16 );
+            var room_array = [];
+            room_array.push(new THREE.MeshBasicMaterial( { map: wall_texture, side: THREE.BackSide } ));
+            room_array.push(new THREE.MeshBasicMaterial( { map: wall_texture, side: THREE.BackSide } ));
+            room_array.push(new THREE.MeshBasicMaterial( { map: wall_texture, side: THREE.BackSide } ));
+            room_array.push(new THREE.MeshBasicMaterial( { map: floor_texture, side: THREE.BackSide } ));
+            room_array.push(new THREE.MeshBasicMaterial( { map: wall_texture, side: THREE.BackSide } ));
+            room_array.push(new THREE.MeshBasicMaterial( { map: wall_texture, side: THREE.BackSide  } ));
             
+            var room_x = 50;
+            var room_y = 25
+            var room_z = 50;
+            const room = new THREE.Mesh(
+                new THREE.BoxGeometry(room_x, room_y, room_z),
+                room_array
+            );
+            room.position.y = 12.5;
+            room.position.z = -24.5;
+            this.scene.add(room);
+
             //Adding drawing objects
             var l = this.pathArray.length;
             for(var i = 0; i < l; i++){
@@ -126,8 +146,19 @@ export default {
                     new THREE.PlaneGeometry(3, 2, 1, 1),
                     this.pathArray[i]                    
                 );
-                mesh.position.set(((l-1)*4)/2-(i*4), 2, 0);
-                mesh.rotation.x -= Math.PI;
+                if(i < (l/3)) {
+                    mesh.rotation.y -= Math.PI/2;
+                    mesh.position.set(room_x/2-0.05, 2, (-room_z+5.5)+((room_z-5)/(l/3)*i));
+                }
+                else if(i >= (l/3) && i < (2*l/3)){
+                    mesh.rotation.x -= Math.PI;
+                    mesh.position.set((room_x/2-4.5)-4.5*(i%(l/3)), 2, 0);
+                }
+                else{
+                    mesh.rotation.y += Math.PI/2;
+                    mesh.position.set(-room_x/2+0.05, 2, -3.5-((room_z-5)/(l/3)*(i%(2*l/3))));
+                }
+                console.log(i, mesh.position);
                 mesh.rotation.z -= Math.PI;
                 this.scene.add(mesh);
                 objects.push(mesh);
@@ -153,7 +184,7 @@ export default {
             var time = performance.now();
             this.performance = time;
             this.objects = [...objects];
-            this.meshFloor = meshFloor;
+            //this.meshFloor = meshFloor;
 
 
         },
