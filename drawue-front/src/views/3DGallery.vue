@@ -1,6 +1,6 @@
 <template>
     <div class="gallery3d" id="3D">
-        <div class="crosshair"></div>
+        <div class="crosshair" :class="{'intersects': intersects}"></div>
         <div class="overlay">
             <div class="instructions">
                 <div class="unlock-pointer">
@@ -10,6 +10,22 @@
                 <div class="item">Jump: Space</div>
             </div>
         </div>
+        <transition name="fade">
+            <div class="drawing-info" v-if="intersects">
+                <div class="drawing-title">
+                    {{selectedDrawingInfo.title}}
+                </div>
+                <div class="drawing-description">
+                    {{selectedDrawingInfo.description}}
+                </div>
+                <div class="drawing-author">
+                    {{selectedDrawingInfo.username}}
+                </div>
+                <div class="like-count">
+                    {{selectedDrawingInfo.like_count}}
+                </div>
+            </div>
+        </transition>
     </div>
 
 </template>
@@ -43,6 +59,9 @@ export default {
             direction: '',
             objects: [],
             performance: '',
+            timer: 0,
+            intersects: false,
+            selectedDrawingInfo: '',
             movement:{
                 forward: false,
                 backward: false,
@@ -146,20 +165,21 @@ export default {
                     new THREE.PlaneGeometry(3, 2, 1, 1),
                     this.pathArray[i]                    
                 );
+                mesh.name = `${i}`;
                 if(i < (l/3)) {
                     mesh.rotation.y -= Math.PI/2;
                     mesh.position.set(room_x/2-0.05, 2, (-room_z+5.5)+((room_z-5)/(l/3)*i));
                 }
                 else if(i >= (l/3) && i < (2*l/3)){
                     mesh.rotation.x -= Math.PI;
+                    mesh.rotation.z -= Math.PI;
                     mesh.position.set((room_x/2-4.5)-4.5*(i%(l/3)), 2, 0);
                 }
                 else{
                     mesh.rotation.y += Math.PI/2;
                     mesh.position.set(-room_x/2+0.05, 2, -3.5-((room_z-5)/(l/3)*(i%(2*l/3))));
                 }
-                console.log(i, mesh.position);
-                mesh.rotation.z -= Math.PI;
+                //mesh.rotation.z -= Math.PI;
                 this.scene.add(mesh);
                 objects.push(mesh);
             }
@@ -300,7 +320,8 @@ export default {
                 this.raycaster.ray.origin.copy( this.controls.getObject().position );
                 this.raycaster.ray.origin.y -= this.player.height-0.1;
                 const intersections = this.raycaster.intersectObjects( this.objects );
-                
+
+                this.checkIfHover();
                 const onObject = intersections.length > 0;
                 const delta = ( time - this.performance ) / 1000;
 
@@ -341,7 +362,22 @@ export default {
 
             this.renderer.render( this.scene, this.camera );
         },
-    }
+        checkIfHover(){
+            var rayCaster = new THREE.Raycaster(this.controls.getObject().position, this.controls.getDirection(new THREE.Vector3(0, 0, 0)));
+            const int = rayCaster.intersectObjects( this.objects );
+            var selectedDrawing = ''
+            if(int.length>0 && selectedDrawing == '') { 
+                this.intersects = true;
+                selectedDrawing = this.drawings[parseInt(int[0].object.name)];
+
+            }
+            else {
+                this.intersects = false;
+                selectedDrawing = '';
+            }
+            this.selectedDrawingInfo = selectedDrawing;
+        }
+    },
 }
 </script>
 
@@ -381,6 +417,7 @@ export default {
     height: 100%;
     width: 100%;
     background: linear-gradient(55deg, rgba(122,163,201,0.6091387238489145) 41%, rgba(161,187,212,0.4186625333727241) 68%);
+    z-index: 2;
 }
 .instructions{
     display: flex;
@@ -401,5 +438,34 @@ export default {
 .locked{
     display: none;
 }
+.intersects{
+    height: 8px;
+    width: 8px;
+}
+.drawing-info{
+    position: absolute;
+    background: white;
+    padding: 15px;
+    right: 15px;
+    top: 4rem;
+    min-width: 200px;
+    max-width: 200px;
+    max-height: 300px;
+    border: 2px solid #859aac;
+    border-radius: 13px;
+    color: #86a1b8;
+    .drawing-title{
+        font-weight: 700;
+    }
+    .drawing-description{
+        padding: 10px 0;
+        word-break: break-all;
+    }
+    .drawing-author{
 
+    }
+    .like-count{
+
+    }
+}
 </style>
