@@ -18,11 +18,19 @@
                 <div class="drawing-description">
                     {{selectedDrawingInfo.description}}
                 </div>
-                <div class="drawing-author">
-                    {{selectedDrawingInfo.username}}
-                </div>
-                <div class="like-count">
-                    {{selectedDrawingInfo.like_count}}
+                <div class="stats">
+                    <div class="stats-labels">
+                        <span>Author</span>
+                        <span>Likes</span>    
+                    </div>
+                    <div class="stats-wrapper">
+                        <div class="drawing-author">
+                            {{selectedDrawingInfo.username}}
+                        </div>
+                        <div class="like-count">
+                            {{selectedDrawingInfo.like_count}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </transition>
@@ -407,6 +415,7 @@ export default {
     border-radius: 50%;
     border: 1px solid rgb(148, 148, 148);
     background: white;
+    transition: all 0.1s;
 }
 .overlay{
     display: flex;
@@ -456,6 +465,8 @@ export default {
     color: #86a1b8;
     .drawing-title{
         font-weight: 700;
+        border-bottom: 2px solid;
+        padding-bottom: 5px;
     }
     .drawing-description{
         padding: 10px 0;
@@ -468,4 +479,32 @@ export default {
 
     }
 }
+.stats{
+    display: flex;
+    flex-direction: column;
+    .stats-labels{
+        display:flex;
+        justify-content: space-between;
+        padding: 3px 0;
+    }
+    span{
+        text-align: left;
+        font-weight: 700;
+    }
+    .stats-wrapper{
+        display: inline-flex;
+        justify-content: space-between;
+        padding: 3px 5px;
+        background: #eef7ff;
+        border-left: 5px solid #bad7f1;
+        .drawing-author{
+
+        }
+        .like-count{
+
+        }
+    }
+
+}
+
 </style>

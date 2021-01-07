@@ -6,6 +6,9 @@
         </div>
         <div class="gallery-link">
             <router-link to="/gallery"> Gallery </router-link>
+             <div class="arrow">
+             </div> 
+             <router-link to="/gallery3d" class="gallery3d"> 3D </router-link>
         </div>
       </div>
       <div class="auth-section" v-if="getLoginState === false">
@@ -96,12 +99,52 @@ export default {
     }
   }
   .gallery-link{
+    position: relative;
     margin-left: 2rem;
+    padding-right: 2.4rem;
     a{
       color: #86a1b8;
       cursor: pointer;
       font-size: 17px;
       font-weight: 600;
+    }
+    .arrow{
+      transform: rotate(-45deg);
+      opacity: 0;
+      background: #86a1b8;
+      border: none;
+      padding: 4px;
+      border-radius: 50%;
+      margin: 0px 4px 1px 1px;
+      transition: opacity 0.15s, transform 0.5s, border-radius 0.5s;
+      &::after{
+        position: absolute;
+        content: "";
+        background: white;
+        padding: 5px;
+        left: -6px;
+        top: -5px;
+        transform: rotate(-45deg);
+      }
+    }
+    .gallery3d{
+      position: absolute;
+      visibility: hidden;
+      opacity: 0;
+      top: 1px;
+      right: 10px;
+      transition: opacity 0.25s
+    }
+    &:hover{
+      .arrow{
+        transform: rotate(-45deg);
+        border-radius: 2px;
+        opacity: 1;
+      }
+      .gallery3d{
+        opacity: 1;
+        visibility: visible;
+      }
     }
   }
 }
