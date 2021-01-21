@@ -114,6 +114,7 @@ export default {
 <style scoped lang="scss">
 @use '../sass/abstracts/_profile';
 @use '../sass/components/_drawingPost';
+
  .user-profile--container{
      display: flex;
      min-height: 100vh;

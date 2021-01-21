@@ -158,6 +158,7 @@ $module-theme: #86a1b8;
         align-items: baseline;
         box-sizing: border-box;
         width: 100%;
+        transition: all 0.5s;
     }
     .reply{
         position: relative;
@@ -261,8 +262,12 @@ $module-theme: #86a1b8;
     }
     .reply-interact{
         @include commentReply.comment-interact;
+        .close-reply{
+            margin-top: 5px;
+        }
     }
     .minimized{
+        transition: all 0.5s;
             .reply{
                 display: flex;
                 flex-direction: row-reverse;
@@ -284,11 +289,15 @@ $module-theme: #86a1b8;
                     margin: 5px 10px;
                 }
             }
-            
-
+    }
+    .reply-input--container{
+        margin-left: 3rem;
+        border-top: 2px solid #eeeeee;
+        padding: 5px 0px;
     }
     .replying{
         @include commentReply.replying;
+        border-top: none;
     }
     .replies-container{
         width: 100%;

@@ -113,6 +113,9 @@ export default {
         document.body.style.overflowY = 'hidden';
         this.selectDrawing(this.drawingID);
     },
+    destroyed(){
+        document.body.style.overflowY = 'visible';
+    },
     methods:{
         clickAwayModal(){
             document.body.style.overflowY = 'auto';

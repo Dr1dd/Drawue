@@ -37,7 +37,7 @@ router.get('/:username', verifyToken, (req, res)=>{
                     return res.send({'drawingPosts': posts, 'likedPosts': result});
                 })
             }
-            else res.send({'error': 'User not found'})
+            else return res.send({'drawingPosts': posts});
         }
     }).skip(skip).limit(limit)
 });
