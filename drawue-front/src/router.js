@@ -81,7 +81,14 @@ const routes = [
               props: true,
               component: () => import("./views/DrawingPost"),
             }
-        ]
+        ],
+        beforeEnter: (to, from, next) => {
+            var username = store.getters.getUsername;
+            if(username == to.params.username) next({name: 'Profile'});
+            else next();
+           // next();
+
+        }
     },
     {
         path: '/gallery',

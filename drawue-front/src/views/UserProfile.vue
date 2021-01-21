@@ -165,7 +165,7 @@ export default {
     }
  }
  .picture-container{
-     @include profile.profile-pic("false");
+     @include profile.profile-pic(false);
      box-shadow: 0px 0px 10px -2px #d8e5f1;
  }
  .drawing-container{

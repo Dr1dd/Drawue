@@ -8,8 +8,9 @@
                 <div class="user-img" @click ="$router.push({ name: 'UserProfile', params: currentReply[0].username })">
                     <img :src="'/api/posts/profile/pic/' + currentReply[0].profilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                     <div class="reply-author">
-                        {{currentReply[0].username}}
-                        
+                        <router-link :to="{name: 'UserProfile'}" :params="currentReply[0].username">
+                          {{currentReply[0].username}}
+                        </router-link>
                     </div>
                 </div>
                 <div class="reply-text" v-if="currentReply[0].expanded">

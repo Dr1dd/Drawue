@@ -94,6 +94,9 @@
                 </div>
                 <div class ="drawing-post--container">
                   <div class="drawing-post" v-for="(drawing, index) in drawingPosts" :key="index">
+                      <div class="delete-post">
+                          <span></span> <span></span>
+                      </div>
                     <router-link :to="{
                         name: 'UserDrawingPost',
                         params: {username:drawing.username, drawing: drawing, drawingID: drawing._id, liked: drawing.liked = likedPosts.includes(drawing._id) }
@@ -402,7 +405,7 @@ export default {
         }
     }
     .picture-container{
-        @include profile.profile-pic("true");
+        @include profile.profile-pic(true);
     }
     input[type=file]{
         display: none;
@@ -533,5 +536,36 @@ export default {
     .drawing-post{
        @include drawingPost.drawingPost;
         margin: 10px 0;
+        position: relative;
+        .delete-post{
+           position: absolute;
+            display: none;
+            right: 5px;
+            top: 8px;
+            width: 12px;
+            transition: all 0.5s;
+            span{
+                display: block;
+                position: absolute;
+                height: 17px;
+                width: 2px;
+                background: #ff9393;
+                transform: rotate(45deg);
+            }
+            span:nth-child(2){
+                transform: rotate(-45deg);
+            }
+            svg{
+                fill: red;
+                height: 24px;
+                width: 24px;
+            }
+            transition: all 0.5s;
+        }
+        &:hover{
+            .delete-post{
+                display: block;
+            }
+        }
     }
 </style>

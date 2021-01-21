@@ -37,14 +37,15 @@
                                     </svg>
                                 </div>
                                 <div class="comment-count">
-                                    
                                     {{selectedDrawing.comment_count !=undefined ? selectedDrawing.comment_count: 0}}
                                 </div>
                             </div>
 
                         </div>
-                        <div class="post-author" @click ="$router.push({ name: 'UserProfile', params: selectedDrawing.username })">
-                          @{{selectedDrawing.username}}
+                        <div class="post-author">
+                            <router-link :to="{name: 'UserProfile'}" :params="selectedDrawing.username">
+                                 @{{selectedDrawing.username}}
+                            </router-link>
                         </div>
                     </div>
                     <div class="modal-right--section">
@@ -140,7 +141,7 @@ export default {
                 .then((res)=>{
                     this.selectedDrawing = res.data.drawingPost;
                     this.selectedDrawing.liked = res.data.likeStatus;
-                    console.log(this.selectedDrawing);
+     
                 })
                 .catch((err)=>{
                     console.log(err.response);

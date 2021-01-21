@@ -35,10 +35,12 @@
                   <span>{{commentObj.expanded ? '&#8722;' : '&#43;'}}</span>
               </div>
               <div class="comment-wrapper">
-                  <div class="comment-author--container" @click ="$router.push({ name: 'UserProfile', params: commentObj.username })">
+                  <div class="comment-author--container">
                       <img :src="'/api/posts/profile/pic/' + commentObj.profilePic" alt="pic" @error="$event.target.src='/api/posts/profile/pic/default-user.png'">
                       <div class="comment-author">
-                          {{commentObj.username}}
+                           <router-link :to="{name: 'UserProfile'}" :params="commentObj.username">
+                             {{commentObj.username}}
+                           </router-link>
                       </div>
                   </div>
                   <div class="comment-text" v-if="commentObj.expanded">

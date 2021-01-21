@@ -51,7 +51,7 @@
                     </div>
             
                     <div class="filter-button" @click="changeFilter">
-                        {{checkedTags.length}} tags <font-awesome-icon :icon="['fas', 'filter']" />
+                        {{checkedTags.length == 0 ? 'Filter' :  checkedTags.length + ' tags'}} <font-awesome-icon :icon="['fas', 'filter']" />
                     </div>
                 </div>
                 </transition>

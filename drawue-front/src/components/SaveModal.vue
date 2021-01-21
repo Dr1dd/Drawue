@@ -181,7 +181,7 @@ export default {
             }
             else{
                 if(e.target.value != " " && e.target.value != ""){
-                    this.drawing.tags.push(e.target.value.slice(0, -1));
+                    this.drawing.tags.push(e.target.value);
                 }
             }
             e.target.value = '';
