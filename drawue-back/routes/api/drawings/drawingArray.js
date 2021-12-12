@@ -4,6 +4,7 @@ const { Drawings } = require('../../../models/drawing');
 const { Likes } = require('../../../models/likes');
 const { Comments } = require('../../../models/comment');
 const { verifyToken } = require("../verifyToken");
+var ObjectID = require('mongodb').ObjectID;
 
 
 router.post('/', verifyToken, (req, res)=>{
@@ -66,14 +67,17 @@ function getCommentedPosts(req, res, skip, limit, posts, result) {
     .limit(limit)
     .sort({'createdAt': -1});
 }
-router.post('/post-info', verifyToken, (req, res)=>{
-    Drawings.findOne({_id: req.body.drawingID }, (drawings_error, post)=>{
+router.post('/post-info', verifyToken, (req, res) => {
+    let drawing_id;
+    if (ObjectID.isValid(req.body.drawingID)) drawing_id = req.body.drawingID;
+    else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
+    Drawings.findOne({_id: drawing_id }, (drawings_error, post)=>{
         if(drawings_error){
             res.send({'error': 'Drawing not found'});
         }
         var likeStatus;
         if(req.user){
-            Likes.countDocuments({postID: req.body.drawingID, userID: req.user._id }, (likes_error, count)=>{
+            Likes.countDocuments({postID: drawing_id, userID: req.user._id }, (likes_error, count)=>{
                 if(count == 0) likeStatus =false;
                 else likeStatus =true;
                 return res.send({'drawingPost': post, 'likeStatus': likeStatus});

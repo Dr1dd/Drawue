@@ -4,6 +4,7 @@ const { Drawings } = require('../../../models/drawing');
 const { User } = require('../../../models/user');
 const { Comments } = require('../../../models/comment');
 const { verifyToken } = require("../verifyToken");
+var ObjectID = require('mongodb').ObjectID;
 
 const router = express.Router();
 
@@ -32,7 +33,10 @@ const findUsers = function (res, user_list, comments) {
     .select({ "username": 1, "_id": 1, "profilePic": 1});
 }
 router.post('/', verifyToken, async (req, res) => {
-    await Comments.find({postID: req.body.postID}, (err, comments)=>{
+    let post_id;
+    if (ObjectID.isValid(req.body.postID)) post_id = req.body.postID;
+    else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
+    await Comments.find({postID: comment_id}, (err, comments)=>{
         if(err) console.log(err);
         else{
             let user_list = comments.map(a => a.userID);

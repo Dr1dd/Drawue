@@ -3,11 +3,15 @@ const { Likes } = require('../../../models/likes');
 const { Drawings } = require('../../../models/drawing');
 const { User } = require('../../../models/user');
 const { verifyToken } = require("../verifyToken");
+var ObjectID = require('mongodb').ObjectID;
 
 const router = express.Router();
 
 router.post('/', verifyToken, async (req, res) => {
-    Likes.deleteOne({postID: req.body.postID, userID: req.user._id}).then(result => {
+    let post_id;
+    if (ObjectID.isValid(req.body.postID)) post_id = req.body.postID;
+    else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
+    Likes.deleteOne({postID: post_id, userID: req.user._id}).then(result => {
         if(result.deletedCount != 0){
            dislikeLikedPost(req, res)
         }
@@ -18,7 +22,10 @@ router.post('/', verifyToken, async (req, res) => {
 
 });
 function dislikeLikedPost(req, res) {
-    Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (drawing_error, response)=>{
+    let post_id;
+    if (ObjectID.isValid(req.body.postID)) post_id = req.body.postID;
+    else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
+    Drawings.findOneAndUpdate({_id: post_id}, {$inc: { like_count: -1 }}, (drawing_error, response)=>{
         if(drawing_error) console.log(drawing_error);
         else{
             if(req.body.author_username){
@@ -36,8 +43,11 @@ function likeDrawing(req, res) {
         postID: req.body.postID,
         userID: req.user._id
     });
+    let post_id;
+    if (ObjectID.isValid(req.body.postID)) post_id = req.body.postID;
+    else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
     like.save().then(()=>{
-        Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: 1 }}, (drawing_error, drawing)=>{
+        Drawings.findOneAndUpdate({_id: post_id}, {$inc: { like_count: 1 }}, (drawing_error, drawing)=>{
             if(drawing_error) console.log(drawing_error);
             else {
                 if(req.body.author_username){

@@ -10,7 +10,8 @@ router.post('/', async (req, res) =>{
     if (error) {
         return res.status(400).send({"sendError": error.details[0].message});
     }
-    User.findOne({email: req.body.restoreEmail}, function(user_err, user){
+    let validated_email = req.body.restoreEmail;
+    User.findOne({email: validated_email}, function(user_err, user){
         if(!user){
             res.status(400).send({"sendError": "No Account with that email found."});
         }
@@ -19,8 +20,8 @@ router.post('/', async (req, res) =>{
         user.resetPasswordExpires = Date.now() + 3600000;
         user.save(function(user_save_err) {
             if(user_save_err) console.log(user_save_err);
-            sendResetEmail(req.body.restoreEmail);
-            return res.status(200).send("Reset token has been sent to"+ req.body.restoreEmail)
+            sendResetEmail(validated_email);
+            return res.status(200).send("Reset token has been sent to"+ validated_email)
         });
         res.end();
     })
@@ -52,7 +53,8 @@ router.post('/reset', async (req, res) =>{
     }
     const salt = await bcrypt.genSalt(10);
     pass = await bcrypt.hash(pass, salt);
-    User.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+    let reset_token = req.body.token;
+    User.findOne({ resetPasswordToken: reset_token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
         if (!user) {
             res.send({ errorMessage: "Password reset token is invalid or has expired."});
         }
@@ -72,8 +74,9 @@ router.post('/reset', async (req, res) =>{
         }
   });
 });
-router.post('/valid', async (req, res)=>{
-    User.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+router.post('/valid', async (req, res) => {
+    let reset_token = req.body.token;
+    User.findOne({ resetPasswordToken: reset_token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
         if (!user) {
             res.status(400).send({ errorMessage: "Password reset token is invalid or has expired."});
         }

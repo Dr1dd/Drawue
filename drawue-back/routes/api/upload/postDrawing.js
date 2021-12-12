@@ -50,17 +50,18 @@ const checkPostLimit = (req, res, next) =>{
 };
 
 router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (req, res) => {
+  let resolution = req.body.resolution;
     if(req.user){
         const file = req.file
         if (!file) {
             return res.status(400).send({'error': 'Failed to upload the file.'});
         }
         var filename = req.file.filename;
-        var path = DIR +'/'+ req.body.resolution +'/'+ filename;
+        var path = DIR +'/'+ resolution +'/'+ filename;
         try {
-          while (fs.existsSync(DIR +'/'+ req.body.resolution +'/'+ filename)) {
+          while (fs.existsSync(DIR +'/'+ resolution +'/'+ filename)) {
             var new_fileName = rug.generate();
-            path = DIR +'/'+ req.body.resolution +'/'+ new_fileName;
+            path = DIR +'/'+ resolution +'/'+ new_fileName;
           } 
         } catch(err) {
           console.error(err)
@@ -73,6 +74,7 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
     res.status(400).send({'error': error.message})
 });
 async function uploadPostDrawing(path, filename, req, res) {
+    let resolution = req.body.resolution;
       fs.rename(DIRTemp +'/'+ filename, path, async function (err) {
         if (err) {
             console.log(err);
@@ -86,7 +88,7 @@ async function uploadPostDrawing(path, filename, req, res) {
               username: user.username,
               title: req.body.title,
               description: req.body.description,
-              drawing_path: req.body.resolution+'/'+file.filename,
+              drawing_path: resolution+'/'+file.filename,
               tags: tags,
           });
           saveDrawing(drawing, user, res, req);
@@ -94,6 +96,7 @@ async function uploadPostDrawing(path, filename, req, res) {
     });
 }
 function saveDrawing(drawing, user, res, req) {
+  let resolution = req.body.resolution;
   drawing.save()
     .then(()=>{
       if(user.drawing_counter == null || user.drawing_counter == undefined) user.drawing_counter = 1;
@@ -107,7 +110,7 @@ function saveDrawing(drawing, user, res, req) {
         })
     })
     .catch((drawing_save_error)=>{
-        fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (image_deletion_error) => {
+        fs.unlink(DIR +'/'+ resolution +'/'+ filename, (image_deletion_error) => {
             if (image_deletion_error) {
               console.error(image_deletion_error)
             }

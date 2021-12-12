@@ -13,9 +13,10 @@ router.post('/', async (req, res) => {
     if (error) {
         return res.status(400).send(error.details[0].message);
     }
+    let validated_username_or_email = req.body.username_email;
  
     //  Now find the user by their email address
-    let user = await User.findOne({$or: [{ username: req.body.username_email}, {email: req.body.username_email}]});
+    let user = await User.findOne({$or: [{ username: validated_username_or_email}, {email: validated_username_or_email}]});
     if (!user) {
         return res.status(400).send('Incorrect username or password.');
     }

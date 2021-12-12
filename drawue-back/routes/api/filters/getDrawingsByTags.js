@@ -29,7 +29,8 @@ router.post("/", verifyToken,  async (req, res) => {
     await getDrawingsByTags(req, res, skip, limit, sort, tags);
 });
 async function getDrawingsByTags(req, res, skip, limit, sort, tags) { 
-    await Drawings.find({tags: {$in: tags }}, (drawing_error, posts)=>{
+    let drawing_tags = tags;
+    await Drawings.find({tags: {$in: drawing_tags }}, (drawing_error, posts)=>{
         if(drawing_error){
             res.send({'error': 'No drawings found'});
         }

@@ -13,10 +13,12 @@ router.post('/', async (req, res) => {
     if (error) {
         return res.status(400).send(error.details[0].message);
     }
+    let validated_username = req.body.username;
+    let validated_email = req.body.email;
     if(req.body.password != req.body.confirmPassword) return res.status(400).send({'passwordConfirm': 'Passwords do not match!'});
-    let user = await User.findOne({$or: [{ username: req.body.username}, {email: req.body.email}]});
+    let user = await User.findOne({$or: [{ username: validated_username}, {email: validated_email}]});
     if(user){
-       userTaken(user, req.body.username, req.body.email, res);
+       userTaken(user, validated_username, validated_email, res);
     }
     else{
         await createUser(req, res);
@@ -46,10 +48,11 @@ async function createUser(req, res) {
     });
 }
 router.post('/resend', async (req, res) => {
-    let user = await User.findOne({ email: req.body.email });
+    let user_email = req.body.email;
+    let user = await User.findOne({ email: user_email });
     if(!user) res.send({"successSend": "User was not found"});
     jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{     
-        sendEmail(req.body.email, emailToken);
+        sendEmail(user_email, emailToken);
         res.send({"successSend": "Email has been resent!"});
     });
 });
