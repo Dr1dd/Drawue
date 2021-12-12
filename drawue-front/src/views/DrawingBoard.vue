@@ -272,25 +272,31 @@ export default {
                
                 this.ctx.lineWidth = this.selectedStrokeSize;
                 this.ctx.beginPath();
-                 switch(this.selectedShape){
-                    case 'rectangle':
-                        this.ctx.rect(rectXCoord, rectYCoord, width, height);
-                        break;
-                    case 'circle':
-                        var hypotenuseLength = Math.sqrt(Math.pow(width, 2) +Math.pow(height, 2));
-                        this.ctx.arc(rectXCoord, rectYCoord, hypotenuseLength, 0, 2 * Math.PI);
-                        break;
-                    case 'triangle':
-                        this.ctx.moveTo(rectXCoord, rectYCoord+height);
-                        this.ctx.lineTo(rectXCoord+(width/2), rectYCoord);
-                        this.ctx.moveTo(rectXCoord+(width/2), rectYCoord);
-                        this.ctx.lineTo(rectXCoord+width, rectYCoord+height);
-                        this.ctx.moveTo(rectXCoord+width, rectYCoord+height);
-                        this.ctx.lineTo(rectXCoord, rectYCoord+height);
-                        break;
-                 }
-                 this.ctx.stroke();
+                switch(this.selectedShape){
+                case 'rectangle':
+                    this.ctx.rect(rectXCoord, rectYCoord, width, height);
+                    break;
+                case 'circle':
+                    this.drawShapeCircle(rectXCoord, rectYCoord, width, height);
+                    break;
+                case 'triangle':
+                    this.drawShapeTriangle(rectXCoord, rectYCoord, width, height);
+                    break;
+                }
+                this.ctx.stroke();
             }
+        },
+        drawShapeCircle(rectXCoord, rectYCoord, width, height){
+            var hypotenuseLength = Math.sqrt(Math.pow(width, 2) +Math.pow(height, 2));
+            this.ctx.arc(rectXCoord, rectYCoord, hypotenuseLength, 0, 2 * Math.PI);
+        },
+        drawShapeTriangle(rectXCoord, rectYCoord, width, height){
+            this.ctx.moveTo(rectXCoord, rectYCoord+height);
+            this.ctx.lineTo(rectXCoord+(width/2), rectYCoord);
+            this.ctx.moveTo(rectXCoord+(width/2), rectYCoord);
+            this.ctx.lineTo(rectXCoord+width, rectYCoord+height);
+            this.ctx.moveTo(rectXCoord+width, rectYCoord+height);
+            this.ctx.lineTo(rectXCoord, rectYCoord+height);
         },
         finishDrawing(){
             this.painting = false;

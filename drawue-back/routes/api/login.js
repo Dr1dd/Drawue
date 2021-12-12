@@ -25,8 +25,15 @@ router.post('/', async (req, res) => {
         return res.status(400).send('Incorrect username or password.');
     }
     const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'), {expiresIn: '1m'});
-    const refreshToken = jwt.sign({ _id: user._id }, config.get('PrivateKey2'), {expiresIn: '7d'});
-    res.cookie('access-token', token,{
+    const refreshToken = jwt.sign({ _id: user._id }, config.get('PrivateKey2'), { expiresIn: '7d' });
+    
+    setTokenCookies(token, refreshToken, res);
+    
+    res.status(200).send("Authorized");
+
+});
+function setTokenCookies(accessToken, refreshToken, res) {
+    res.cookie('access-token', accessToken,{
         maxAge: maxAccessTokenAge,
         httpOnly: true,
     })
@@ -34,9 +41,7 @@ router.post('/', async (req, res) => {
         maxAge: maxRefreshTokenAge,
         httpOnly: true,
     })
-    res.status(200).send("Authorized");
-
-});
+}
 
 
 module.exports = router;

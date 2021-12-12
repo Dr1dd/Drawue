@@ -25,29 +25,16 @@ router.post('/', verifyToken, (req, res)=>{
             sort['createdAt'] = -1;
             break;
     }
-    Drawings.find({createdOn: { $lte: req.createdOnBefore } }, (err, posts)=>{
+   galleryDrawings(req, res, skip, sort, limit);
+});
+function galleryDrawings(req, res, skip, sort, limit) {
+     Drawings.find({createdOn: { $lte: req.createdOnBefore } }, (err, posts)=>{
         if(err){
             res.send({'error': 'No drawings found'});
         }
         if(posts.length == 0) return res.send({'notFound': true});
         if(req.user){
-            Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (likes_error, likedPosts)=>{
-                var result =  likedPosts.map(({ postID }) => postID)
-                if(req.body.filter == 'commented'){
-                    Comments.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (post_error, commentedPosts)=>{
-                        var resultComments = [...new Set(commentedPosts.map(item => JSON.stringify(item.postID)))];
-                        resultComments= resultComments.map(item => JSON.parse(item));
-                        return res.send({'drawingPosts': posts, 'likedPosts': result, 'commentedPosts': resultComments});
-                    })
-                    .skip(skip)
-                    .limit(limit)
-                    .sort({'createdAt': -1});
-                }
-                else return res.send({'drawingPosts': posts, 'likedPosts': result});
-            })
-            .skip(skip)
-            .limit(limit)
-            .sort({'createdAt': -1});
+            getLikedPosts(req, res, skip, limit, posts);
         }
         else{
             return res.send({'drawingPosts': posts}); 
@@ -56,7 +43,29 @@ router.post('/', verifyToken, (req, res)=>{
     .skip(skip)
     .sort(sort)
     .limit(limit);
-});
+}
+function getLikedPosts(req, res, skip, limit, posts) {
+    Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (likes_error, likedPosts)=>{
+        var result =  likedPosts.map(({ postID }) => postID)
+        if(req.body.filter == 'commented'){
+            getCommentedPosts(req, res, skip, limit, posts, result);
+        }
+        else return res.send({'drawingPosts': posts, 'likedPosts': result});
+    })
+    .skip(skip)
+    .limit(limit)
+    .sort({'createdAt': -1});
+}
+function getCommentedPosts(req, res, skip, limit, posts, result) {
+    Comments.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (post_error, commentedPosts)=>{
+        var resultComments = [...new Set(commentedPosts.map(item => JSON.stringify(item.postID)))];
+        resultComments= resultComments.map(item => JSON.parse(item));
+        return res.send({'drawingPosts': posts, 'likedPosts': result, 'commentedPosts': resultComments});
+    })
+    .skip(skip)
+    .limit(limit)
+    .sort({'createdAt': -1});
+}
 router.post('/post-info', verifyToken, (req, res)=>{
     Drawings.findOne({_id: req.body.drawingID }, (drawings_error, post)=>{
         if(drawings_error){

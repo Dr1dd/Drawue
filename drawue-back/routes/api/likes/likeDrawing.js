@@ -9,43 +9,49 @@ const router = express.Router();
 router.post('/', verifyToken, async (req, res) => {
     Likes.deleteOne({postID: req.body.postID, userID: req.user._id}).then(result => {
         if(result.deletedCount != 0){
-            Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (drawing_error, response)=>{
-                if(drawing_error) console.log(drawing_error);
-                else{
-                    if(req.body.author_username){
-                        User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: -1 }}, (user_error, response)=>{
-                            if(user_error) console.log(user_error);
-                            else return res.status(200).send({'status':false});
-                        });
-                    }
-                    else return res.status(200).send({'status':false});
-                }
-            });
+           dislikeLikedPost(req, res)
         }
         else{
-            let like = new Likes({
-                postID: req.body.postID,
-                userID: req.user._id
-            });
-            like.save().then(()=>{
-                Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: 1 }}, (drawing_error, drawing)=>{
-                    if(drawing_error) console.log(drawing_error);
-                    else {
-                        if(req.body.author_username){
-                            User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: 1 }}, (user_error, user)=>{
-                                if(user_error) console.log(user_error);
-                                else return res.status(200).send({'status':true});
-                            });
-                        }
-                        else return res.status(200).send({'status':true});
-                    }
-                });
-            })
-            .catch((like_error)=>{
-                console.log(like_error);
-            })
+            likeDrawing(req, res);
         }
     });
 
 });
+function dislikeLikedPost(req, res) {
+    Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (drawing_error, response)=>{
+        if(drawing_error) console.log(drawing_error);
+        else{
+            if(req.body.author_username){
+                User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: -1 }}, (user_error, response)=>{
+                    if(user_error) console.log(user_error);
+                    else return res.status(200).send({'status':false});
+                });
+            }
+            else return res.status(200).send({'status':false});
+        }
+    });
+}
+function likeDrawing(req, res) {
+    let like = new Likes({
+        postID: req.body.postID,
+        userID: req.user._id
+    });
+    like.save().then(()=>{
+        Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: 1 }}, (drawing_error, drawing)=>{
+            if(drawing_error) console.log(drawing_error);
+            else {
+                if(req.body.author_username){
+                    User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: 1 }}, (user_error, user)=>{
+                        if(user_error) console.log(user_error);
+                        else return res.status(200).send({'status':true});
+                    });
+                }
+                else return res.status(200).send({'status':true});
+            }
+        });
+    })
+    .catch((like_error)=>{
+        console.log(like_error);
+    })
+}
 module.exports = router;

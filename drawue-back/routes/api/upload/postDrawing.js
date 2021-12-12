@@ -66,48 +66,54 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
           console.error(err)
         }
 
-        fs.rename(DIRTemp +'/'+ filename, path, async function (err) {
-            if (err) {
-                console.log(err);
-                return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
-            }
-            await User.findOne({_id: req.user._id}, (user_err, user)=>{
-              var tags = req.body.tags.split(",");
-              if(user_err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
-                let drawing = new Drawings({
-                    userID: req.user._id,
-                    username: user.username,
-                    title: req.body.title,
-                    description: req.body.description,
-                    drawing_path: req.body.resolution+'/'+file.filename,
-                    tags: tags,
-                });
-                drawing.save()
-                    .then(()=>{
-                      if(user.drawing_counter == null || user.drawing_counter == undefined) user.drawing_counter = 1;
-                      else user.drawing_counter +=1;
-                        user.save().then(()=>{
-                          return res.status(200).send({'success': 'Your drawing has been successfully published!'});
-                        })
-                        .catch((user_save_error)=>{
-                          console.log(eruser_save_errorr);
-                        })
-                    })
-                    .catch((drawing_save_error)=>{
-                        fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (image_deletion_error) => {
-                            if (image_deletion_error) {
-                              console.error(image_deletion_error)
-                              return
-                            }
-                          })
-                        console.log(drawing_save_error);
-                        return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
-                    });
-            });
-        });
+      await uploadPostDrawing(path, filename, req, res);
     }
     else return res.status(401).send({'error':'User not logged on.'});
   }, (error, req, res, next) =>{
     res.status(400).send({'error': error.message})
 });
+async function uploadPostDrawing(path, filename, req, res) {
+      fs.rename(DIRTemp +'/'+ filename, path, async function (err) {
+        if (err) {
+            console.log(err);
+            return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+        }
+        await User.findOne({_id: req.user._id}, (user_err, user)=>{
+          var tags = req.body.tags.split(",");
+          if(user_err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+          let drawing = new Drawings({
+              userID: req.user._id,
+              username: user.username,
+              title: req.body.title,
+              description: req.body.description,
+              drawing_path: req.body.resolution+'/'+file.filename,
+              tags: tags,
+          });
+          saveDrawing(drawing, user, res, req);
+        });
+    });
+}
+function saveDrawing(drawing, user, res, req) {
+  drawing.save()
+    .then(()=>{
+      if(user.drawing_counter == null || user.drawing_counter == undefined) user.drawing_counter = 1;
+      else user.drawing_counter +=1;
+      user.save()
+        .then(() => {
+          return res.status(200).send({'success': 'Your drawing has been successfully published!'});
+        })
+        .catch((user_save_error)=>{
+          console.log(user_save_error);
+        })
+    })
+    .catch((drawing_save_error)=>{
+        fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (image_deletion_error) => {
+            if (image_deletion_error) {
+              console.error(image_deletion_error)
+            }
+          })
+        console.log(drawing_save_error);
+        return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+    });
+}
 module.exports = router;
