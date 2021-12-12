@@ -12,7 +12,7 @@ const Drawings = mongoose.model('Drawings', new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        maxlength: 64,
+        maxlength: 32,
     },
     description: {
         type: String,

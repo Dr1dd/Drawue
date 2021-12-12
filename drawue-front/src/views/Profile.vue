@@ -94,7 +94,7 @@
                 </div>
                 <div class ="drawing-post--container">
                   <div class="drawing-post" v-for="(drawing, index) in drawingPosts" :key="index">
-                      <div class="delete-post">
+                      <div class="delete-post" @click="deletePost(index)">
                           <span></span> <span></span>
                       </div>
                     <router-link :to="{
@@ -269,6 +269,17 @@ export default {
             this.emailConfirm = true;
             var email = this.getEmail;
             axios.post('/api/auth/register/resend', { email }, {})
+            .then((res) => {
+                if (res.data) {
+                    this.successMessage = res.data.successSend;
+                }
+            })
+            .catch((err) => {
+                this.successMessage = err.response.data
+            });
+        },
+        deletePost(index){
+            axios.post('/api/drawings/delete', { index }, {})
             .then((res) => {
                 if (res.data) {
                     this.successMessage = res.data.successSend;
@@ -554,11 +565,6 @@ export default {
             }
             span:nth-child(2){
                 transform: rotate(-45deg);
-            }
-            svg{
-                fill: red;
-                height: 24px;
-                width: 24px;
             }
             transition: all 0.5s;
         }
