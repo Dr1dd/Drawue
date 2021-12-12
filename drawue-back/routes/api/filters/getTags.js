@@ -1,6 +1,5 @@
 const express = require('express');
 const { Drawings } = require('../../../models/drawing');
-// const { verifyToken } = require("../verifyToken");
 
 const router = express.Router();
 

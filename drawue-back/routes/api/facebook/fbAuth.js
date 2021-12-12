@@ -7,6 +7,11 @@ var passport = require('passport')
 const bcrypt = require('bcrypt');
 const config = require('config');
 
+
+const AdjectivesList = [
+    'Fast', 'Dangerous', 'Bland', 'Slow', 'Speedy', 'Gamer', 'Drawer', 'Painter', 'Artistic'
+];
+const temp_generated_password_length = 12;
 passport.use(new FacebookStrategy({
     clientID: config.get('FacebookAppID'),
     clientSecret: config.get('FacebookAppSecret'),
@@ -14,34 +19,34 @@ passport.use(new FacebookStrategy({
     profileFields: ['id', 'emails', 'name']
   },
   function(accessToken, refreshToken, profile, done) {
-    User.findOne({email: profile.emails[0].value}, (err, user)=>{
-        if (err) {
-            return done(err);
+    User.findOne({email: profile.emails[0].value}, (user_error, user)=>{
+        if (user_error) {
+            return done(user_error);
         }
         if(user){
             done(null,user);
         }
         else{
-            var new_password = generatePassword(12);
-            rug.setAdjectives(['Fast', 'Dangerous', 'Bland', 'Slow', 'Speedy', 'Gamer', 'Drawer', 'Painter', 'Artistic']);
+            var new_password = generatePassword(temp_generated_password_length);
+            rug.setAdjectives(AdjectivesList);
             rug.setSeperator('');
             var new_username = rug.generate();
-            new_username = new_username.slice(0, 12);
+            new_username = new_username.slice(0, temp_generated_password_length);
 
             generateUsername(new_username)
                 .then((newUsername)=>{
 
-                    userNew = new User({
+                    let userNew = new User({
                         username: String(newUsername),
                         email: profile.emails[0].value,
                         password: new_password,
                         profilePic: 'default-user.png',
                         emailConfirmed: true,
                     });
-                    bcrypt.genSalt(10, function(err, salt) {
-                        if (err) return next(err);            
-                        bcrypt.hash(userNew.password, salt, function(err, hash) {
-                            if (err) return err;
+                    bcrypt.genSalt(10, function(salt_error, salt) {
+                        if (salt_error) return next(salt_error);            
+                        bcrypt.hash(userNew.password, salt, function(hash_error, hash) {
+                            if (hash_error) return hash_error;
                             userNew.password = hash;
                             userNew.save().then(()=>{
                                 done(null, userNew);
@@ -49,8 +54,8 @@ passport.use(new FacebookStrategy({
                         });
                     });
                 })
-                .catch((err)=>{
-                    if (err) return err;
+                .catch((generate_username_error)=>{
+                    if (generate_username_error) return generate_username_error;
                 });
             
         }

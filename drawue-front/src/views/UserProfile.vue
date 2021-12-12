@@ -96,7 +96,6 @@ export default {
            var url = '/api/profile/drawings/'+username +"?skip="+this.skip+"&limit=30";
            axios.get(url)
                 .then((res)=>{
-                   // console.log(res.data);
                     if(res.data.notFound != undefined) this.postLimit = res.data.notFound;
                     if(res.data.drawingPosts) this.drawings.push(...res.data.drawingPosts);
                     if(res.data.likedPosts) this.likes.push(...res.data.likedPosts);
@@ -149,7 +148,6 @@ export default {
     width: fit-content;
     color: #86a1b8;
     background: url('~@/assets/wave.svg');
-    background-repeat-y: no-repeat;
     background-position-y: bottom;
     background-size: 102%;
     background-color: #fafdff;

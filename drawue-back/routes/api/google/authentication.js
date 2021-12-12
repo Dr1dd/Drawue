@@ -35,17 +35,17 @@ passport.use(new GoogleStrategy({
             generateUsername(new_username)
                 .then((newUsername)=>{
 
-                    userNew = new User({
+                    let userNew = new User({
                         username: String(newUsername),
                         email: profile.emails[0].value,
                         password: new_password,
                         profilePic: 'default-user.png',
                         emailConfirmed: true,
                     });
-                    bcrypt.genSalt(10, function(err, salt) {
-                        if (err) return next(err);            
-                        bcrypt.hash(userNew.password, salt, function(err, hash) {
-                            if (err) return err;
+                    bcrypt.genSalt(10, function(salt_error, salt) {
+                        if (salt_error) return next(salt_error);            
+                        bcrypt.hash(userNew.password, salt, function(hash_error, hash) {
+                            if (hash_error) return hash_error;
                             userNew.password = hash;
                             userNew.save().then(()=>{
                                 cb(null, userNew);
@@ -53,8 +53,8 @@ passport.use(new GoogleStrategy({
                         });
                     });
                 })
-                .catch((err)=>{
-                    if (err) return err;
+                .catch((generate_username_error)=>{
+                    if (generate_username_error) return generate_username_error;
                 });
         }
     });

@@ -40,7 +40,7 @@
                                     </g>
                                     </svg>
                                 </div>
-                                <div v-else class="edit-username checkmark" @click="saveUsername">
+                                <div v-else class="edit-username checkmark">
                                     ✓
                             </div>
                         </div>
@@ -165,7 +165,7 @@ export default {
                 strongPassword(currentPassword) {
                     return (
                     /[a-z]/.test(currentPassword) && 
-                    /[0-9]/.test(currentPassword) && 
+                    /\d/.test(currentPassword) && 
                     /\W|_/.test(currentPassword) && 
                     currentPassword.length >= 8
                     );
@@ -177,7 +177,7 @@ export default {
                 strongPassword(newPassword) {
                     return (
                     /[a-z]/.test(newPassword) && 
-                    /[0-9]/.test(newPassword) && 
+                    /\d/.test(newPassword) && 
                     /\W|_/.test(newPassword) && 
                     newPassword.length >= 8
                     );
@@ -253,17 +253,6 @@ export default {
             this.editUsername = true; 
             var username = this.$refs.username;
             username.focus();
-        },
-        saveUsername(){
-            var username = event.target.previousSibling;
-            username = username.textContent;
-           // username = username.substring(0,username.length-1);
-            console.log(username);
-            var patt = new RegExp(/^[a-zA-Z0-9]+$/);
-            var validation = patt.test(username);
-            if(username.length < 6) validation = false;
-            if(username.length > 22) validation = false;
-            console.log(validation);
         },
         resendEmail(){
             this.emailConfirm = true;
@@ -469,7 +458,6 @@ export default {
     .post-info{
         display: flex;
         flex-direction: column;
-        margin-top: 10px;
         text-align: left;
         color: #89a3ba;
         margin: 10px auto 0 2rem;
@@ -566,7 +554,6 @@ export default {
             span:nth-child(2){
                 transform: rotate(-45deg);
             }
-            transition: all 0.5s;
         }
         &:hover{
             .delete-post{

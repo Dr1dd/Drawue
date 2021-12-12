@@ -155,7 +155,7 @@ export default {
         addLike(ID){
             if(this.getLoginState){
                 this.selectedDrawing.liked = !this.selectedDrawing.liked
-                this.selectedDrawing.like_count = this.selectedDrawing.liked ? this.selectedDrawing.like_count+=1 : this.selectedDrawing.like_count-=1; 
+                this.selectedDrawing.like_count = this.selectedDrawing.liked ? this.selectedDrawing.like_count+1 : this.selectedDrawing.like_count-1; 
                 var postID = ID;
                 var index = this.$parent.likedPosts.indexOf(postID);
                 if (index !== -1) {

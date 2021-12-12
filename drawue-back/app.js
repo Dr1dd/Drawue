@@ -5,7 +5,6 @@ var helmet = require('helmet');
 var cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 var cors = require('cors');
-var cookieParser = require('cookie-parser')
 var passport = require('passport');
 var bodyParser = require('body-parser');
 const createError = require('http-errors');
@@ -57,7 +56,6 @@ const PORT = process.env.PORT || 5000;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -66,7 +64,6 @@ app.use(bodyParser.urlencoded({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use(express.static(__dirname+'/public/'));
 
 //working routes
 app.use('/api/auth/register', register);
@@ -109,8 +106,6 @@ if(process.env.NODE_ENV == 'production'){
     console.log("production");
   }
 
-  // app.use(express.static(__dirname+'/public/'));
-  // app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
   app.use(function(req, res, next) {
     next(createError(404));
   });
@@ -123,7 +118,6 @@ if(process.env.NODE_ENV == 'production'){
     // render the error page
   console.log( res.locals);
     res.status(err.status || 500);
-    //res.render('error');
   });
 
 app.listen(PORT, ()=>{

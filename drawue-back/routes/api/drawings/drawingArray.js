@@ -31,10 +31,10 @@ router.post('/', verifyToken, (req, res)=>{
         }
         if(posts.length == 0) return res.send({'notFound': true});
         if(req.user){
-            Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
+            Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (likes_error, likedPosts)=>{
                 var result =  likedPosts.map(({ postID }) => postID)
                 if(req.body.filter == 'commented'){
-                    Comments.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, commentedPosts)=>{
+                    Comments.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (post_error, commentedPosts)=>{
                         var resultComments = [...new Set(commentedPosts.map(item => JSON.stringify(item.postID)))];
                         resultComments= resultComments.map(item => JSON.parse(item));
                         return res.send({'drawingPosts': posts, 'likedPosts': result, 'commentedPosts': resultComments});
@@ -58,13 +58,13 @@ router.post('/', verifyToken, (req, res)=>{
     .limit(limit);
 });
 router.post('/post-info', verifyToken, (req, res)=>{
-    Drawings.findOne({_id: req.body.drawingID }, (err, post)=>{
-        if(err){
+    Drawings.findOne({_id: req.body.drawingID }, (drawings_error, post)=>{
+        if(drawings_error){
             res.send({'error': 'Drawing not found'});
         }
         var likeStatus;
         if(req.user){
-            Likes.countDocuments({postID: req.body.drawingID, userID: req.user._id }, (err, count)=>{
+            Likes.countDocuments({postID: req.body.drawingID, userID: req.user._id }, (likes_error, count)=>{
                 if(count == 0) likeStatus =false;
                 else likeStatus =true;
                 return res.send({'drawingPost': post, 'likeStatus': likeStatus});
@@ -77,13 +77,13 @@ router.post('/post-info', verifyToken, (req, res)=>{
     })
 });
 router.get('/carousel', verifyToken, (req, res)=>{
-    Drawings.find({ createdOn: { $lte: req.createdOnBefore } }, (err, posts)=>{
-        if(err){
+    Drawings.find({ createdOn: { $lte: req.createdOnBefore } }, (drawings_error, posts)=>{
+        if(drawings_error){
             res.send({'error': 'No drawings found'});
         }
         else{
             if(req.user){
-                Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
+                Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (likes_error, likedPosts)=>{
                     var result =  likedPosts.map(({ postID }) => postID)
                     return res.send({'drawingPosts': posts, 'likedPosts': result});
                 })

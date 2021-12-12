@@ -2,7 +2,7 @@
   <div class="header">
       <div class="gallery-section">
         <div class="site-logo">
-          <router-link to="/"><img src="@/assets/Drawue-logo.png"> </router-link>
+          <router-link to="/"><img src="@/assets/Drawue-logo.png" alt="logo"> </router-link>
         </div>
         <div class="gallery-link">
             <router-link to="/gallery"> Gallery </router-link>
@@ -23,8 +23,8 @@
           <div class="username" @click="dropDown = !dropDown">
             {{ getUsername }}
             <div class="down-symbol">
-              <p v-if="dropDown"><i class="arrow up"></i></p>
-              <p v-else><i class="arrow down"></i></p>
+              <p v-if="dropDown"><em class="arrow up"></em></p>
+              <p v-else><em class="arrow down"></em></p>
             </div>
             <transition name="fade">
               <div v-if="dropDown" class="drop-down">

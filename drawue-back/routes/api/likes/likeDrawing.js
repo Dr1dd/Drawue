@@ -9,12 +9,12 @@ const router = express.Router();
 router.post('/', verifyToken, async (req, res) => {
     Likes.deleteOne({postID: req.body.postID, userID: req.user._id}).then(result => {
         if(result.deletedCount != 0){
-            Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (err, response)=>{
-                if(err) console.log(err);
+            Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: -1 }}, (drawing_error, response)=>{
+                if(drawing_error) console.log(drawing_error);
                 else{
                     if(req.body.author_username){
-                        User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: -1 }}, (err, response)=>{
-                            if(err) console.log(err);
+                        User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: -1 }}, (user_error, response)=>{
+                            if(user_error) console.log(user_error);
                             else return res.status(200).send({'status':false});
                         });
                     }
@@ -23,17 +23,17 @@ router.post('/', verifyToken, async (req, res) => {
             });
         }
         else{
-            like = new Likes({
+            let like = new Likes({
                 postID: req.body.postID,
                 userID: req.user._id
             });
             like.save().then(()=>{
-                Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: 1 }}, (err, response)=>{
-                    if(err) console.log(err);
+                Drawings.findOneAndUpdate({_id: req.body.postID}, {$inc: { like_count: 1 }}, (drawing_error, drawing)=>{
+                    if(drawing_error) console.log(drawing_error);
                     else {
                         if(req.body.author_username){
-                            User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: 1 }}, (err, response)=>{
-                                if(err) console.log(err);
+                            User.findOneAndUpdate({username: req.body.author_username}, {$inc: { total_like_count: 1 }}, (user_error, user)=>{
+                                if(user_error) console.log(user_error);
                                 else return res.status(200).send({'status':true});
                             });
                         }
@@ -41,8 +41,8 @@ router.post('/', verifyToken, async (req, res) => {
                     }
                 });
             })
-            .catch((err)=>{
-                console.log(err);
+            .catch((like_error)=>{
+                console.log(like_error);
             })
         }
     });

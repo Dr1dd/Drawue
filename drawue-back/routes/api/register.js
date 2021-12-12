@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
             return res.status(400).send({'email': 'The email address you have entered is already registered!'});
     }
     else{
-        user = new User({
+        let user = new User({
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,

@@ -62,10 +62,9 @@ input{
   }
 }
 textarea{
-    margin: 10px 0;
+  margin: 10px 0;
   padding: 8px;
   font-size: 20px;
-  border: none;
   resize: none;
   border: 3px solid $module-theme;
   transition: 0.25s all;

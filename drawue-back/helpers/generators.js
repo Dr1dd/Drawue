@@ -1,13 +1,13 @@
 
 const { User } = require('../models/user');
 
-function generatePassword(length) {
-    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-    retVal = "";
+function generatePseudoPassword(length) {
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var password_value = "";
     for (var i = 0, n = charset.length; i < length; ++i) {
-        retVal += charset.charAt(Math.floor(Math.random() * n));
+        password_value += charset.charAt(Math.floor(Math.random() * n));
     }
-return retVal;
+return password_value;
 }
 function generateUniqueUsername(proposedName) {
     return User
@@ -23,5 +23,5 @@ function generateUniqueUsername(proposedName) {
         throw err;
       });
  }
-exports.generatePassword = generatePassword;
+exports.generatePassword = generatePseudoPassword;
 exports.generateUsername = generateUniqueUsername;

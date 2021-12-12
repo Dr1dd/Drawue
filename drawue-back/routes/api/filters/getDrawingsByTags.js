@@ -26,17 +26,17 @@ router.post("/", verifyToken,  async (req, res) => {
             sort['createdAt'] = -1;
             break;
     }
-    await Drawings.find({tags: {$in: tags }}, (err, posts)=>{
-        if(err){
+    await Drawings.find({tags: {$in: tags }}, (drawing_error, posts)=>{
+        if(drawing_error){
             res.send({'error': 'No drawings found'});
         }
         if(posts.length == 0) return res.send({'notFound': true});
         if(req.user){
             
-            Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, likedPosts)=>{
+            Likes.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (likes_error, likedPosts)=>{
                 var result =  likedPosts.map(({ postID }) => postID)
                 if(req.body.filter == 'commented'){
-                    Comments.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (err, commentedPosts)=>{
+                    Comments.find({userID: req.user._id, createdOn: { $lte: req.createdOnBefore }}, 'postID', (comments_error, commentedPosts)=>{
                         var resultComments = [...new Set(commentedPosts.map(item => JSON.stringify(item.postID)))];
                         resultComments= resultComments.map(item => JSON.parse(item));
                         return res.send({'drawingPosts': posts, 'likedPosts': result, 'commentedPosts': resultComments});

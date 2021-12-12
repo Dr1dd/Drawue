@@ -143,7 +143,6 @@
 import colorPicker from '@caohenghu/vue-colorpicker'
 import SaveModal from '../components/SaveModal'
 import InfoModal from '../components/InfoModal'
-// import halseadMetrics from '@/halstead_metrics-master/halstead.js'
 export default {
     name: 'DrawingBoard',
     components:{
@@ -191,8 +190,6 @@ export default {
         }
     },
     mounted(){
-        // const metrics = halsteadMetrics(code);
-        // console.log(metrics);
             this.canvasContainer = document.getElementsByClassName('canvas-container');
             this.canvas = document.querySelector("#canvas");
             this.ctx = this.canvas.getContext('2d');
@@ -209,7 +206,6 @@ export default {
             this.canvas.width = this.selectedResolution[0];
             localStorage.setItem('resolution', [this.canvas.width, this.canvas.height]);
             this.onResize();
-            //this.marginVertical = 67/2*1.075;
             this.canvas.style.margin = '7px 0px 0';
 
             var ctx = document.querySelector("#canvas").getContext('2d');
@@ -245,13 +241,11 @@ export default {
         },
         draw(e){
             if(!this.painting) return;
-            //var tmp = this.ctx;
             this.ctx.strokeStyle = this.color;
             this.ctx.lineWidth = this.selectedStrokeSize;
             this.ctx.lineJoin = 'round';
             this.ctx.lineCap = "round";
             var mousePos = this.getMousePosition(e);
-            //var len = points.length;
             var temp = this.ctx;
             this.points.push(mousePos);
             switch(this.toolType){
@@ -305,7 +299,8 @@ export default {
                 var tmp = this.ctx;
                 tmp.beginPath();
                 tmp.moveTo(this.points[0][0], this.points[0][1]);
-                for (var i = 1; i < this.points.length - 2; i++) {
+                let i;
+                for (i = 1; i < this.points.length - 2; i++) {
                     var c = (this.points[i][0] + this.points[i + 1][0]) / 2;
                     var d = (this.points[i][1] + this.points[i + 1][1]) / 2;
                 

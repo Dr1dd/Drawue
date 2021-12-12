@@ -7,34 +7,37 @@ const { verifyToken } = require("../verifyToken");
 
 const router = express.Router();
 
+const findUsers = function (res, user_list, comments) {
+    User.find({_id: {$in: user_list} }, (user_error, users)=>{
+        if(user_error) console.log(user_error);
+        if(users){
+            const mapUsersAndComments = async () => {
+                return Promise.all(comments.map(x => {
+                    return users.map(y => {
+                        if (JSON.stringify(y._id) == JSON.stringify(x.userID)) {
+                            return {comment:x, username:y.username, profilePic:y.profilePic};
+                        }
+                    });
+                }));
+            };
+            mapUsersAndComments().then((merged)=>{
+                const fixedArray = merged.map(x => x[0]);
+                fixedArray.forEach(function (comment) {
+                    comment.expanded = true;
+                });
+                res.status(200).send({ 'commentArray': fixedArray });
+            });
+        }
+    })
+    .select({ "username": 1, "_id": 1, "profilePic": 1});
+}
 router.post('/', verifyToken, async (req, res) => {
     await Comments.find({postID: req.body.postID}, (err, comments)=>{
         if(err) console.log(err);
         else{
-            let result = comments.map(a => a.userID);
-            User.find({_id: {$in: result}, }, (err, users)=>{
-                if(err) console.log(err);
-                if(users){
-                    //console.log(comments);
-                    const getData = async () => {
-                        return Promise.all(comments.map(x => {
-                            return users.map(y => {
-                                if (JSON.stringify(y._id) == JSON.stringify(x.userID)) {
-                                    return {comment:x, username:y.username, profilePic:y.profilePic};
-                                }
-                            });
-                        }));
-                    };
-                    getData().then((merged)=>{
-                        const fixedArray = merged.map(x => x[0]);
-                        fixedArray.forEach(function (comment) {
-                            comment.expanded = true;
-                        });
-                        res.status(200).send({'commentArray': fixedArray});
-                    });
-                }
-            })
-            .select({ "username": 1, "_id": 1, "profilePic": 1});
+            let user_list = comments.map(a => a.userID);
+            findUsers(res, user_list, comments);
+            
         }
     });
 

@@ -53,10 +53,10 @@ export default {
             required,
             strongPassword(password) {
                 return (
-                /[a-z]/.test(password) && 
-                /[0-9]/.test(password) && 
-                /\W|_/.test(password) && 
-                password.length >= 8
+                    /[a-z]/.test(password) && 
+                    /\d/.test(password) && 
+                    /\W|_/.test(password) && 
+                    password.length >= 8
                 );
             },
             maxLength: maxLength(100),   
@@ -91,8 +91,6 @@ export default {
         if(token.length!=64) this.message = 'Password reset token is invalid or has expired.';
         else{
             axios.post('/api/auth/account-recovery/valid', { token }, {})
-            .then(()=>{
-            })
             .catch((err)=>{
                 this.message = err.response.data.errorMessage;
             });

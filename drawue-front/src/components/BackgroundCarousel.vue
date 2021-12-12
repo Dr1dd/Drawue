@@ -8,7 +8,6 @@
         <div class="bg-color" :style="{'background': color}" @click="changeCanvasBg(color)">
         </div>
     </swiper-slide>
-    <!-- <div class="swiper-pagination bullet" slot="pagination" /> -->
   </swiper>
 </template>
 

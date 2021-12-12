@@ -148,7 +148,7 @@ export default {
             var sort = this.sort;
             axios.post(this.axiosUrl, {skip, tags, filter, sort})
                 .then((res)=>{
-                    if(res.data.notFound == true) this.postLimit = true;
+                    if(res.data.notFound) this.postLimit = true;
                     var filtered;
                     var allDrawings
                     switch(this.personal){
@@ -268,7 +268,6 @@ $module-theme: #86a1b8;
     }
     .sort-container{
         display: flex;
-        position: relative;
         right: 20px;
         bottom: 5px;
         position: absolute;

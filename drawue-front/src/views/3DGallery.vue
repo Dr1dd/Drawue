@@ -40,7 +40,6 @@
 
 <script>
 import * as THREE from "three";
-// import {FirstPersonControls} from "three/examples/jsm/controls/FirstPersonControls"
 import {PointerLockControls} from "three/examples/jsm/controls/PointerLockControls"
 import axios from 'axios';
 export default {
@@ -187,7 +186,6 @@ export default {
                     mesh.rotation.y += Math.PI/2;
                     mesh.position.set(-room_x/2+0.05, 2, -3.5-((room_z-5)/(l/3)*(i%(2*l/3))));
                 }
-                //mesh.rotation.z -= Math.PI;
                 this.scene.add(mesh);
                 objects.push(mesh);
             }
@@ -212,7 +210,6 @@ export default {
             var time = performance.now();
             this.performance = time;
             this.objects = [...objects];
-            //this.meshFloor = meshFloor;
 
 
         },
@@ -276,19 +273,17 @@ export default {
             const baseFilename = basePath + filename;
             const fileType = ".jpg";
             const sides = ["ft", "bk", "up", "dn", "rt", "lf"];
-            const pathStings = sides.map(side => {
+            return sides.map(side => {
                 return baseFilename + "_" + side + fileType;
             });
-            return pathStings;
         },
         createMaterialArray: function(filename) {
             const skyboxImagepaths = this.createPathStrings(filename);
-            const materialArray = skyboxImagepaths.map(image => {
+            return skyboxImagepaths.map(image => {
                 image = require(`@/${image}`)
                 let texture = new THREE.TextureLoader().load(image);
                 return new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
             });
-            return materialArray;
         },
         onWindowResize() {
 
@@ -381,7 +376,6 @@ export default {
             }
             else {
                 this.intersects = false;
-                selectedDrawing = '';
             }
             this.selectedDrawingInfo = selectedDrawing;
         }
@@ -472,12 +466,7 @@ export default {
         padding: 10px 0;
         word-break: break-all;
     }
-    .drawing-author{
 
-    }
-    .like-count{
-
-    }
 }
 .stats{
     display: flex;
@@ -497,12 +486,6 @@ export default {
         padding: 3px 5px;
         background: #eef7ff;
         border-left: 5px solid #bad7f1;
-        .drawing-author{
-
-        }
-        .like-count{
-
-        }
     }
 
 }

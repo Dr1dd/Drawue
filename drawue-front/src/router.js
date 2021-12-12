@@ -86,7 +86,6 @@ const routes = [
             var username = store.getters.getUsername;
             if(username == to.params.username) next({name: 'Profile'});
             else next();
-           // next();
 
         }
     },

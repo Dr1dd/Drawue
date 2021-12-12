@@ -322,7 +322,6 @@ $module-theme: #86a1b8;
         display: flex;
         flex-direction: column;
         min-height: 100px;  
-        align-items: flex-start;
         border-bottom: 2px solid #f1f1f1;
         align-items: center;
         .resize-comment{

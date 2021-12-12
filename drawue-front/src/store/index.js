@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import router from '../router';
-// import router from '../router';
 
 Vue.use(Vuex);
 
@@ -67,13 +66,10 @@ export default new Vuex.Store({
         },
         Logout({ commit }){
             axios.get('/api/auth/logout')
-            .then(() => {
-                commit('SET_STATE', false);
-                router.push({path:'/'});
-            })
-            .catch(() =>{
-                
-            })
+                .then(() => {
+                    commit('SET_STATE', false);
+                    router.push({ path: '/' });
+                });
         },
         UpdateProfilePic( {commit, path} ){
             commit('SET_PROFILE_PIC', path);

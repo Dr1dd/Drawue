@@ -137,7 +137,7 @@ export default {
             if(this.isPublishing && this.isPublishing!=undefined){
                 var modal = document.getElementsByClassName('save-modal');
                 if(!modal.contains(e.target)){
-                    this.closeModal;
+                    this.closeModal();
                 }
             }
         });
@@ -382,7 +382,6 @@ a{
     display: flex;
     max-width: 400px;
     width: 400px;
-    margin-top: 15px;
     margin: 0 auto;
     flex: 2;
     .drawing-img{
@@ -496,7 +495,6 @@ a{
             margin: 0;
             padding: 0px;
             margin-left: 5px;
-            width: 100%;
             flex: 1;
             width: inherit;
             min-width: 50px;     
@@ -512,7 +510,6 @@ a{
     position: absolute;
     left: 0;
     right: 0;
-    margin-bottom: -4px;
     bottom: -3px;
     margin: 0 auto;
     color: red;

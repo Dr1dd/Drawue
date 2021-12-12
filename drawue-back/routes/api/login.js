@@ -5,7 +5,8 @@ const { User, validateLogin } = require('../../models/user');
 const express = require('express');
 const router = express.Router();
 
- 
+const maxAccessTokenAge = 1000 * 60 * 2;
+const maxRefreshTokenAge = 1000 * 60 * 60 * 24 * 7;
 router.post('/', async (req, res) => {
     // First Validate The HTTP Request
     const { error } = validateLogin(req.body);
@@ -18,7 +19,6 @@ router.post('/', async (req, res) => {
     if (!user) {
         return res.status(400).send('Incorrect username or password.');
     }
-    // if(user.emailConfirmed==false) return res.status(400).send('Please confirm your email address before logging in.');
 
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
@@ -27,11 +27,11 @@ router.post('/', async (req, res) => {
     const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'), {expiresIn: '1m'});
     const refreshToken = jwt.sign({ _id: user._id }, config.get('PrivateKey2'), {expiresIn: '7d'});
     res.cookie('access-token', token,{
-        maxAge: 1000*60*2,
+        maxAge: maxAccessTokenAge,
         httpOnly: true,
     })
     res.cookie('refresh-token', refreshToken,{
-        maxAge: 1000*60*60*24*7,
+        maxAge: maxRefreshTokenAge,
         httpOnly: true,
     })
     res.status(200).send("Authorized");

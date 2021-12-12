@@ -12,7 +12,8 @@ const DIRTemp = './uploads/drawings/temp';
 const DIR = './uploads/drawings';
 rug.setAdjectives(['pic', 'random', 'gen', 'drawing', 'draw', 'drawer', 'drew', 'art', 'Artistic', 'image']);
 rug.setSeperator('');
-
+const maxFileSize = 5000000;
+const maxNumOfPosts = 15;
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, DIRTemp);
@@ -25,14 +26,9 @@ const storage = multer.diskStorage({
   });
 const imageFilterHelper = function(req, file, cb) {
     // Accept images only
-    // if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
-    //     return cb(new Error('Only image files are allowed!'), false);
-    // }
-    // console.log(req);
-    if(file.size >5000000){
+    if(file.size > maxFileSize){
         return cb(new Error('File size should not exceed 5MB'), false);
     }
-    if(file)
     cb(null, true);
 };
 var upload = multer({
@@ -46,8 +42,8 @@ const checkPostLimit = (req, res, next) =>{
      if(err){
       return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
      }
-     if(count <15) next();
-     else return res.status(400).send({'error':'Maximum number (15) of drawing posts has been reached.'});
+     if(count <maxNumOfPosts) next();
+     else return res.status(400).send({'error':'Maximum number ('+maxNumOfPosts+') of drawing posts has been reached.'});
    });
   }
   else return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
@@ -75,10 +71,10 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
                 console.log(err);
                 return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
             }
-            await User.findOne({_id: req.user._id}, (err, user)=>{
+            await User.findOne({_id: req.user._id}, (user_err, user)=>{
               var tags = req.body.tags.split(",");
-              if(err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
-                drawing = new Drawings({
+              if(user_err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
+                let drawing = new Drawings({
                     userID: req.user._id,
                     username: user.username,
                     title: req.body.title,
@@ -93,18 +89,18 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
                         user.save().then(()=>{
                           return res.status(200).send({'success': 'Your drawing has been successfully published!'});
                         })
-                        .catch((err)=>{
-                          console.log(err);
+                        .catch((user_save_error)=>{
+                          console.log(eruser_save_errorr);
                         })
                     })
-                    .catch((err)=>{
-                        fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (err) => {
-                            if (err) {
-                              console.error(err)
+                    .catch((drawing_save_error)=>{
+                        fs.unlink(DIR +'/'+ req.body.resolution +'/'+ filename, (image_deletion_error) => {
+                            if (image_deletion_error) {
+                              console.error(image_deletion_error)
                               return
                             }
                           })
-                        console.log(err);
+                        console.log(drawing_save_error);
                         return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
                     });
             });

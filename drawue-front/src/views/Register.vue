@@ -123,7 +123,7 @@ export default {
                 strongPassword(password) {
                     return (
                     /[a-z]/.test(password) && 
-                    /[0-9]/.test(password) && 
+                    /\d]/.test(password) && 
                     /\W|_/.test(password) && 
                     password.length >= 8
                     );
@@ -146,11 +146,11 @@ export default {
                 return;
             }
             this.loading = true;
-            var username = this.user.username;
-            var email = this.user.email;
-            var password = this.user.password;
-            var confirmPassword = this.user.passwordConfirm;
-            axios.post('/api/auth/register', {username, email, password, confirmPassword }, {})
+            let username = this.user.username;
+            let user_email = this.user.email;
+            let password = this.user.password;
+            let confirmPassword = this.user.passwordConfirm;
+            axios.post('/api/auth/register', {username, user_email, password, confirmPassword }, {})
                 .then((res) => {
                    this.loading = false;
                    if (res.data) {
@@ -163,9 +163,9 @@ export default {
                 });
         },
         resendEmail(){
-            var email = this.user.email;
+            let user_email = this.user.email;
             this.loading = true;
-            axios.post('/api/auth/register/resend', { email }, {})
+            axios.post('/api/auth/register/resend', { user_email }, {})
             .then((res) => {
                 if (res.data) {
                     this.successMessage = res.data.successSend;

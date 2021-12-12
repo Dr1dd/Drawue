@@ -7,6 +7,7 @@ var fs = require('fs');
 const router = express();
 
 const DIR = './uploads/profile-pics';
+const maxFileSize = 5000000;
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,10 +23,9 @@ const imageFilterHelper = function(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
         return cb(new Error('Only image files are allowed!'), false);
     }
-    if(file.size >5000000){
+    if(file.size > maxFileSize){
         return cb(new Error('File size should not exceed 5MB'), false);
     }
-    if(file)
     cb(null, true);
 };
 var upload = multer({
@@ -89,10 +89,8 @@ router.post('/', [verifyToken, upload.single('file')], async (req, res) => {
         return res.status(400).send('Session not found. Please try to re-login.');
     }
 
-    }, (error, req, res, next) =>{
-        res.status(400).send({error: error.message});
-    
-    
-    
+},
+(error, req, res, next) => {
+    res.status(400).send({error: error.message});
 });
 module.exports = router;
