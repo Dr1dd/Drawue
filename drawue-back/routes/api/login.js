@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     if (error) {
         return res.status(400).send(error.details[0].message);
     }
-    let validated_username_or_email = req.body.username_email;
+    let validated_username_or_email = req.body.username_email.toString();
  
     //  Now find the user by their email address
     let user = await User.findOne({$or: [{ username: validated_username_or_email}, {email: validated_username_or_email}]});

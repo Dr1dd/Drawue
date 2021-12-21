@@ -69,7 +69,7 @@ function getCommentedPosts(req, res, skip, limit, posts, result) {
 }
 router.post('/post-info', verifyToken, (req, res) => {
     let drawing_id;
-    if (ObjectID.isValid(req.body.drawingID)) drawing_id = req.body.drawingID;
+    if (ObjectID.isValid(req.body.drawingID)) drawing_id = req.body.drawingID.toString();
     else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
     Drawings.findOne({_id: drawing_id }, (drawings_error, post)=>{
         if(drawings_error){
@@ -77,7 +77,7 @@ router.post('/post-info', verifyToken, (req, res) => {
         }
         var likeStatus;
         if(req.user){
-            Likes.countDocuments({postID: drawing_id, userID: req.user._id }, (likes_error, count)=>{
+            Likes.countDocuments({postID: drawing_id, userID: req.user._id.toString() }, (likes_error, count)=>{
                 if(count == 0) likeStatus =false;
                 else likeStatus =true;
                 return res.send({'drawingPost': post, 'likeStatus': likeStatus});

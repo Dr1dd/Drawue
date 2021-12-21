@@ -149,35 +149,38 @@ export default {
             axios.post(this.axiosUrl, {skip, tags, filter, sort})
                 .then((res)=>{
                     if(res.data.notFound) this.postLimit = true;
-                    var filtered;
-                    var allDrawings
-                    switch(this.personal){
-                        case 'liked':
-                            allDrawings = [...res.data.drawingPosts];
-                            if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
-                            filtered = allDrawings.filter((drawing) => this.likedPosts.includes(drawing._id));
-                            this.drawings.push(...filtered);
-                            break;
-                        case 'commented':
-                            if(res.data.commentedPosts) {
-                                allDrawings = [...res.data.drawingPosts];
-                                if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
-                                var commentedPosts = [...res.data.commentedPosts];
-                                filtered = allDrawings.filter((drawing) => commentedPosts.includes(drawing._id));
-                                this.drawings.push(...filtered);
-                            }
-                            break;
-                        case 'default':
-                            if(res.data.drawingPosts) this.drawings.push(...res.data.drawingPosts);
-                            if(res.data.likedPosts) this.likedPosts.push(...res.data.likedPosts);
-                            break;
-                  }
+                    this.filterDrawings(res.data);
                     this.loading=false;
                })
                 .catch((err)=>{
                     console.log(err.response);
                     this.loading=false;
                 })
+        },
+        filterDrawings(data){
+            let allDrawings = [];
+            let filtered = [];
+             switch(this.personal){
+                case 'liked':
+                    allDrawings = [...data.drawingPosts];
+                    if(data.likedPosts) this.likedPosts.push(...data.likedPosts);
+                    filtered = allDrawings.filter((drawing) => this.likedPosts.includes(drawing._id));
+                    this.drawings.push(...filtered);
+                    break;
+                case 'commented':
+                    if(data.commentedPosts) {
+                        allDrawings = [...data.drawingPosts];
+                        if(data.likedPosts) this.likedPosts.push(...data.likedPosts);
+                        var commentedPosts = [...data.commentedPosts];
+                        filtered = allDrawings.filter((drawing) => commentedPosts.includes(drawing._id));
+                        this.drawings.push(...filtered);
+                    }
+                    break;
+                case 'default':
+                    if(data.drawingPosts) this.drawings.push(...data.drawingPosts);
+                    if(data.likedPosts) this.likedPosts.push(...data.likedPosts);
+                    break;
+            }
         },
         getTags(){
             axios.get('/api/posts/get-tags')

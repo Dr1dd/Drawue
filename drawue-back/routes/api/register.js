@@ -13,9 +13,10 @@ router.post('/', async (req, res) => {
     if (error) {
         return res.status(400).send(error.details[0].message);
     }
-    let validated_username = req.body.username;
-    let validated_email = req.body.email;
-    if(req.body.password != req.body.confirmPassword) return res.status(400).send({'passwordConfirm': 'Passwords do not match!'});
+    let validated_username = req.body.username.toString();
+    let validated_email = req.body.email.toString();
+    let passwordMissMatchMessage = 'Passwords do not match!';
+    if(req.body.password != req.body.confirmPassword) return res.status(400).send({'passwordConfirm': passwordMissMatchMessage});
     let user = await User.findOne({$or: [{ username: validated_username}, {email: validated_email}]});
     if(user){
        userTaken(user, validated_username, validated_email, res);
@@ -32,9 +33,9 @@ function userTaken(user, username, email, res) {
 }
 async function createUser(req, res) {
     let new_user = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
+        username: req.body.username.toString(),
+        email: req.body.email.toString(),
+        password: req.body.password.toString(),
         profilePic: 'default-user.png',
         emailConfirmed: false,
     });
@@ -48,7 +49,7 @@ async function createUser(req, res) {
     });
 }
 router.post('/resend', async (req, res) => {
-    let user_email = req.body.email;
+    let user_email = req.body.email.toString();
     let user = await User.findOne({ email: user_email });
     if(!user) res.send({"successSend": "User was not found"});
     jwt.sign({_id: user._id}, config.get('Email_Secret'),{expiresIn: '1d'}, (err, emailToken)=>{     

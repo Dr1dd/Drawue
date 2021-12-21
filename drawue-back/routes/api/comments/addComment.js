@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', verifyToken, async (req, res) => {
     let post_id;
-    if (ObjectID.isValid(req.body.postID)) post_id = req.body.postID;
+    if (ObjectID.isValid(req.body.postID)) post_id = req.body.postID.toString();
     else res.status(400).send({'status': 'error', 'message': 'Invalid post ID'});
     let comment = new Comments({
         postID: req.body.postID,
@@ -31,7 +31,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 router.post('/reply', verifyToken, async (req, res) => {
     let comment_id;
-    if (ObjectID.isValid(req.body.commentID)) comment_id = req.body.commentID;
+    if (ObjectID.isValid(req.body.commentID)) comment_id = req.body.commentID.toString();
     else res.status(400).send({'status': 'error', 'message': 'Invalid comment ID'});
     await Comments.findOne({_id: comment_id}, (comment_error, comment)=>{
         if(comment_error) console.log(comment_error);

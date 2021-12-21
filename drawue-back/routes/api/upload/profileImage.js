@@ -88,15 +88,13 @@ async function replaceFile(file, oldFileName) {
     fs.unlink('./uploads/profile-pics/'+file.filename, (err) => {
         if (err) {
             console.error(err)
-            return
         }
     });
     if (fs.existsSync('./uploads/profile-pics/'+oldFileName)){
         if(oldFileName!="default-user.png"){
-            fs.unlink('./uploads/profile-pics/'+oldFileName, (err) => {
-                if (err) {
-                    console.error(err)
-                    return
+            fs.unlink('./uploads/profile-pics/'+oldFileName, (file_err) => {
+                if (file_err) {
+                    console.error(file_err)
                 }
             });
         }

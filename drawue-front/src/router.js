@@ -107,12 +107,7 @@ const routes = [
         name: "Gallery3D",
         component: () => import('./views/3DGallery')
     },
-    {
-        path: '/404',
-        alias: '*',
-        name: "Error",
-        component: () => import("./views/Error"),
-    },
+
 ];
 const router = new VueRouter({
     base: '/',

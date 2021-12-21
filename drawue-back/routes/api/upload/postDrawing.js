@@ -50,13 +50,13 @@ const checkPostLimit = (req, res, next) =>{
 };
 
 router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (req, res) => {
-  let resolution = req.body.resolution;
+  let resolution = req.body.resolution.toString();
     if(req.user){
         const file = req.file
         if (!file) {
             return res.status(400).send({'error': 'Failed to upload the file.'});
         }
-        var filename = req.file.filename;
+        var filename = req.file.filename.toString();
         var path = DIR +'/'+ resolution +'/'+ filename;
         try {
           while (fs.existsSync(DIR +'/'+ resolution +'/'+ filename)) {
@@ -74,7 +74,7 @@ router.post('/', [verifyToken, checkPostLimit, upload.single('file')], async (re
     res.status(400).send({'error': error.message})
 });
 async function uploadPostDrawing(path, filename, req, res) {
-    let resolution = req.body.resolution;
+    let resolution = req.body.resolution.toString();
       fs.rename(DIRTemp +'/'+ filename, path, async function (err) {
         if (err) {
             console.log(err);
@@ -84,11 +84,11 @@ async function uploadPostDrawing(path, filename, req, res) {
           var tags = req.body.tags.split(",");
           if(user_err)  return res.status(400).send({'error':'An error occurred while trying to publish the drawing.'});
           let drawing = new Drawings({
-              userID: req.user._id,
+              userID: req.user._id.toString(),
               username: user.username,
-              title: req.body.title,
-              description: req.body.description,
-              drawing_path: resolution+'/'+file.filename,
+              title: req.body.title.toString(),
+              description: req.body.description.toString(),
+              drawing_path: resolution+'/'+file.filename.toString(),
               tags: tags,
           });
           saveDrawing(drawing, user, res, req);
@@ -96,7 +96,7 @@ async function uploadPostDrawing(path, filename, req, res) {
     });
 }
 function saveDrawing(drawing, user, res, req) {
-  let resolution = req.body.resolution;
+  let resolution = req.body.resolution.toString();
   drawing.save()
     .then(()=>{
       if(user.drawing_counter == null || user.drawing_counter == undefined) user.drawing_counter = 1;

@@ -46,7 +46,7 @@
                                     <span class="reply-text" contenteditable="true" name="comment"></span>
                                     <transition name="drop-down">
                                         <div class="comment-edit--overlay">
-                                            <div class="send-icon" @click="sendReply(currentReply[0].comment._id, currentReply[0].comment.postID)">
+                                            <div class="send-icon" @click="sendReply($event, currentReply[0].comment._id, currentReply[0].comment.postID)">
                                                 <svg width="536" height="536" viewBox="0 0 536 536" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <g clip-path="url(#clip0)">
                                                     <path d="M0 457.82C0 476.486 19.0853 489.071 36.2419 481.718L535.5 267.75L36.2418 53.7822C19.0853 46.4294 0 59.0142 0 77.68V193.987C0 207.018 9.64679 218.036 22.5637 219.758L382.5 267.75L22.5638 315.741C9.64681 317.464 0 328.482 0 341.513V457.82Z" fill="#86A1B8"/>
@@ -113,7 +113,7 @@ export default {
         this.comments = this.commentArray;
     },
     methods:{
-        sendReply(commentID, postID){
+        sendReply(event, commentID, postID){
                 if(this.getLoginState){
                     var textArea = event.target.closest('.text-area');
                     var text = textArea.firstChild.textContent;

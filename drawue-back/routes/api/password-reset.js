@@ -10,7 +10,7 @@ router.post('/', async (req, res) =>{
     if (error) {
         return res.status(400).send({"sendError": error.details[0].message});
     }
-    let validated_email = req.body.restoreEmail;
+    let validated_email = req.body.restoreEmail.toString();
     User.findOne({email: validated_email}, function(user_err, user){
         if(!user){
             res.status(400).send({"sendError": "No Account with that email found."});
@@ -53,7 +53,7 @@ router.post('/reset', async (req, res) =>{
     }
     const salt = await bcrypt.genSalt(10);
     pass = await bcrypt.hash(pass, salt);
-    let reset_token = req.body.token;
+    let reset_token = req.body.token.toString();
     User.findOne({ resetPasswordToken: reset_token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
         if (!user) {
             res.send({ errorMessage: "Password reset token is invalid or has expired."});
@@ -75,7 +75,7 @@ router.post('/reset', async (req, res) =>{
   });
 });
 router.post('/valid', async (req, res) => {
-    let reset_token = req.body.token;
+    let reset_token = req.body.token.toString();
     User.findOne({ resetPasswordToken: reset_token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
         if (!user) {
             res.status(400).send({ errorMessage: "Password reset token is invalid or has expired."});

@@ -277,7 +277,7 @@ export default {
             .catch((err) => {
                 this.successMessage = err.response.data
             });
-        }
+        },
     },
     mounted(){
         this.getDrawings();
@@ -289,7 +289,7 @@ export default {
         uploadErrorMessage: function(){
             if(this.uploadErrorMessage!=''){
                 setTimeout(()=> {
-                    return this.uploadErrorMessage = '';
+                    this.uploadErrorMessage = '';
                 }, 3000);
             }
      
@@ -297,7 +297,7 @@ export default {
         successMessage: function(){
               if(this.successMessage!=''){
                 setTimeout(()=> {
-                    return this.successMessage = '';
+                    this.successMessage = '';
                 }, 2000);
             }
         }

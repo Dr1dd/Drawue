@@ -13,8 +13,8 @@ router.get("/", async (req, res) => {
             return tag._id !='';
           });
         var filteredArray = [];
-        for (var i = 0; i < filtered.length; i++) {
-            filteredArray.push(filtered[i]._id);
+        for (let filtered_tag of filtered) {
+            filteredArray.push(filtered_tag._id);
         }
         return res.status(200).send({'tagArray': filteredArray});
     }).limit(11);
