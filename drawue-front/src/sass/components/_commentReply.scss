@@ -1,0 +1,125 @@
+$module-theme: #86a1b8;
+@mixin replying{
+    display: block;
+    border-top: 2px solid #f1f1f1;
+    margin-top: 5px;
+    padding-top: 5px;
+    .comment-reply{
+        float: right;
+    }
+    .write-reply{
+        position: relative;
+        display: flex;
+        min-height: 50px;
+        max-height: 400px;
+        box-sizing: border-box;
+        padding: 7px 7px 7px 7px;
+        .user-img{
+            display: flex;
+            align-self: center;
+            img{
+                height: 36px;
+                width: 36px;
+                border-radius: 50%;
+                border: 1px solid #eeeeee;
+            }
+        }
+    }
+    .comment-input{
+        width: 92%;
+    }
+    .comment-edit--overlay{
+        background: initial;
+        transform: translateY(0);
+        position: initial;
+        width: initial;
+        height: initial;
+
+    }
+    .send-icon{
+        position: initial;
+        right: -15px;
+        bottom: 0px;
+    }
+    .text-area{
+        .reply-text{
+            box-sizing: border-box;
+            min-height: 35px;
+            max-height: 150px;
+            max-width: 97%;
+            border-radius: 8px;
+            border: 2px solid #d6dbda;
+            width: 100%;
+            margin: 0;
+            z-index: 2;
+            padding: 5px;
+            word-break: break-word;
+            overflow: auto;
+            &:focus{
+                outline: none;
+                box-shadow: 0px 0px 0px 0px;
+            }
+        }
+    }
+}
+@mixin comment-interact{
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding-bottom: 5px;
+    .comment-reply{
+        height: 20px;
+        width: 20px;
+        padding-right: 15px;
+        cursor: pointer;
+        svg{
+            fill: $module-theme;
+            height: 100%;
+            width: 100%;
+        }
+    }
+    .close-reply{
+        position: relative;
+        height: 20px;
+        width: 20px;
+        div{
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: $module-theme;
+            transform: rotate(45deg);
+            right: 0;
+            left: 0;
+            margin: 0 auto;
+        }
+        div:nth-child(2){
+            transform: rotate(-45deg);
+        }
+    }
+}
+@mixin minimized{
+    flex-direction: row-reverse;
+    width: 100%;
+    min-height: 40px;
+    .comment-wrapper{
+        padding: 0 0 0 15px;
+    }
+    .comment-author--container{
+        flex-direction: row;
+        img{
+            height: 24px;
+            width: 24px;
+            border: 2px solid #eeeeee;
+        }
+        .comment-author{
+            margin: 5px 10px;
+        }
+    }
+}
+@mixin replyError{
+    position: absolute;
+    bottom: -3px;
+    font-size: 12px;
+    left: 7rem;
+    color: #ff5454;
+}
