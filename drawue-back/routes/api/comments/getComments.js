@@ -21,7 +21,8 @@ const findUsers = function (res, user_list, comments) {
                     });
                 }));
             };
-            mapUsersAndComments().then((merged)=>{
+            mapUsersAndComments().then((merged) => {
+                console.log(merged)
                 const fixedArray = merged.map(x => x[0]);
                 fixedArray.forEach(function (comment) {
                     comment.expanded = true;
@@ -30,7 +31,7 @@ const findUsers = function (res, user_list, comments) {
             });
         }
     })
-    .select({ "username": 1, "_id": 1, "profilePic": 1});
+    .select({ "username": 1, "_id": 1, "profilePic": 1}).lean();
 }
 router.post('/', verifyToken, async (req, res) => {
     let post_id;
@@ -41,9 +42,8 @@ router.post('/', verifyToken, async (req, res) => {
         else{
             let user_list = comments.map(a => a.userID);
             findUsers(res, user_list, comments);
-            
         }
-    });
+    }).lean();
 
 });
 module.exports = router;
